@@ -126,6 +126,19 @@
       background: rgba(255, 252, 245, 0.9);
       border: 1px dashed rgba(0,0,0,0.12);
       box-shadow: 0 2px 0 rgba(0,0,0,0.06);
+      position: relative;
+    }
+
+    .dialogueBox::after {
+      content: "";
+      position: absolute;
+      top: -8px;
+      right: 24px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid rgba(255, 252, 245, 0.9);
     }
 
     #customerAvatar {
@@ -150,6 +163,8 @@
       margin-top: 18px;
       margin-left: 24px;
       min-height: 110px;
+      transform: scale(1.3);
+      transform-origin: top left;
     }
 
     .cone {
@@ -379,15 +394,29 @@
       inset: 0;
       background: radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
                   rgba(0,0,0,0.3);
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       padding: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #shopOverlay.active {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     #shopPanel {
       max-width: 520px;
       width: 100%;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    #shopOverlay.active #shopPanel {
+      transform: translateY(0);
     }
 
     .shop-item {
@@ -415,6 +444,341 @@
       font-size: 0.9rem;
     }
 
+    /* --- Timer bar --- */
+    #timerBarContainer {
+      width: 100%;
+      height: 8px;
+      background: rgba(0,0,0,0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    #timerBar {
+      height: 100%;
+      width: 0%;
+      background: var(--good);
+      border-radius: 999px;
+      transition: width 1s linear, background-color 0.5s ease;
+    }
+
+    #timerBar.warning {
+      background: #ff9800;
+    }
+
+    #timerBar.danger {
+      background: var(--bad);
+    }
+
+    /* --- Customer progress dots --- */
+    #customerProgress {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.1);
+      transition: background 0.3s ease;
+    }
+
+    .progress-dot.served {
+      background: var(--good);
+      border-color: rgba(0,0,0,0.15);
+    }
+
+    .progress-dot.current {
+      background: var(--accent-3);
+      border-color: rgba(0,0,0,0.2);
+      box-shadow: 0 0 4px rgba(248, 230, 160, 0.6);
+    }
+
+    /* --- Flavour swatches --- */
+    .flavour-swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    /* --- Day-end overlay --- */
+    #dayEndOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.7), transparent 70%),
+                  rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    #dayEndOverlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #dayEndPanel {
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.4s ease;
+    }
+
+    #dayEndOverlay.active #dayEndPanel {
+      transform: scale(1);
+    }
+
+    /* --- Order tabs (multi-ice-cream) --- */
+    .order-tab {
+      padding: 4px 10px;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-bottom: none;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.15s;
+    }
+    .order-tab:hover {
+      background: rgba(255,255,255,0.8);
+    }
+    .order-tab.active {
+      background: rgba(255,255,255,0.95);
+      font-weight: 600;
+      border-color: rgba(0,0,0,0.15);
+    }
+    .order-tab .tab-status {
+      margin-left: 4px;
+      font-size: 0.7rem;
+    }
+
+    /* --- Customer patience avatar states --- */
+    .avatar-neutral {
+      background: radial-gradient(circle at 30% 30%, #ffe4c0 0, #e0a040 60%) !important;
+    }
+    .avatar-impatient {
+      background: radial-gradient(circle at 30% 30%, #ffc8c8 0, #d05050 60%) !important;
+      animation: shake 0.3s infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      75% { transform: translateX(2px); }
+    }
+
+    /* --- Ingredient bar & topping tiles --- */
+    .ingredient-bar {
+      display: flex;
+      gap: 8px;
+      background: linear-gradient(to bottom, #f5ede0, #e8ddd0);
+      border-radius: 12px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+
+    .topping-tile {
+      width: 70px;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 0.72rem;
+      padding: 4px 2px;
+      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+      filter: saturate(0.6);
+      position: relative;
+    }
+
+    .topping-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+    .topping-tile.selected {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(247, 196, 200, 0.5);
+      filter: saturate(1);
+      border-color: rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.95);
+    }
+
+    .topping-tile[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+      filter: saturate(0.3);
+    }
+
+    .topping-tile .tile-badge {
+      display: none;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--good);
+      color: #fff;
+      font-size: 0.6rem;
+      border-radius: 999px;
+      padding: 1px 5px;
+      font-weight: 600;
+    }
+
+    .topping-tile.selected .tile-badge {
+      display: block;
+    }
+
+    .topping-illust {
+      width: 40px;
+      height: 40px;
+      position: relative;
+    }
+
+    /* Sprinkles illustration: colored dots */
+    .topping-illust-sprinkles::before {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      top: 12px;
+      left: 10px;
+      background: #ff5f7e;
+      box-shadow:
+        8px -6px 0 #4ea6ff,
+        16px 2px 0 #ffe040,
+        4px 8px 0 #4caf50,
+        14px 10px 0 #ff8bb0,
+        -2px 2px 0 #7ad6ff,
+        20px -2px 0 #ff5f7e,
+        10px 14px 0 #ffe040;
+    }
+
+    /* Flake illustration: brown rectangle rotated */
+    .topping-illust-flake::before {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 32px;
+      background: linear-gradient(135deg, #8B6914, #5B3B15);
+      border-radius: 2px;
+      top: 4px;
+      left: 16px;
+      transform: rotate(15deg);
+      box-shadow: inset 1px 0 0 rgba(255,255,255,0.2);
+    }
+
+    /* Caramel drizzle: golden wavy shape */
+    .topping-illust-caramel::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 10px;
+      background: #DAA520;
+      border-radius: 40% 60% 50% 40%;
+      top: 10px;
+      left: 6px;
+      transform: rotate(-8deg);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+    .topping-illust-caramel::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 8px;
+      background: #DAA520;
+      border-radius: 50% 40% 60% 40%;
+      top: 22px;
+      left: 10px;
+      transform: rotate(10deg);
+      opacity: 0.8;
+    }
+
+    /* Chocolate sauce: dark brown wavy shape */
+    .topping-illust-choc_sauce::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 10px;
+      background: #3B1E08;
+      border-radius: 40% 60% 50% 40%;
+      top: 10px;
+      left: 6px;
+      transform: rotate(-8deg);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    }
+    .topping-illust-choc_sauce::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 8px;
+      background: #3B1E08;
+      border-radius: 50% 40% 60% 40%;
+      top: 22px;
+      left: 10px;
+      transform: rotate(10deg);
+      opacity: 0.8;
+    }
+
+    /* --- Notepad --- */
+    #notepadPanel {
+      margin-top: 8px;
+    }
+    #notepadPanel .notepad-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    #notepadPanel .notepad-header strong {
+      margin-right: auto;
+    }
+    .notepad-color-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.15);
+      cursor: pointer;
+      padding: 0;
+      box-shadow: none;
+      transition: transform 0.1s;
+    }
+    .notepad-color-btn:hover {
+      transform: scale(1.15);
+    }
+    .notepad-color-btn.active {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 2px rgba(74,59,52,0.3);
+    }
+    #notepadCanvas {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      background: #fffef6;
+      border: 1px dashed rgba(0,0,0,0.12);
+      cursor: crosshair;
+      touch-action: none;
+      display: block;
+    }
+
     /* --- Utility --- */
     .hidden {
       display: none !important;
@@ -435,11 +799,13 @@
     <div id="topBar">
       <div>
         <div id="dayLabel">Day 1</div>
+        <div id="customerProgress"></div>
         <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
       </div>
       <div>
         <div id="moneyLabel">$0</div>
         <div id="timer"></div>
+        <div id="timerBarContainer"><div id="timerBar"></div></div>
       </div>
     </div>
 
@@ -455,12 +821,25 @@
           <div id="customerVisual" class="ice-cream-visual"></div>
           <div id="customerAvatar"></div>
         </div>
+        <div id="notepadPanel" class="card hidden">
+          <div class="notepad-header">
+            <strong>Notepad</strong>
+            <button class="notepad-color-btn active" data-color="#4a3b34" style="background:#4a3b34"></button>
+            <button class="notepad-color-btn" data-color="#e57373" style="background:#e57373"></button>
+            <button class="notepad-color-btn" data-color="#4caf50" style="background:#4caf50"></button>
+            <button class="notepad-color-btn" data-color="eraser" style="background:#fffef6; border-style:dashed;">&#x1f6ab;</button>
+            <button class="notepad-color-btn" data-color="clear" style="background:#fff; font-size:0.6rem;">CLR</button>
+          </div>
+          <canvas id="notepadCanvas"></canvas>
+        </div>
       </div>
 
       <div class="col">
         <div id="builder" class="card">
           <h2>Your Station</h2>
           <small id="builderHint">When the order disappears, build exactly what they asked for.</small>
+
+          <div id="orderTabs" class="hidden" style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;"></div>
 
           <div style="margin-top:6px;">
             <strong>Ice cream you are building</strong>
@@ -478,8 +857,8 @@
           </div>
 
           <div>
-            <strong>Toppings</strong> <small>(toggle on/off)</small>
-            <div id="toppingButtons" class="btn-row"></div>
+            <strong>Toppings</strong>
+            <div id="toppingButtons"></div>
           </div>
 
           <div id="stations">
@@ -490,8 +869,12 @@
             </div>
             <div class="station" id="station2">
               <div class="station-label">Station B</div>
-              <div class="station-badge">Locked</div>
+              <div class="station-badge" id="station2Badge">Locked</div>
               <div id="station2Desc">Buy an extra station in the shop!</div>
+              <div id="station2Content" class="hidden">
+                <div id="station2Hint" style="margin-top:4px; min-height:30px;"></div>
+                <div id="station2Preview" style="margin-top:4px; display:flex; gap:4px;"></div>
+              </div>
             </div>
           </div>
 
@@ -512,6 +895,17 @@
         <h3>Controls</h3>
         <button id="nextCustomerBtn" class="primary">Start Day 1</button>
         <button id="openShopBtn" disabled>Shop (between days)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day-end overlay -->
+  <div id="dayEndOverlay">
+    <div id="dayEndPanel" class="card">
+      <h2 id="dayEndTitle">Day Complete!</h2>
+      <div id="dayEndStats"></div>
+      <div style="margin-top:10px; text-align:center;">
+        <button id="dayEndContinueBtn" class="primary">Continue to Shop</button>
       </div>
     </div>
   </div>
@@ -539,24 +933,29 @@
 
     let day = 1;
     let money = 0;
-    let customersPerDay = 4;
     let customersServedToday = 0;
 
     let currentOrder = null;
+    let currentOrders = [];
+    let playerOrders = [];
+    let activeOrderIndex = 0;
     let playerOrder = {
       container: null,
       scoops: [],
       toppings: new Set()
     };
     let showPhaseSeconds = 4;
-    let buildPhaseSeconds = 12;
-    let timeLeft = 0;
-    let timerId = null;
+    let dayTimerSeconds = 100;
+    let dayTimeLeft = 0;
+    let dayTimerId = null;
+    let customerBuildStart = null;
     let roundActive = false;
     let inTutorial = true;
     let audioCtx = null;
     let phase = "idle"; // idle | dialogue | build
     let currentCustomerName = null;
+    let hasNotepad = false;
+    let dayEarnings = [];
 
     // ---- DOM refs ----
     const dayLabel = document.getElementById("dayLabel");
@@ -587,6 +986,12 @@
     const shopMoneyEl = document.getElementById("shopMoney");
     const shopItemsEl = document.getElementById("shopItems");
     const shopCloseBtn = document.getElementById("shopCloseBtn");
+    const timerBarEl = document.getElementById("timerBar");
+    const customerProgressEl = document.getElementById("customerProgress");
+    const dayEndOverlay = document.getElementById("dayEndOverlay");
+    const dayEndTitle = document.getElementById("dayEndTitle");
+    const dayEndStats = document.getElementById("dayEndStats");
+    const dayEndContinueBtn = document.getElementById("dayEndContinueBtn");
 
     function setBuilderEnabled(enabled) {
       containerButtonsEl.querySelectorAll("button").forEach(b => b.disabled = !enabled);
@@ -617,11 +1022,22 @@
       setBuilderEnabled(false);
     }
 
+    const flavourColors = {
+      vanilla: "#f0e0ac",
+      chocolate: "#6c3c19",
+      strawberry: "#ff8bb0",
+      mint: "#96d6b3"
+    };
+
     function refreshFlavourButtons() {
       flavourButtonsEl.innerHTML = "";
       allUnlockedFlavours().forEach(f => {
         const btn = document.createElement("button");
-        btn.textContent = labelForFlavour(f);
+        const swatch = document.createElement("span");
+        swatch.className = "flavour-swatch";
+        swatch.style.background = flavourColors[f] || "#ccc";
+        btn.appendChild(swatch);
+        btn.appendChild(document.createTextNode(labelForFlavour(f)));
         btn.dataset.value = f;
         btn.addEventListener("click", () => {
           if (playerOrder.scoops.length < 3) {
@@ -633,14 +1049,43 @@
         });
         flavourButtonsEl.appendChild(btn);
       });
+      // Clear scoops button
+      const clearBtn = document.createElement("button");
+      clearBtn.textContent = "Clear scoops";
+      clearBtn.style.opacity = "0.7";
+      clearBtn.style.fontSize = "0.8rem";
+      clearBtn.addEventListener("click", () => {
+        playerOrder.scoops = [];
+        refreshSelectionStates();
+        maybeEnableServe();
+        renderBuilderVisual();
+      });
+      flavourButtonsEl.appendChild(clearBtn);
     }
 
     function refreshToppingButtons() {
       toppingButtonsEl.innerHTML = "";
+      toppingButtonsEl.classList.add("ingredient-bar");
       allUnlockedToppings().forEach(t => {
         const btn = document.createElement("button");
-        btn.textContent = labelForTopping(t);
+        btn.className = "topping-tile";
         btn.dataset.value = t;
+
+        const illust = document.createElement("div");
+        illust.className = "topping-illust topping-illust-" + t;
+        btn.appendChild(illust);
+
+        const label = document.createElement("span");
+        label.textContent = labelForTopping(t).split(" ").pop(); // short label
+        label.style.lineHeight = "1.1";
+        label.style.textAlign = "center";
+        btn.appendChild(label);
+
+        const badge = document.createElement("span");
+        badge.className = "tile-badge";
+        badge.textContent = "\u2713";
+        btn.appendChild(badge);
+
         btn.addEventListener("click", () => {
           if (playerOrder.toppings.has(t)) {
             playerOrder.toppings.delete(t);
@@ -756,11 +1201,7 @@
       return `${n} scoops`;
     }
 
-    function generateDialogue(order, customerLabel) {
-      const lines = [];
-      const mainFlavour = primaryFlavour(order) || "vanilla";
-      const vibe = flavourVibe(mainFlavour);
-
+    function generateSingleOrderDialogue(order) {
       const counts = {};
       order.scoops.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
       const scoopParts = Object.entries(counts).map(([f, c]) => {
@@ -768,50 +1209,97 @@
       });
 
       const toppingsText = order.toppings.length
-        ? order.toppings.map(toppingPhrase)
+        ? [...order.toppings.map(toppingPhrase)]
         : [];
 
-      const name = customerLabel || "";
-
-      if (name.includes("Sunny Tourist")) {
-        lines.push("Hiya! I'm in the mood for " + vibe + ".");
-        lines.push(`Maybe ${scoopPhrase(order.scoops.length)}… like ${scoopParts.join(" and ")}?`);
-      } else if (name.includes("Hurry-Up Commuter")) {
-        lines.push("Quick order please.");
-        lines.push(`${scoopPhrase(order.scoops.length)}: ${scoopParts.join(", ")}.`);
-      } else if (name.includes("Local Kid")) {
-        lines.push("Um, can I get " + scoopParts.join(" and ") + "?");
-      } else if (name.includes("Sleepy Student")) {
-        lines.push("Hey… I need " + vibe + " to wake up.");
-        lines.push(`${scoopPhrase(order.scoops.length)} of ${scoopParts.join(" and ")}.`);
-      } else {
-        lines.push("Hi! I'd like " + scoopParts.join(" and ") + ", please.");
-      }
-
-      if (order.container === "cone") {
-        lines.push("On a cone.");
-      } else {
-        lines.push("In a cup.");
-      }
+      let desc = `${scoopParts.join(" and ")}`;
+      desc += order.container === "cone" ? " on a cone" : " in a cup";
 
       if (toppingsText.length) {
         if (toppingsText.length === 1) {
-          lines.push("Add " + toppingsText[0] + ".");
+          desc += " with " + toppingsText[0];
         } else {
           const last = toppingsText.pop();
-          lines.push("Add " + toppingsText.join(", ") + " and " + last + ".");
-        }
-      } else {
-        if (Math.random() < 0.5) {
-          lines.push("No toppings today.");
+          desc += " with " + toppingsText.join(", ") + " and " + last;
         }
       }
+      return desc;
+    }
 
-      const unlocked = allUnlockedToppings();
-      const excludedOptions = unlocked.filter(t => !order.toppings.includes(t));
-      if (excludedOptions.length && Math.random() < 0.6) {
-        const noTopping = excludedOptions[Math.floor(Math.random() * excludedOptions.length)];
-        lines.push("And definitely no " + toppingPhrase(noTopping) + ".");
+    function generateDialogue(orders, customerLabel) {
+      const lines = [];
+      const name = customerLabel || "";
+      const order = orders[0];
+      const mainFlavour = primaryFlavour(order) || "vanilla";
+      const vibe = flavourVibe(mainFlavour);
+
+      if (orders.length > 1) {
+        // Multi-order intro
+        const countWord = orders.length === 2 ? "two" : "three";
+        if (name.includes("Sunny Tourist")) {
+          lines.push(`Hiya! I'd like ${countWord} ice creams today!`);
+        } else if (name.includes("Hurry-Up Commuter")) {
+          lines.push(`Quick, ${countWord} ice creams.`);
+        } else {
+          lines.push(`Hi! Can I get ${countWord} ice creams?`);
+        }
+
+        orders.forEach((o, i) => {
+          const ordinal = i === 0 ? "First" : i === 1 ? "Second" : "Third";
+          lines.push(`${ordinal}: ${generateSingleOrderDialogue(o)}.`);
+        });
+      } else {
+        // Single order dialogue (original style)
+        const counts = {};
+        order.scoops.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+        const scoopParts = Object.entries(counts).map(([f, c]) => {
+          return `${c === 1 ? "one" : c} ${labelForFlavour(f)}`;
+        });
+
+        const toppingsText = order.toppings.length
+          ? [...order.toppings.map(toppingPhrase)]
+          : [];
+
+        if (name.includes("Sunny Tourist")) {
+          lines.push("Hiya! I'm in the mood for " + vibe + ".");
+          lines.push(`Maybe ${scoopPhrase(order.scoops.length)}\u2026 like ${scoopParts.join(" and ")}?`);
+        } else if (name.includes("Hurry-Up Commuter")) {
+          lines.push("Quick order please.");
+          lines.push(`${scoopPhrase(order.scoops.length)}: ${scoopParts.join(", ")}.`);
+        } else if (name.includes("Local Kid")) {
+          lines.push("Um, can I get " + scoopParts.join(" and ") + "?");
+        } else if (name.includes("Sleepy Student")) {
+          lines.push("Hey\u2026 I need " + vibe + " to wake up.");
+          lines.push(`${scoopPhrase(order.scoops.length)} of ${scoopParts.join(" and ")}.`);
+        } else {
+          lines.push("Hi! I'd like " + scoopParts.join(" and ") + ", please.");
+        }
+
+        if (order.container === "cone") {
+          lines.push("On a cone.");
+        } else {
+          lines.push("In a cup.");
+        }
+
+        if (toppingsText.length) {
+          if (toppingsText.length === 1) {
+            lines.push("Add " + toppingsText[0] + ".");
+          } else {
+            const last = toppingsText.pop();
+            lines.push("Add " + toppingsText.join(", ") + " and " + last + ".");
+          }
+        } else {
+          if (Math.random() < 0.5) {
+            lines.push("No toppings today.");
+          }
+        }
+
+        const unlocked = allUnlockedToppings();
+        const excludedOptions = unlocked.filter(t => !order.toppings.includes(t));
+        if (excludedOptions.length && Math.random() < 0.6) {
+          const noTopping = excludedOptions[Math.floor(Math.random() * excludedOptions.length)];
+          lines.push("And definitely no " + toppingPhrase(noTopping) + ".");
+        }
       }
 
       if (name.includes("Hurry-Up Commuter")) {
@@ -821,7 +1309,7 @@
       } else if (name.includes("Local Kid")) {
         lines.push("Thank you!");
       } else {
-        lines.push("That’s all, thanks.");
+        lines.push("That's all, thanks.");
       }
 
       return lines.join(" ");
@@ -834,9 +1322,14 @@
         scoops: [],
         toppings: new Set()
       };
+      activeOrderIndex = 0;
+      playerOrders = [playerOrder];
+      currentOrders = [];
       refreshSelectionStates();
       submitOrderBtn.disabled = true;
       renderBuilderVisual();
+      const tabsEl = document.getElementById("orderTabs");
+      if (tabsEl) { tabsEl.classList.add("hidden"); tabsEl.innerHTML = ""; }
     }
 
     function allUnlockedFlavours() {
@@ -851,25 +1344,70 @@
       const flavours = allUnlockedFlavours();
       const availableToppings = allUnlockedToppings();
 
-      const totalScoops = 1 + Math.floor(Math.random() * 3); // 1–3 scoops
+      // Difficulty scaling by day
+      let minScoops, forceMixed, minToppings;
+      if (day <= 2) {
+        minScoops = 1; forceMixed = false; minToppings = 0;
+      } else if (day <= 4) {
+        minScoops = 1; forceMixed = true; minToppings = 0;
+      } else if (day <= 6) {
+        minScoops = 2; forceMixed = true; minToppings = 1;
+      } else {
+        minScoops = 2; forceMixed = true; minToppings = 1;
+      }
+
+      let totalScoops = minScoops + Math.floor(Math.random() * (4 - minScoops)); // up to 3
+      totalScoops = Math.min(totalScoops, 3);
+      // Day 7+: always 3 scoops if 3+ flavours available
+      if (day >= 7 && flavours.length >= 3) totalScoops = 3;
+
       const scoops = [];
-      // sometimes all one flavour, sometimes mixed
-      if (Math.random() < 0.6) {
+      if (!forceMixed && Math.random() < 0.6) {
+        // Same flavour for all scoops
         const f = flavours[Math.floor(Math.random() * flavours.length)];
         for (let i = 0; i < totalScoops; i++) scoops.push(f);
+      } else if (forceMixed && totalScoops >= 2 && flavours.length >= 2) {
+        // Ensure at least 2 different flavours
+        const shuffled = [...flavours].sort(() => Math.random() - 0.5);
+        scoops.push(shuffled[0], shuffled[1]);
+        for (let i = 2; i < totalScoops; i++) {
+          scoops.push(flavours[Math.floor(Math.random() * flavours.length)]);
+        }
       } else {
         for (let i = 0; i < totalScoops; i++) {
-          const f = flavours[Math.floor(Math.random() * flavours.length)];
-          scoops.push(f);
+          scoops.push(flavours[Math.floor(Math.random() * flavours.length)]);
         }
       }
 
       const maxToppings = Math.min(3, availableToppings.length);
-      const count = (maxToppings === 0) ? 0 : Math.floor(Math.random() * (maxToppings + 1));
+      let count = (maxToppings === 0) ? 0 : Math.floor(Math.random() * (maxToppings + 1));
+      count = Math.max(count, Math.min(minToppings, availableToppings.length));
       const shuffled = [...availableToppings].sort(() => Math.random() - 0.5);
       const toppings = shuffled.slice(0, count);
 
       return { container, scoops, toppings };
+    }
+
+    function getOrderCount() {
+      // Multi-ice-cream: requires Station B AND day >= 5
+      if (!hasSecondStation || day < 5) return 1;
+      const r = Math.random();
+      if (day >= 8) {
+        if (r < 0.4) return 2;
+        if (r < 0.6) return 3;
+        return 1;
+      }
+      // Day 5-7
+      return r < 0.4 ? 2 : 1;
+    }
+
+    function generateCustomerOrders() {
+      const count = getOrderCount();
+      const orders = [];
+      for (let i = 0; i < count; i++) {
+        orders.push(randomOrder());
+      }
+      return orders;
     }
 
     function describeOrder(order) {
@@ -926,12 +1464,20 @@
           spr.style.left = "18px";
           scoop.appendChild(spr);
         }
-        if (toppingsArr.includes("caramel") || toppingsArr.includes("choc_sauce")) {
+        if (toppingsArr.includes("caramel")) {
           const dr = document.createElement("div");
           dr.className = "drizzle";
-          dr.style.background = toppingsArr.includes("caramel")
-            ? "rgba(205,133,63,0.75)"
-            : "rgba(90,44,25,0.8)";
+          dr.style.background = "rgba(205,133,63,0.75)";
+          dr.style.top = "10px";
+          dr.style.transform = "rotate(-12deg)";
+          scoop.appendChild(dr);
+        }
+        if (toppingsArr.includes("choc_sauce")) {
+          const dr = document.createElement("div");
+          dr.className = "drizzle";
+          dr.style.background = "rgba(90,44,25,0.8)";
+          dr.style.top = "18px";
+          dr.style.transform = "rotate(6deg)";
           scoop.appendChild(dr);
         }
 
@@ -953,21 +1499,28 @@
     function startDay() {
       customersServedToday = 0;
       endOfDayPanelEl.classList.add("hidden");
+      dayEndOverlay.classList.remove("active");
       openShopBtn.disabled = true;
       nextCustomerBtn.disabled = false;
       roundActive = false;
       phase = "idle";
       okOrderBtn.classList.add("hidden");
+      timerBarEl.style.width = "0%";
+      timerBarEl.className = "";
       customerOrderTextEl.classList.remove("hidden");
       customerOrderTextEl.style.opacity = "1";
-      customerOrderTextEl.textContent = "Click “Serve first customer” to start!";
+      customerOrderTextEl.textContent = "\u201CServe first customer\u201D to start the day!";
       setBuilderEnabled(false);
       updateTopBar();
 
-      // Adjust difficulty slightly by day
-      // (showPhaseSeconds kept for future use if you want auto-hide dialogue)
+      // Day timer: starts at 100s on Day 1, scales down to min 60s
+      dayTimerSeconds = Math.max(60, 100 - (day - 1) * 5);
+      dayTimeLeft = dayTimerSeconds;
+      clearInterval(dayTimerId);
+      dayTimerId = null;
+      dayEarnings = [];
+
       showPhaseSeconds = Math.max(2, 4 - Math.floor((day - 1) / 2));
-      buildPhaseSeconds = Math.max(8, 12 - day);
 
       if (day === 1) {
         inTutorial = true;
@@ -977,7 +1530,10 @@
         setTutorialMessage("A new day! More customers, maybe trickier orders.");
       }
 
+      timerEl.textContent = "Day: " + dayTimeLeft + "s";
+      timerBarEl.style.width = "100%";
       nextCustomerBtn.textContent = "Serve first customer of Day " + day;
+      updateCustomerProgress();
     }
 
     function startCustomerRound() {
@@ -990,24 +1546,59 @@
       customerOrderTextEl.classList.remove("hidden");
       customerOrderTextEl.style.opacity = "1";
 
-      currentOrder = randomOrder();
-      playerOrder.scoops = [];
+      currentOrders = generateCustomerOrders();
+      currentOrder = currentOrders[0]; // backwards compat
+      activeOrderIndex = 0;
+      playerOrders = currentOrders.map(() => ({
+        container: null,
+        scoops: [],
+        toppings: new Set()
+      }));
+      playerOrder = playerOrders[0];
       currentCustomerName = randomCustomerName();
       customerNameEl.textContent = currentCustomerName;
-      customerOrderTextEl.textContent = generateDialogue(currentOrder, currentCustomerName);
-      okOrderBtn.classList.remove("hidden");
-      okOrderBtn.disabled = false;
+
+      // Avatar color variety
+      const avatarColors = {
+        "Sunny Tourist": "radial-gradient(circle at 30% 30%, #fff4c8 0, #f0c040 60%)",
+        "Local Kid": "radial-gradient(circle at 30% 30%, #d8ffe6 0, #5cb87a 60%)",
+        "Sleepy Student": "radial-gradient(circle at 30% 30%, #d2e4ff 0, #6a9fd8 60%)",
+        "Curious Critic": "radial-gradient(circle at 30% 30%, #f0d8ff 0, #b07acc 60%)",
+        "Hurry-Up Commuter": "radial-gradient(circle at 30% 30%, #ffe0d2 0, #d87a5c 60%)",
+        "Ice Cream Expert": "radial-gradient(circle at 30% 30%, #ffe8f0 0, #e08aa0 60%)",
+        "Birthday Guest": "radial-gradient(circle at 30% 30%, #fff0d8 0, #e8b060 60%)"
+      };
+      document.getElementById("customerAvatar").style.background =
+        avatarColors[currentCustomerName] || "radial-gradient(circle at 30% 30%, #ffe3d2 0, #e2a68a 60%)";
+
+      // Typewriter effect for dialogue
+      const dialogue = generateDialogue(currentOrders, currentCustomerName);
+      typewriterEffect(customerOrderTextEl, dialogue, 20, () => {
+        okOrderBtn.classList.remove("hidden");
+        okOrderBtn.disabled = false;
+      });
+
       setBuilderEnabled(false);
       playDing();
+      updateCustomerProgress();
+
+      // Show and clear notepad
+      if (hasNotepad) {
+        showNotepad();
+        clearNotepad();
+      }
 
       // Tutorial hint day 1
       if (day === 1 && customersServedToday === 0) {
         setTutorialMessage("Memorise container, flavour and toppings. They will vanish soon!");
       }
 
-      // Wait for player to press OK, then start timer
-      clearInterval(timerId);
-      timerEl.textContent = "Listening…";
+      // Start day timer on first customer
+      if (customersServedToday === 0 && !dayTimerId) {
+        startDayTimer();
+      }
+
+      timerEl.textContent = "Day: " + dayTimeLeft + "s";
       submitOrderBtn.disabled = true;
     }
 
@@ -1031,30 +1622,165 @@
       phase = "build";
       roundActive = true;
       setBuilderEnabled(true);
-      startBuildTimer();
+      customerBuildStart = Date.now();
+      renderOrderTabs();
+      updateStation2Hint();
     });
 
-    function startBuildTimer() {
-      timeLeft = buildPhaseSeconds + (hasSecondStation ? 3 : 0);
-      timerEl.textContent = "Time: " + timeLeft + "s";
+    function startDayTimer() {
+      clearInterval(dayTimerId);
+      dayTimerId = setInterval(() => {
+        dayTimeLeft--;
+        timerEl.textContent = "Day: " + dayTimeLeft + "s";
+        const pct = (dayTimeLeft / dayTimerSeconds) * 100;
+        timerBarEl.style.width = pct + "%";
+        if (pct <= 15) {
+          timerBarEl.className = "danger";
+        } else if (pct <= 33) {
+          timerBarEl.className = "warning";
+        } else {
+          timerBarEl.className = "";
+        }
 
-      clearInterval(timerId);
-      timerId = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = "Time: " + timeLeft + "s";
-        if (timeLeft <= 0) {
-          clearInterval(timerId);
-          timerEl.textContent = "Time's up!";
-          submitOrderBtn.disabled = true;
-          evaluateOrder(true);
+        // Customer patience indicator (Feature 7)
+        if (phase === "build" && customerBuildStart) {
+          const elapsed = (Date.now() - customerBuildStart) / 1000;
+          const avatar = document.getElementById("customerAvatar");
+          avatar.classList.remove("avatar-neutral", "avatar-impatient");
+          if (elapsed > 15) {
+            avatar.classList.add("avatar-impatient");
+          } else if (elapsed >= 8) {
+            avatar.classList.add("avatar-neutral");
+          }
+        }
+
+        if (dayTimeLeft <= 0) {
+          endDayFromTimer();
         }
       }, 1000);
     }
 
+    function endDayFromTimer() {
+      clearInterval(dayTimerId);
+      dayTimerId = null;
+      timerEl.textContent = "Day over!";
+      timerBarEl.style.width = "0%";
+      timerBarEl.className = "";
+
+      if (roundActive) {
+        // Auto-submit current order
+        evaluateOrder(true);
+      } else if (phase === "dialogue") {
+        // Mid-dialogue: lost customer, end day
+        phase = "idle";
+        okOrderBtn.classList.add("hidden");
+        endDaySummary();
+      } else {
+        endDaySummary();
+      }
+    }
+
+    function renderOrderTabs() {
+      const tabsEl = document.getElementById("orderTabs");
+      if (currentOrders.length <= 1) {
+        tabsEl.classList.add("hidden");
+        tabsEl.innerHTML = "";
+        return;
+      }
+      tabsEl.classList.remove("hidden");
+      tabsEl.style.display = "flex";
+      tabsEl.innerHTML = "";
+      currentOrders.forEach((_, i) => {
+        const tab = document.createElement("button");
+        tab.className = "order-tab" + (i === activeOrderIndex ? " active" : "");
+        const po = playerOrders[i];
+        let statusIcon = "\u25cb"; // empty circle
+        if (po.container && po.scoops.length > 0) {
+          statusIcon = "\u2713"; // checkmark
+        } else if (po.container || po.scoops.length > 0 || po.toppings.size > 0) {
+          statusIcon = "\u270e"; // pencil
+        }
+        tab.innerHTML = `Ice Cream ${i + 1} <span class="tab-status">${statusIcon}</span>`;
+        tab.addEventListener("click", () => {
+          switchToOrder(i);
+        });
+        tabsEl.appendChild(tab);
+      });
+    }
+
+    function switchToOrder(index) {
+      if (index === activeOrderIndex) return;
+      // Save current state
+      playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
+      activeOrderIndex = index;
+      // Load new state
+      playerOrder = playerOrders[activeOrderIndex];
+      currentOrder = currentOrders[activeOrderIndex];
+      refreshSelectionStates();
+      renderBuilderVisual();
+      renderOrderTabs();
+      maybeEnableServe();
+      updateStation2Preview();
+    }
+
+    function updateStation2Preview() {
+      if (!hasSecondStation || currentOrders.length <= 1) return;
+      const previewEl = document.getElementById("station2Preview");
+      if (!previewEl) return;
+      previewEl.innerHTML = "";
+      // Show mini renders of completed orders (not the active one)
+      playerOrders.forEach((po, i) => {
+        if (i === activeOrderIndex) return;
+        if (!po.container && po.scoops.length === 0) return;
+        const mini = document.createElement("div");
+        mini.style.cssText = "transform:scale(0.4); transform-origin:bottom left; width:60px; height:60px; position:relative; display:inline-block;";
+        if (po.container) {
+          const base = document.createElement("div");
+          base.classList.add(po.container === "cone" ? "cone" : "cup");
+          mini.appendChild(base);
+        }
+        po.scoops.forEach((f, si) => {
+          const scoop = document.createElement("div");
+          scoop.className = "scoop scoop-" + f;
+          scoop.style.bottom = (32 + si * 26) + "px";
+          mini.appendChild(scoop);
+        });
+        previewEl.appendChild(mini);
+      });
+    }
+
+    function updateStation2Hint() {
+      if (!hasSecondStation) return;
+      const hintEl = document.getElementById("station2Hint");
+      const previewEl = document.getElementById("station2Preview");
+      if (!hintEl) return;
+
+      hintEl.innerHTML = "";
+      previewEl.innerHTML = "";
+
+      if (phase === "build" && currentOrder) {
+        // Container hint: show faint silhouette
+        const hint = document.createElement("div");
+        hint.style.opacity = "0.25";
+        hint.style.display = "inline-block";
+        hint.style.position = "relative";
+        hint.style.width = "50px";
+        hint.style.height = "50px";
+        if (currentOrder.container === "cone") {
+          hint.innerHTML = `<div style="width:36px;height:48px;background:linear-gradient(145deg,#f5c48d,#e39b51);clip-path:polygon(50% 100%, 0 0, 100% 0);"></div>`;
+        } else {
+          hint.innerHTML = `<div style="width:44px;height:30px;background:linear-gradient(145deg,#fefefe,#f5f5f5);border-radius:0 0 12px 12px;border:1px solid rgba(0,0,0,0.06);margin-top:16px;"></div>`;
+        }
+        hintEl.appendChild(hint);
+      }
+    }
+
     function maybeEnableServe() {
-      const ready = playerOrder.container && playerOrder.scoops && playerOrder.scoops.length > 0;
       if (!roundActive) return;
-      submitOrderBtn.disabled = !ready;
+      // For multi-orders: save current state first, check all orders
+      playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
+      const allReady = playerOrders.every(po => po.container && po.scoops && po.scoops.length > 0);
+      submitOrderBtn.disabled = !allReady;
     }
 
     function randomCustomerName() {
@@ -1065,77 +1791,101 @@
       return names[Math.floor(Math.random() * names.length)];
     }
 
-    function evaluateOrder(timeUp = false) {
-      if (!roundActive) return;
-      roundActive = false;
-      clearInterval(timerId);
-      submitOrderBtn.disabled = true;
-
-      // Compare answer
+    function scoreOneOrder(trueOrder, builtOrder) {
       let scoreParts = 0;
-      const totalParts = 3; // container, scoops, toppings
-
-      // Container
-      if (playerOrder.container === currentOrder.container) scoreParts++;
-
-      // Scoops as multiset of flavours
-      const trueScoops = currentOrder.scoops || [];
-      const playerScoops = playerOrder.scoops || [];
+      const totalParts = 3;
+      if (builtOrder.container === trueOrder.container) scoreParts++;
+      const trueScoops = trueOrder.scoops || [];
+      const playerScoops = builtOrder.scoops || [];
       const scoopMatch =
         trueScoops.length === playerScoops.length &&
         [...trueScoops].sort().join("|") === [...playerScoops].sort().join("|");
       if (scoopMatch) scoreParts++;
-
-      // Toppings
-      const trueToppings = new Set(currentOrder.toppings);
-      const playerToppings = playerOrder.toppings;
+      const trueToppings = new Set(trueOrder.toppings);
+      const playerToppings = builtOrder.toppings;
       const toppingsMatch =
         trueToppings.size === playerToppings.size &&
         [...trueToppings].every(t => playerToppings.has(t));
       if (toppingsMatch) scoreParts++;
+      return { scoreParts, totalParts, scoopMatch, toppingsMatch };
+    }
 
-      const accuracy = (scoreParts / totalParts);
-      let earnings = Math.round(accuracy * 12);
-      if (hasSecondStation) {
-        earnings = Math.round(earnings * 1.15);
+    function evaluateOrder(timeUp = false) {
+      if (!roundActive) return;
+      roundActive = false;
+      phase = "idle";
+      submitOrderBtn.disabled = true;
+
+      // Reset avatar patience state
+      const avatar = document.getElementById("customerAvatar");
+      avatar.classList.remove("avatar-neutral", "avatar-impatient");
+
+      // Save current active order state
+      playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
+
+      // Score each ice cream
+      const numOrders = currentOrders.length;
+      let totalScore = 0;
+      let totalMaxParts = 0;
+      const perOrderResults = [];
+
+      for (let i = 0; i < numOrders; i++) {
+        const result = scoreOneOrder(currentOrders[i], playerOrders[i]);
+        totalScore += result.scoreParts;
+        totalMaxParts += result.totalParts;
+        perOrderResults.push(result);
       }
 
-      // Refund if order is completely wrong
+      const accuracy = totalMaxParts > 0 ? totalScore / totalMaxParts : 0;
+      // Base earnings scale by order count
+      const baseEarnings = numOrders === 1 ? 12 : numOrders === 2 ? 20 : 28;
+      let earnings = Math.round(accuracy * baseEarnings);
+
+      // Refund if all orders are completely wrong
       let refund = 0;
-      if (scoreParts === 0) {
+      if (totalScore === 0) {
         refund = 8;
         earnings -= refund;
       }
 
+      // Tip based on build speed (15s window)
       let tip = 0;
-      if (!timeUp && scoreParts >= 2 && scoreParts === totalParts) {
-        const maxTimeThisRound = buildPhaseSeconds + (hasSecondStation ? 3 : 0);
-        const clampedTimeLeft = Math.max(0, Math.min(timeLeft, maxTimeThisRound));
-        const speedFactor = maxTimeThisRound > 0 ? clampedTimeLeft / maxTimeThisRound : 0;
-        const maxTip = 6;
-        tip = Math.round(maxTip * speedFactor);
+      if (!timeUp && totalScore === totalMaxParts && customerBuildStart) {
+        const elapsedSec = (Date.now() - customerBuildStart) / 1000;
+        const speedFactor = Math.max(0, 1 - elapsedSec / 15);
+        tip = Math.round(6 * speedFactor);
       }
 
       money += earnings + tip;
       updateTopBar();
 
       customersServedToday++;
+      updateCustomerProgress();
+
+      // Track earnings for day-end breakdown
+      dayEarnings.push({
+        name: currentCustomerName,
+        earnings: earnings,
+        tip: tip,
+        scoreParts: totalScore,
+        totalParts: totalMaxParts
+      });
 
       let text = "";
       if (timeUp) {
-        text += "<span class='text-bad'>Time's up!</span> ";
+        text += "<span class='text-bad'>Day timer ran out!</span> ";
       }
 
-      if (scoreParts === totalParts) {
+      if (totalScore === totalMaxParts) {
         text += "<span class='text-good'>Perfect order!</span> ";
-      } else if (scoreParts >= 2) {
+      } else if (totalScore >= totalMaxParts * 0.66) {
         text += "<span class='text-good'>Pretty close.</span> ";
-      } else if (scoreParts === 1) {
-        text += "<span class='text-bad'>Only one part was right.</span> ";
+      } else if (totalScore >= totalMaxParts * 0.33) {
+        text += "<span class='text-bad'>Only some parts were right.</span> ";
       } else {
-        text += "<span class='text-bad'>That was completely wrong.</span> ";
+        text += "<span class='text-bad'>That was mostly wrong.</span> ";
       }
-      text += `You got ${scoreParts}/${totalParts} parts correct.`;
+      text += `You got ${totalScore}/${totalMaxParts} parts correct.`;
 
       if (refund > 0) {
         text += ` The customer asked for a refund and you lost $${refund}.`;
@@ -1146,23 +1896,49 @@
         text += ` They also tipped you <strong>$${tip}</strong> for speedy service.`;
       }
 
+      // Post-evaluation feedback per order
+      for (let i = 0; i < numOrders; i++) {
+        const co = currentOrders[i];
+        const po = playerOrders[i];
+        const r = perOrderResults[i];
+        const label = numOrders > 1 ? `Ice Cream ${i + 1}: ` : "";
+        const correctDesc = describeOrder(co);
+        text += `<br><small style="opacity:0.8">${label}${correctDesc}</small>`;
+        const containerIcon = po.container === co.container ? "\u2713" : "\u2717";
+        const scoopsIcon = r.scoopMatch ? "\u2713" : "\u2717";
+        const toppingsIcon = r.toppingsMatch ? "\u2713" : "\u2717";
+        text += `<br><small>`;
+        text += `<span class="${po.container === co.container ? 'text-good' : 'text-bad'}">${containerIcon} Container</span> \u00b7 `;
+        text += `<span class="${r.scoopMatch ? 'text-good' : 'text-bad'}">${scoopsIcon} Scoops</span> \u00b7 `;
+        text += `<span class="${r.toppingsMatch ? 'text-good' : 'text-bad'}">${toppingsIcon} Toppings</span>`;
+        text += `</small>`;
+      }
+
       resultTextEl.innerHTML = text;
 
-      // End of day?
-      if (customersServedToday >= customersPerDay) {
+      // Hide order tabs
+      const tabsEl = document.getElementById("orderTabs");
+      tabsEl.classList.add("hidden");
+      tabsEl.innerHTML = "";
+
+      // Day timer expired? End day. Otherwise allow next customer
+      if (dayTimeLeft <= 0) {
         endDaySummary();
       } else {
         nextCustomerBtn.disabled = false;
-        nextCustomerBtn.textContent = "Next customer (" +
-          customersServedToday + "/" + customersPerDay + " today)";
+        nextCustomerBtn.textContent = "Next customer (" + customersServedToday + " served)";
       }
     }
 
     function endDaySummary() {
+      clearInterval(dayTimerId);
+      dayTimerId = null;
       openShopBtn.disabled = false;
       nextCustomerBtn.disabled = true;
       timerEl.textContent = "";
-      setTutorialMessage("Day finished! Visit the shop for upgrades.");
+      timerBarEl.style.width = "0%";
+      timerBarEl.className = "";
+      setTutorialMessage("Day finished!");
 
       endOfDayPanelEl.classList.remove("hidden");
       endOfDayPanelEl.innerHTML =
@@ -1170,56 +1946,129 @@
         `You served ${customersServedToday} customers and now have <strong>$${money}</strong>.`;
 
       nextCustomerBtn.textContent = "Day finished";
+
+      // Build earnings breakdown table (Feature 8)
+      let breakdownHtml = "";
+      if (dayEarnings.length > 0) {
+        breakdownHtml += `<div style="text-align:left; margin-top:8px; font-size:0.85rem;">`;
+        let dayTotal = 0;
+        dayEarnings.forEach(e => {
+          const total = e.earnings + e.tip;
+          dayTotal += total;
+          const color = e.scoreParts === e.totalParts ? "var(--good)" :
+                        e.scoreParts >= 2 ? "#ff9800" : "var(--bad)";
+          const icons = [];
+          for (let i = 0; i < e.totalParts; i++) {
+            icons.push(i < e.scoreParts ? "\u2713" : "\u2717");
+          }
+          let line = `<div style="padding:3px 0; border-bottom:1px dashed rgba(0,0,0,0.08);">`;
+          line += `<span style="color:${color}; font-weight:600;">${e.name}</span>`;
+          line += ` \u2014 $${e.earnings}`;
+          if (e.tip > 0) line += ` + $${e.tip} tip`;
+          line += ` <span style="opacity:0.6">${icons.join("")}</span>`;
+          line += `</div>`;
+          breakdownHtml += line;
+        });
+        breakdownHtml += `<div style="padding:4px 0; font-weight:bold;">Total: $${dayTotal}</div>`;
+        breakdownHtml += `</div>`;
+      }
+
+      // Show day-end overlay
+      dayEndTitle.textContent = `Day ${day} Complete!`;
+      dayEndStats.innerHTML =
+        `<p>Customers served: <strong>${customersServedToday}</strong></p>` +
+        `<p>Total money: <strong>$${money}</strong></p>` +
+        breakdownHtml;
+      requestAnimationFrame(() => {
+        dayEndOverlay.classList.add("active");
+      });
     }
 
     // ---- Shop / upgrades ----
     function openShop() {
-      shopOverlay.style.display = "flex";
       shopMoneyEl.textContent = "You have $" + money + " to spend on your shop.";
       renderShopItems();
+      requestAnimationFrame(() => {
+        shopOverlay.classList.add("active");
+      });
     }
 
     function closeShopAndNextDay() {
-      shopOverlay.style.display = "none";
-      day++;
-      startDay();
+      shopOverlay.classList.remove("active");
+      setTimeout(() => {
+        day++;
+        startDay();
+      }, 300);
     }
 
     function renderShopItems() {
+      shopMoneyEl.textContent = "You have $" + money + " to spend on your shop.";
       shopItemsEl.innerHTML = "";
 
       const remainingFlavours = ALL_FLAVOURS.filter(f => !unlockedFlavours.has(f));
       const remainingToppings = ALL_TOPPINGS.filter(t => !unlockedToppings.has(t));
 
-      // Extra station
-      const stationRow = document.createElement("div");
-      stationRow.className = "shop-item";
-      stationRow.innerHTML = `
-        <div>
-          <strong>Extra Station</strong><br>
-          Lets you work a bit faster and earn slightly more.
-        </div>
-      `;
-      const stationRight = document.createElement("div");
-      const stationCost = 60;
-      stationRight.innerHTML = `<span class="shop-cost">$${stationCost}</span>`;
-      const stationBtn = document.createElement("button");
-      stationBtn.textContent = hasSecondStation ? "Owned" : "Buy";
-      stationBtn.disabled = hasSecondStation || money < stationCost;
-      stationBtn.addEventListener("click", () => {
-        if (money >= stationCost && !hasSecondStation) {
-          money -= stationCost;
-          hasSecondStation = true;
-          station2El.style.borderStyle = "solid";
-          station2El.querySelector(".station-badge").textContent = "Open";
-          station2DescEl.textContent = "Second pair of hands! Slight time bonus and tips.";
-          updateTopBar();
-          renderShopItems();
-        }
-      });
-      stationRight.appendChild(stationBtn);
-      stationRow.appendChild(stationRight);
-      shopItemsEl.appendChild(stationRow);
+      // Extra station (only show if not yet owned)
+      if (!hasSecondStation) {
+        const stationRow = document.createElement("div");
+        stationRow.className = "shop-item";
+        stationRow.innerHTML = `
+          <div>
+            <strong>Extra Station</strong><br>
+            Unlocks advanced orders and provides build hints.
+          </div>
+        `;
+        const stationRight = document.createElement("div");
+        const stationCost = 60;
+        stationRight.innerHTML = `<span class="shop-cost">$${stationCost}</span>`;
+        const stationBtn = document.createElement("button");
+        stationBtn.textContent = "Buy";
+        stationBtn.disabled = money < stationCost;
+        stationBtn.addEventListener("click", () => {
+          if (money >= stationCost && !hasSecondStation) {
+            money -= stationCost;
+            hasSecondStation = true;
+            station2El.style.borderStyle = "solid";
+            document.getElementById("station2Badge").textContent = "Active";
+            station2DescEl.textContent = "Advanced orders + build hints";
+            document.getElementById("station2Content").classList.remove("hidden");
+            updateTopBar();
+            renderShopItems();
+          }
+        });
+        stationRight.appendChild(stationBtn);
+        stationRow.appendChild(stationRight);
+        shopItemsEl.appendChild(stationRow);
+      }
+
+      // Notepad (only show if not yet owned)
+      if (!hasNotepad) {
+        const noteRow = document.createElement("div");
+        noteRow.className = "shop-item";
+        noteRow.innerHTML = `
+          <div>
+            <strong>Notepad</strong><br>
+            Scribble notes while listening to orders.
+          </div>
+        `;
+        const noteRight = document.createElement("div");
+        const noteCost = 45;
+        noteRight.innerHTML = `<span class="shop-cost">$${noteCost}</span>`;
+        const noteBtn = document.createElement("button");
+        noteBtn.textContent = "Buy";
+        noteBtn.disabled = money < noteCost;
+        noteBtn.addEventListener("click", () => {
+          if (money >= noteCost && !hasNotepad) {
+            money -= noteCost;
+            hasNotepad = true;
+            updateTopBar();
+            renderShopItems();
+          }
+        });
+        noteRight.appendChild(noteBtn);
+        noteRow.appendChild(noteRight);
+        shopItemsEl.appendChild(noteRow);
+      }
 
       // New flavours
       remainingFlavours.forEach(f => {
@@ -1286,6 +2135,121 @@
       }
     }
 
+    // ---- New utility functions ----
+    function typewriterEffect(element, text, speed, callback) {
+      element.textContent = "";
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else if (callback) {
+          callback();
+        }
+      }
+      type();
+    }
+
+    function updateCustomerProgress() {
+      customerProgressEl.innerHTML = "";
+      // Dynamic dots: one per served customer + current if active
+      for (let i = 0; i < customersServedToday; i++) {
+        const dot = document.createElement("div");
+        dot.className = "progress-dot served";
+        customerProgressEl.appendChild(dot);
+      }
+      if (phase !== "idle" && dayTimeLeft > 0) {
+        const dot = document.createElement("div");
+        dot.className = "progress-dot current";
+        customerProgressEl.appendChild(dot);
+      }
+    }
+
+    // ---- Notepad drawing ----
+    const notepadPanel = document.getElementById("notepadPanel");
+    const notepadCanvas = document.getElementById("notepadCanvas");
+    const notepadCtx = notepadCanvas.getContext("2d");
+    let notepadColor = "#4a3b34";
+    let notepadDrawing = false;
+    let notepadEraser = false;
+
+    function initNotepadCanvas() {
+      // High-DPI support
+      const rect = notepadCanvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      notepadCanvas.width = rect.width * dpr;
+      notepadCanvas.height = rect.height * dpr;
+      notepadCtx.scale(dpr, dpr);
+      notepadCtx.lineCap = "round";
+      notepadCtx.lineJoin = "round";
+    }
+
+    function clearNotepad() {
+      const rect = notepadCanvas.getBoundingClientRect();
+      notepadCtx.clearRect(0, 0, rect.width, rect.height);
+    }
+
+    function notepadPos(e) {
+      const rect = notepadCanvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    }
+
+    function notepadStart(e) {
+      e.preventDefault();
+      notepadDrawing = true;
+      const pos = notepadPos(e);
+      notepadCtx.beginPath();
+      notepadCtx.moveTo(pos.x, pos.y);
+    }
+    function notepadMove(e) {
+      if (!notepadDrawing) return;
+      e.preventDefault();
+      const pos = notepadPos(e);
+      notepadCtx.strokeStyle = notepadEraser ? "#fffef6" : notepadColor;
+      notepadCtx.lineWidth = notepadEraser ? 16 : 2.5;
+      notepadCtx.lineTo(pos.x, pos.y);
+      notepadCtx.stroke();
+    }
+    function notepadEnd(e) {
+      notepadDrawing = false;
+    }
+
+    notepadCanvas.addEventListener("mousedown", notepadStart);
+    notepadCanvas.addEventListener("mousemove", notepadMove);
+    notepadCanvas.addEventListener("mouseup", notepadEnd);
+    notepadCanvas.addEventListener("mouseleave", notepadEnd);
+    notepadCanvas.addEventListener("touchstart", notepadStart, { passive: false });
+    notepadCanvas.addEventListener("touchmove", notepadMove, { passive: false });
+    notepadCanvas.addEventListener("touchend", notepadEnd);
+
+    document.querySelectorAll("#notepadPanel .notepad-color-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const c = btn.dataset.color;
+        if (c === "clear") { clearNotepad(); return; }
+        document.querySelectorAll("#notepadPanel .notepad-color-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        if (c === "eraser") {
+          notepadEraser = true;
+        } else {
+          notepadEraser = false;
+          notepadColor = c;
+        }
+      });
+    });
+
+    // Init canvas on first show
+    let notepadInited = false;
+    function showNotepad() {
+      if (!hasNotepad) return;
+      notepadPanel.classList.remove("hidden");
+      if (!notepadInited) {
+        notepadInited = true;
+        requestAnimationFrame(() => initNotepadCanvas());
+      }
+    }
+
     // ---- Event wiring ----
     submitOrderBtn.addEventListener("click", () => {
       if (!roundActive) return;
@@ -1293,18 +2257,24 @@
     });
 
     nextCustomerBtn.addEventListener("click", () => {
-      if (customersServedToday >= customersPerDay) return;
+      if (dayTimeLeft <= 0 && dayTimerId === null && customersServedToday > 0) return;
       nextCustomerBtn.disabled = true;
       startCustomerRound();
     });
 
     openShopBtn.addEventListener("click", () => {
-      if (customersServedToday < customersPerDay) return;
       openShop();
     });
 
     shopCloseBtn.addEventListener("click", () => {
       closeShopAndNextDay();
+    });
+
+    dayEndContinueBtn.addEventListener("click", () => {
+      dayEndOverlay.classList.remove("active");
+      setTimeout(() => {
+        openShop();
+      }, 300);
     });
 
     // ---- Init ----
