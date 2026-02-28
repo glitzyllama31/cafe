@@ -77,7 +77,7 @@
     }
 
     .col-left {
-      flex: 0 0 210px;
+      flex: 0 0 250px;
       overflow-y: auto;
       max-height: 100%;
       display: flex;
@@ -91,13 +91,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 140px;
-    }
-
-    .col-right {
-      flex: 0 0 340px;
-      overflow-y: auto;
-      max-height: 100%;
+      min-width: 200px;
     }
 
     /* --- Top bar: day, money, hint --- */
@@ -396,20 +390,7 @@
     }
 
     /* --- Builder area --- */
-    #builder.card {
-      margin-top: 0;
-      padding: 8px 10px;
-      opacity: 1;
-      transition: opacity 0.2s ease-out;
-    }
-
-    #builder.card h2 {
-      display: none;
-    }
-
-    #builder.card #builderHint {
-      display: none;
-    }
+    /* Builder div hidden — stations kept for JS compatibility */
 
     #orderTabs {
       display: flex;
@@ -506,6 +487,50 @@
       top: 4px;
       font-size: 0.7rem;
       opacity: 0.75;
+    }
+
+    /* --- Counter bar: flavours + toppings --- */
+    #counterBar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 14px;
+      margin-top: 4px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .counter-section {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .counter-section .btn-row {
+      margin: 0;
+      gap: 4px;
+    }
+
+    .counter-label {
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .counter-divider {
+      width: 1px;
+      align-self: stretch;
+      background: rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    .counter-toppings {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
     }
 
     /* --- Result bar: slim inline feedback --- */
@@ -748,19 +773,19 @@
     }
 
     .topping-tile {
-      width: 80px;
-      height: 88px;
+      width: 60px;
+      height: 62px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      border-radius: 10px;
+      gap: 2px;
+      border-radius: 8px;
       border: 1px solid rgba(0,0,0,0.1);
       background: rgba(255,255,255,0.7);
       cursor: pointer;
-      font-size: 0.72rem;
-      padding: 4px 2px;
+      font-size: 0.65rem;
+      padding: 3px 2px;
       transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
       filter: saturate(0.6);
       position: relative;
@@ -805,9 +830,10 @@
     }
 
     .topping-illust {
-      width: 40px;
-      height: 40px;
+      width: 28px;
+      height: 28px;
       position: relative;
+      transform: scale(0.7);
     }
 
     /* Sprinkles illustration: colored dots */
@@ -1148,49 +1174,45 @@
         </div>
       </div>
 
-      <!-- Center: Ice cream visual + serve button -->
+      <!-- Center: Container selector + ice cream visual + serve -->
       <div class="col-center">
         <div id="orderTabs" class="hidden"></div>
+        <div id="containerButtons" class="btn-row" style="justify-content:center;"></div>
         <div id="builderVisual" class="ice-cream-visual"></div>
         <button id="submitOrderBtn" class="primary" disabled>Serve</button>
       </div>
+    </div>
 
-      <!-- Right: Builder controls -->
-      <div class="col-right">
-        <div id="builder" class="card">
-          <h2>Your Station</h2>
-          <small id="builderHint">When the order disappears, build exactly what they asked for.</small>
+    <!-- Counter bar: flavours + toppings -->
+    <div id="counterBar">
+      <div class="counter-section">
+        <strong class="counter-label">Flavour</strong><span id="scoopCounter" class="scoop-counter">0/3</span>
+        <div id="flavourButtons" class="btn-row"></div>
+      </div>
+      <div class="counter-divider"></div>
+      <div class="counter-section">
+        <strong class="counter-label">Toppings</strong>
+        <div id="toppingButtons" class="counter-toppings"></div>
+      </div>
+    </div>
 
-          <div style="margin-bottom:4px;">
-            <strong style="font-size:0.82rem;">Container</strong>
-            <div id="containerButtons" class="btn-row"></div>
-          </div>
-
-          <div style="margin-bottom:4px;">
-            <strong style="font-size:0.82rem;">Flavour</strong><span id="scoopCounter" class="scoop-counter">0/3</span>
-            <div id="flavourButtons" class="btn-row"></div>
-          </div>
-
-          <div style="margin-bottom:4px;">
-            <strong style="font-size:0.82rem;">Toppings</strong>
-            <div id="toppingButtons"></div>
-          </div>
-
-          <div id="stations">
-            <div class="station" id="station1">
-              <div class="station-label">Station A</div>
-              <div class="station-badge">Base station</div>
-              <div id="station1Desc">Single scoop, classic service.</div>
-            </div>
-            <div class="station" id="station2">
-              <div class="station-label">Station B</div>
-              <div class="station-badge" id="station2Badge">Locked</div>
-              <div id="station2Desc">Buy an extra station in the shop!</div>
-              <div id="station2Content" class="hidden">
-                <div id="station2Hint" style="margin-top:4px; min-height:30px;"></div>
-                <div id="station2Preview" style="margin-top:4px; display:flex; gap:4px;"></div>
-              </div>
-            </div>
+    <!-- Hidden builder wrapper for JS compatibility -->
+    <div id="builder" class="hidden">
+      <h2>Your Station</h2>
+      <small id="builderHint"></small>
+      <div id="stations">
+        <div class="station" id="station1">
+          <div class="station-label">Station A</div>
+          <div class="station-badge">Base station</div>
+          <div id="station1Desc">Single scoop, classic service.</div>
+        </div>
+        <div class="station" id="station2">
+          <div class="station-label">Station B</div>
+          <div class="station-badge" id="station2Badge">Locked</div>
+          <div id="station2Desc">Buy an extra station in the shop!</div>
+          <div id="station2Content" class="hidden">
+            <div id="station2Hint" style="margin-top:4px; min-height:30px;"></div>
+            <div id="station2Preview" style="margin-top:4px; display:flex; gap:4px;"></div>
           </div>
         </div>
       </div>
