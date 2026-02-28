@@ -32,13 +32,18 @@
       display: flex;
       justify-content: center;
       align-items: stretch;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
     }
 
     #gameRoot {
       width: 100%;
       max-width: 960px;
-      padding: 16px 18px 24px;
+      padding: 12px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
     }
 
     h1, h2, h3 {
@@ -67,19 +72,37 @@
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      flex: 1 1 0;
+      overflow: hidden;
+      min-height: 0;
     }
 
     .col {
       flex: 1 1 0;
       min-width: 220px;
+      overflow-y: auto;
+      max-height: 100%;
     }
 
     /* --- Top bar: day, money, hint --- */
     #topBar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      gap: 10px;
+      flex-shrink: 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      margin-bottom: 6px;
+    }
+
+    #topBar .top-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    #topBar .top-controls button {
+      font-size: 0.82rem;
+      padding: 4px 12px;
     }
 
     #dayLabel {
@@ -99,15 +122,16 @@
     }
 
     #tutorialBanner {
-      font-size: 0.9rem;
-      opacity: 0.9;
+      flex-shrink: 0;
+      font-size: 0.82rem;
+      opacity: 0.7;
+      padding: 2px 0 4px;
       font-style: italic;
     }
 
     /* --- Customer order / ice cream visual --- */
     #customerCard {
       position: relative;
-      min-height: 120px;
     }
 
     #customerOrderText {
@@ -283,7 +307,7 @@
 
     /* --- Builder area --- */
     #builder.card {
-      margin-top: 10px;
+      margin-top: 4px;
       opacity: 1;
       transition: opacity 0.2s ease-out;
     }
@@ -337,8 +361,8 @@
 
     #timer {
       font-weight: bold;
-      font-size: 0.95rem;
-      margin-top: 4px;
+      font-size: 0.82rem;
+      white-space: nowrap;
     }
 
     /* --- Stations --- */
@@ -371,21 +395,27 @@
       opacity: 0.75;
     }
 
-    /* --- Bottom bar: results, next day, shop --- */
-    #bottomBar {
-      margin-top: 10px;
+    /* --- Result bar: slim inline feedback --- */
+    #resultBar {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 12px;
+      margin-top: 6px;
+      font-size: 0.88rem;
       display: flex;
+      align-items: center;
       gap: 10px;
-      align-items: flex-start;
+      min-height: 32px;
+      backdrop-filter: blur(4px);
     }
 
     #resultText {
-      font-size: 0.95rem;
+      font-size: 0.88rem;
     }
 
     #endOfDayPanel {
-      margin-top: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     /* --- Shop modal --- */
@@ -446,12 +476,11 @@
 
     /* --- Timer bar --- */
     #timerBarContainer {
-      width: 100%;
+      flex: 1;
       height: 8px;
       background: rgba(0,0,0,0.08);
       border-radius: 999px;
       overflow: hidden;
-      margin-top: 4px;
     }
 
     #timerBar {
@@ -797,17 +826,18 @@
 <body>
   <div id="gameRoot">
     <div id="topBar">
-      <div>
-        <div id="dayLabel">Day 1</div>
-        <div id="customerProgress"></div>
-        <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
-      </div>
-      <div>
-        <div id="moneyLabel">$0</div>
-        <div id="timer"></div>
+      <div id="dayLabel">Day 1</div>
+      <div style="flex:1; display:flex; align-items:center; gap:8px;">
+        <span id="timer" style="font-size:0.82rem; white-space:nowrap;"></span>
         <div id="timerBarContainer"><div id="timerBar"></div></div>
       </div>
+      <div id="moneyLabel">$0</div>
+      <div class="top-controls">
+        <button id="nextCustomerBtn" class="primary">Start Day 1</button>
+        <button id="openShopBtn" disabled>Shop</button>
+      </div>
     </div>
+    <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
 
     <div class="row">
       <div class="col">
@@ -820,6 +850,7 @@
           </div>
           <div id="customerVisual" class="ice-cream-visual"></div>
           <div id="customerAvatar"></div>
+          <div id="customerProgress"></div>
         </div>
         <div id="notepadPanel" class="card hidden">
           <div class="notepad-header">
@@ -885,17 +916,9 @@
       </div>
     </div>
 
-    <div id="bottomBar">
-      <div class="col card">
-        <h3>Results</h3>
-        <div id="resultText">Serve your first customer to see how you did!</div>
-        <div id="endOfDayPanel" class="hidden"></div>
-      </div>
-      <div class="col card">
-        <h3>Controls</h3>
-        <button id="nextCustomerBtn" class="primary">Start Day 1</button>
-        <button id="openShopBtn" disabled>Shop (between days)</button>
-      </div>
+    <div id="resultBar">
+      <span id="resultText">Serve your first customer to see how you did!</span>
+      <div id="endOfDayPanel" class="hidden"></div>
     </div>
   </div>
 
@@ -1532,7 +1555,7 @@
 
       timerEl.textContent = "Day: " + dayTimeLeft + "s";
       timerBarEl.style.width = "100%";
-      nextCustomerBtn.textContent = "Serve first customer of Day " + day;
+      nextCustomerBtn.textContent = "Start Day " + day;
       updateCustomerProgress();
     }
 
@@ -1871,47 +1894,28 @@
         totalParts: totalMaxParts
       });
 
+      // Build short one-line result for the slim result bar
       let text = "";
       if (timeUp) {
-        text += "<span class='text-bad'>Day timer ran out!</span> ";
+        text += "<span class='text-bad'>Time's up!</span> ";
       }
-
       if (totalScore === totalMaxParts) {
-        text += "<span class='text-good'>Perfect order!</span> ";
+        text += "<span class='text-good'>Perfect!</span> ";
       } else if (totalScore >= totalMaxParts * 0.66) {
-        text += "<span class='text-good'>Pretty close.</span> ";
+        text += "<span class='text-good'>Close!</span> ";
       } else if (totalScore >= totalMaxParts * 0.33) {
-        text += "<span class='text-bad'>Only some parts were right.</span> ";
+        text += "<span class='text-bad'>Partial.</span> ";
       } else {
-        text += "<span class='text-bad'>That was mostly wrong.</span> ";
+        text += "<span class='text-bad'>Wrong.</span> ";
       }
-      text += `You got ${totalScore}/${totalMaxParts} parts correct.`;
-
+      text += `${totalScore}/${totalMaxParts}`;
       if (refund > 0) {
-        text += ` The customer asked for a refund and you lost $${refund}.`;
+        text += ` −$${refund}`;
       } else {
-        text += ` You earned $${earnings}.`;
+        text += ` +$${earnings}`;
       }
       if (tip > 0) {
-        text += ` They also tipped you <strong>$${tip}</strong> for speedy service.`;
-      }
-
-      // Post-evaluation feedback per order
-      for (let i = 0; i < numOrders; i++) {
-        const co = currentOrders[i];
-        const po = playerOrders[i];
-        const r = perOrderResults[i];
-        const label = numOrders > 1 ? `Ice Cream ${i + 1}: ` : "";
-        const correctDesc = describeOrder(co);
-        text += `<br><small style="opacity:0.8">${label}${correctDesc}</small>`;
-        const containerIcon = po.container === co.container ? "\u2713" : "\u2717";
-        const scoopsIcon = r.scoopMatch ? "\u2713" : "\u2717";
-        const toppingsIcon = r.toppingsMatch ? "\u2713" : "\u2717";
-        text += `<br><small>`;
-        text += `<span class="${po.container === co.container ? 'text-good' : 'text-bad'}">${containerIcon} Container</span> \u00b7 `;
-        text += `<span class="${r.scoopMatch ? 'text-good' : 'text-bad'}">${scoopsIcon} Scoops</span> \u00b7 `;
-        text += `<span class="${r.toppingsMatch ? 'text-good' : 'text-bad'}">${toppingsIcon} Toppings</span>`;
-        text += `</small>`;
+        text += ` <span class='text-good'>+$${tip} tip</span>`;
       }
 
       resultTextEl.innerHTML = text;
@@ -1926,7 +1930,7 @@
         endDaySummary();
       } else {
         nextCustomerBtn.disabled = false;
-        nextCustomerBtn.textContent = "Next customer (" + customersServedToday + " served)";
+        nextCustomerBtn.textContent = "Next Customer";
       }
     }
 
@@ -1942,10 +1946,9 @@
 
       endOfDayPanelEl.classList.remove("hidden");
       endOfDayPanelEl.innerHTML =
-        `<strong>Day ${day} complete!</strong><br>` +
-        `You served ${customersServedToday} customers and now have <strong>$${money}</strong>.`;
+        `<strong>Day ${day} done!</strong> ${customersServedToday} served · <strong>$${money}</strong>`;
 
-      nextCustomerBtn.textContent = "Day finished";
+      nextCustomerBtn.textContent = "Day Over";
 
       // Build earnings breakdown table (Feature 8)
       let breakdownHtml = "";
