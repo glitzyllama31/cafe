@@ -606,12 +606,13 @@
     /* --- Flavour swatches --- */
     .flavour-swatch {
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       margin-right: 4px;
       vertical-align: middle;
       border: 1px solid rgba(0,0,0,0.15);
+      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);
     }
 
     /* --- Day-end overlay --- */
@@ -711,8 +712,8 @@
     }
 
     .topping-tile {
-      width: 70px;
-      height: 80px;
+      width: 80px;
+      height: 88px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -901,6 +902,159 @@
       display: block;
     }
 
+    /* --- Container cards --- */
+    .container-card {
+      width: 80px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    }
+    .container-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    .container-card.selected {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(247, 196, 200, 0.5);
+      border-color: rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.95);
+    }
+    .container-illust {
+      width: 40px;
+      height: 48px;
+      position: relative;
+    }
+    .container-illust-cone::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 42px;
+      background: linear-gradient(145deg, #f5c48d, #e39b51);
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+    }
+    .container-illust-cup::before {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 26px;
+      background: linear-gradient(145deg, #fefefe, #f0f0f0);
+      border-radius: 0 0 10px 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* --- Scoop counter --- */
+    .scoop-counter {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.06);
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* --- Feedback animations --- */
+    #builderVisual.perfect {
+      animation: perfectBounce 0.5s ease-out;
+    }
+    #builderVisual.perfect::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+      animation: perfectFlash 0.5s ease-out;
+      pointer-events: none;
+    }
+    @keyframes perfectFlash {
+      0% { opacity: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes perfectBounce {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.06); }
+      50% { transform: scale(0.97); }
+      100% { transform: scale(1); }
+    }
+
+    #builderVisual.wrong {
+      animation: wrongShake 0.4s ease-out;
+    }
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      15% { transform: translateX(-6px); }
+      30% { transform: translateX(6px); }
+      45% { transform: translateX(-4px); }
+      60% { transform: translateX(4px); }
+      75% { transform: translateX(-2px); }
+      90% { transform: translateX(2px); }
+    }
+
+    .float-money {
+      position: fixed;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--good);
+      pointer-events: none;
+      z-index: 100;
+      animation: floatUp 1s ease-out forwards;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-40px); }
+    }
+
+    #moneyLabel.earning {
+      animation: coinBounce 0.4s ease-out;
+    }
+    @keyframes coinBounce {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.2); }
+      60% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    /* --- Star rating --- */
+    .star-rating {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin: 8px 0;
+    }
+    .star {
+      width: 28px;
+      height: 28px;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      background: rgba(0,0,0,0.12);
+    }
+    .star.filled {
+      background: linear-gradient(135deg, #ffd700, #ffaa00);
+    }
+    .star.half {
+      background: linear-gradient(90deg, #ffd700 50%, rgba(0,0,0,0.12) 50%);
+    }
+
     /* --- Utility --- */
     .hidden {
       display: none !important;
@@ -972,7 +1126,7 @@
           </div>
 
           <div>
-            <strong>Flavour</strong>
+            <strong>Flavour</strong><span id="scoopCounter" class="scoop-counter">0/3</span>
             <div id="flavourButtons" class="btn-row"></div>
           </div>
 
@@ -1015,6 +1169,7 @@
   <div id="dayEndOverlay">
     <div id="dayEndPanel" class="card">
       <h2 id="dayEndTitle">Day Complete!</h2>
+      <div id="dayEndStars" class="star-rating"></div>
       <div id="dayEndStats"></div>
       <div style="margin-top:10px; text-align:center;">
         <button id="dayEndContinueBtn" class="primary">Continue to Shop</button>
@@ -1106,7 +1261,11 @@
     const dayEndContinueBtn = document.getElementById("dayEndContinueBtn");
 
     function setBuilderEnabled(enabled) {
-      containerButtonsEl.querySelectorAll("button").forEach(b => b.disabled = !enabled);
+      containerButtonsEl.querySelectorAll(".container-card").forEach(c => {
+        c.classList.toggle("disabled", !enabled);
+        c.style.opacity = enabled ? "" : "0.5";
+        c.style.pointerEvents = enabled ? "" : "none";
+      });
       flavourButtonsEl.querySelectorAll("button").forEach(b => b.disabled = !enabled);
       toppingButtonsEl.querySelectorAll("button").forEach(b => b.disabled = !enabled);
       if (!enabled) submitOrderBtn.disabled = true;
@@ -1114,19 +1273,29 @@
 
     // ---- UI setup ----
     function createButtons() {
-      // Container buttons
+      // Container cards
       containerButtonsEl.innerHTML = "";
       ["cone", "cup"].forEach(val => {
-        const btn = document.createElement("button");
-        btn.textContent = val === "cone" ? "Cone" : "Cup";
-        btn.dataset.value = val;
-        btn.addEventListener("click", () => {
+        const card = document.createElement("div");
+        card.className = "container-card";
+        card.dataset.value = val;
+
+        const illust = document.createElement("div");
+        illust.className = "container-illust container-illust-" + val;
+        card.appendChild(illust);
+
+        const label = document.createElement("span");
+        label.textContent = val === "cone" ? "Cone" : "Cup";
+        card.appendChild(label);
+
+        card.addEventListener("click", () => {
+          if (card.classList.contains("disabled")) return;
           playerOrder.container = val;
           refreshSelectionStates();
           maybeEnableServe();
           renderBuilderVisual();
         });
-        containerButtonsEl.appendChild(btn);
+        containerButtonsEl.appendChild(card);
       });
 
       refreshFlavourButtons();
@@ -1213,9 +1382,9 @@
     }
 
     function refreshSelectionStates() {
-      // container
-      [...containerButtonsEl.children].forEach(btn => {
-        btn.classList.toggle("selected", btn.dataset.value === playerOrder.container);
+      // container cards
+      [...containerButtonsEl.children].forEach(card => {
+        card.classList.toggle("selected", card.dataset.value === playerOrder.container);
       });
       // flavour buttons highlighted if that flavour appears in any scoop
       const flavourCounts = {};
@@ -1227,6 +1396,11 @@
       [...toppingButtonsEl.children].forEach(btn => {
         btn.classList.toggle("selected", playerOrder.toppings.has(btn.dataset.value));
       });
+      // scoop counter
+      const scoopCounter = document.getElementById("scoopCounter");
+      if (scoopCounter) {
+        scoopCounter.textContent = (playerOrder.scoops ? playerOrder.scoops.length : 0) + "/3 scoops";
+      }
     }
 
     function labelForFlavour(f) {
@@ -2025,6 +2199,34 @@
 
       resultTextEl.innerHTML = text;
 
+      // Visual feedback on builder
+      builderVisualEl.classList.remove("perfect", "wrong");
+      if (totalScore === totalMaxParts) {
+        builderVisualEl.classList.add("perfect");
+        setTimeout(() => builderVisualEl.classList.remove("perfect"), 600);
+      } else if (totalScore < totalMaxParts * 0.5) {
+        builderVisualEl.classList.add("wrong");
+        setTimeout(() => builderVisualEl.classList.remove("wrong"), 500);
+      }
+
+      // Floating +$X near money label
+      if (earnings + tip > 0) {
+        const floater = document.createElement("div");
+        floater.className = "float-money";
+        floater.textContent = "+$" + (earnings + tip);
+        const rect = moneyLabel.getBoundingClientRect();
+        floater.style.left = rect.left + "px";
+        floater.style.top = (rect.top - 4) + "px";
+        document.body.appendChild(floater);
+        setTimeout(() => floater.remove(), 1000);
+
+        // Coin bounce on money label
+        moneyLabel.classList.remove("earning");
+        void moneyLabel.offsetWidth; // trigger reflow
+        moneyLabel.classList.add("earning");
+        setTimeout(() => moneyLabel.classList.remove("earning"), 500);
+      }
+
       // Hide order tabs
       const tabsEl = document.getElementById("orderTabs");
       tabsEl.classList.add("hidden");
@@ -2079,6 +2281,28 @@
         });
         breakdownHtml += `<div style="padding:4px 0; font-weight:bold;">Total: $${dayTotal}</div>`;
         breakdownHtml += `</div>`;
+      }
+
+      // Calculate star rating (0-5, half increments) based on accuracy
+      let totalAccuracy = 0;
+      let totalPossible = 0;
+      dayEarnings.forEach(e => {
+        totalAccuracy += e.scoreParts;
+        totalPossible += e.totalParts;
+      });
+      const accuracyPct = totalPossible > 0 ? totalAccuracy / totalPossible : 0;
+      const starCount = Math.round(accuracyPct * 10) / 2; // 0 to 5 in 0.5 steps
+      const starsEl = document.getElementById("dayEndStars");
+      starsEl.innerHTML = "";
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+        if (i <= starCount) {
+          star.classList.add("filled");
+        } else if (i - 0.5 === starCount) {
+          star.classList.add("half");
+        }
+        starsEl.appendChild(star);
       }
 
       // Show day-end overlay
