@@ -38,8 +38,8 @@
 
     #gameRoot {
       width: 100%;
-      max-width: 960px;
-      padding: 12px 16px 8px;
+      max-width: 1000px;
+      padding: 8px 12px 6px;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -59,8 +59,8 @@
     /* --- Card / panel style: sketchy, soft --- */
     .card {
       background: rgba(255,255,255,0.85);
-      border-radius: 18px;
-      padding: 14px 16px;
+      border-radius: 14px;
+      padding: 10px 12px;
       box-shadow:
         0 2px 0 rgba(0,0,0,0.05),
         0 0 0 2px rgba(0,0,0,0.04);
@@ -70,27 +70,34 @@
 
     .row {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 8px;
       flex: 1 1 0;
       overflow: hidden;
       min-height: 0;
     }
 
-    .col {
-      flex: 1 1 0;
-      min-width: 220px;
+    .col-left {
+      flex: 0 0 210px;
       overflow-y: auto;
       max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .col:first-child {
-      flex: 0 0 280px;
-    }
-
-    .col:last-child {
+    .col-center {
       flex: 1 1 0;
-      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 140px;
+    }
+
+    .col-right {
+      flex: 0 0 340px;
+      overflow-y: auto;
+      max-height: 100%;
     }
 
     /* --- Top bar: day, money, hint --- */
@@ -144,71 +151,76 @@
     }
 
     #customerOrderText {
-      margin-top: 4px;
-      font-size: 0.95rem;
-    }
-
-    #okOrderBtn {
-      margin-top: 8px;
+      margin-top: 2px;
+      font-size: 0.85rem;
     }
 
     .dialogueBox {
-      margin-top: 6px;
-      padding: 10px 12px;
-      border-radius: 14px;
+      margin-top: 4px;
+      padding: 8px 10px;
+      border-radius: 12px;
       background: #fff;
       border: 2px solid rgba(0,0,0,0.1);
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       position: relative;
+      font-size: 0.88rem;
     }
 
     .dialogueBox::after {
       content: "";
       position: absolute;
-      top: -10px;
+      top: -8px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 10px solid #fff;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #fff;
       filter: drop-shadow(0 -1px 0 rgba(0,0,0,0.08));
     }
 
+    #okOrderBtn {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 8px;
+      font-size: 0.95rem;
+    }
+
     #customerAvatar {
-      width: 72px;
-      height: 72px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ffe3d2 0, #e2a68a 60%);
       border: 2px solid rgba(0,0,0,0.1);
       position: relative;
-      margin: 0 auto 8px;
+      margin: 0 auto 4px;
       box-shadow: 0 2px 0 rgba(0,0,0,0.08);
     }
 
     #customerAvatar::before {
       content: "";
       position: absolute;
-      top: 24px;
-      left: 20px;
-      width: 8px;
-      height: 8px;
+      top: 17px;
+      left: 14px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--ink);
-      box-shadow: 24px 0 0 var(--ink);
+      box-shadow: 18px 0 0 var(--ink);
     }
 
     #customerAvatar::after {
       content: "";
       position: absolute;
-      bottom: 18px;
+      bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
-      width: 16px;
-      height: 8px;
-      border-radius: 0 0 10px 10px;
-      border-bottom: 2.5px solid var(--ink);
+      width: 12px;
+      height: 6px;
+      border-radius: 0 0 8px 8px;
+      border-bottom: 2px solid var(--ink);
       border-left: 1px solid transparent;
       border-right: 1px solid transparent;
     }
@@ -216,15 +228,15 @@
     .avatar-neutral::after {
       border-radius: 0 !important;
       height: 0 !important;
-      border-bottom: 2.5px solid var(--ink) !important;
-      width: 16px !important;
+      border-bottom: 2px solid var(--ink) !important;
+      width: 12px !important;
     }
 
     .avatar-impatient::after {
-      border-radius: 10px 10px 0 0 !important;
+      border-radius: 8px 8px 0 0 !important;
       border-bottom: none !important;
-      border-top: 2.5px solid var(--ink) !important;
-      height: 6px !important;
+      border-top: 2px solid var(--ink) !important;
+      height: 5px !important;
     }
 
     .ice-cream-visual {
@@ -238,8 +250,9 @@
       justify-content: center;
       align-items: flex-end;
       min-height: 160px;
-      margin: 4px auto;
+      margin: 0 auto;
       position: relative;
+      width: 100%;
     }
 
     .cone {
@@ -384,9 +397,32 @@
 
     /* --- Builder area --- */
     #builder.card {
-      margin-top: 4px;
+      margin-top: 0;
+      padding: 8px 10px;
       opacity: 1;
       transition: opacity 0.2s ease-out;
+    }
+
+    #builder.card h2 {
+      display: none;
+    }
+
+    #builder.card #builderHint {
+      display: none;
+    }
+
+    #orderTabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    #submitOrderBtn {
+      width: 80%;
+      max-width: 180px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      margin-top: 8px;
     }
 
     .btn-row {
@@ -445,17 +481,17 @@
     /* --- Stations --- */
     #stations {
       display: flex;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: 0.8rem;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 0.72rem;
     }
 
     .station {
       flex: 1;
-      min-height: 46px;
-      border-radius: 12px;
-      border: 1px dashed rgba(0,0,0,0.2);
-      padding: 4px 6px;
+      min-height: 32px;
+      border-radius: 10px;
+      border: 1px dashed rgba(0,0,0,0.15);
+      padding: 3px 6px;
       position: relative;
     }
 
@@ -1087,17 +1123,8 @@
     <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
 
     <div class="row">
-      <div class="col">
-        <div id="customerCard" class="card">
-          <div id="customerAvatar"></div>
-          <h2 id="customerName" style="text-align:center; font-size:1rem; margin:0 0 6px;">Shy Customer</h2>
-          <div class="dialogueBox">
-            <div id="customerOrderText">They haven't ordered yet…</div>
-            <button id="okOrderBtn" class="primary hidden">Okay</button>
-          </div>
-          <div id="customerVisual" class="ice-cream-visual"></div>
-          <div id="customerProgress"></div>
-        </div>
+      <!-- Left: Customer + Notepad -->
+      <div class="col-left">
         <div id="notepadPanel" class="card hidden">
           <div class="notepad-header">
             <strong>Notepad</strong>
@@ -1109,29 +1136,43 @@
           </div>
           <canvas id="notepadCanvas"></canvas>
         </div>
+        <div id="customerCard" class="card">
+          <div id="customerAvatar"></div>
+          <h2 id="customerName" style="text-align:center; font-size:0.9rem; margin:0 0 4px;">Shy Customer</h2>
+          <div class="dialogueBox">
+            <div id="customerOrderText">They haven't ordered yet…</div>
+            <button id="okOrderBtn" class="primary hidden">Okay, got it!</button>
+          </div>
+          <div id="customerVisual" class="ice-cream-visual"></div>
+          <div id="customerProgress"></div>
+        </div>
       </div>
 
-      <div class="col">
+      <!-- Center: Ice cream visual + serve button -->
+      <div class="col-center">
+        <div id="orderTabs" class="hidden"></div>
+        <div id="builderVisual" class="ice-cream-visual"></div>
+        <button id="submitOrderBtn" class="primary" disabled>Serve</button>
+      </div>
+
+      <!-- Right: Builder controls -->
+      <div class="col-right">
         <div id="builder" class="card">
           <h2>Your Station</h2>
           <small id="builderHint">When the order disappears, build exactly what they asked for.</small>
 
-          <div id="builderVisual" class="ice-cream-visual"></div>
-
-          <div id="orderTabs" class="hidden" style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;"></div>
-
-          <div style="margin-top:6px;">
-            <strong>Container</strong>
+          <div style="margin-bottom:4px;">
+            <strong style="font-size:0.82rem;">Container</strong>
             <div id="containerButtons" class="btn-row"></div>
           </div>
 
-          <div>
-            <strong>Flavour</strong><span id="scoopCounter" class="scoop-counter">0/3</span>
+          <div style="margin-bottom:4px;">
+            <strong style="font-size:0.82rem;">Flavour</strong><span id="scoopCounter" class="scoop-counter">0/3</span>
             <div id="flavourButtons" class="btn-row"></div>
           </div>
 
-          <div>
-            <strong>Toppings</strong>
+          <div style="margin-bottom:4px;">
+            <strong style="font-size:0.82rem;">Toppings</strong>
             <div id="toppingButtons"></div>
           </div>
 
@@ -1150,10 +1191,6 @@
                 <div id="station2Preview" style="margin-top:4px; display:flex; gap:4px;"></div>
               </div>
             </div>
-          </div>
-
-          <div style="margin-top:8px;">
-            <button id="submitOrderBtn" class="primary" disabled>Serve Ice Cream</button>
           </div>
         </div>
       </div>
