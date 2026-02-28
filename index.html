@@ -84,6 +84,15 @@
       max-height: 100%;
     }
 
+    .col:first-child {
+      flex: 0 0 280px;
+    }
+
+    .col:last-child {
+      flex: 1 1 0;
+      min-width: 320px;
+    }
+
     /* --- Top bar: day, money, hint --- */
     #topBar {
       display: flex;
@@ -145,36 +154,77 @@
 
     .dialogueBox {
       margin-top: 6px;
-      padding: 10px 10px;
+      padding: 10px 12px;
       border-radius: 14px;
-      background: rgba(255, 252, 245, 0.9);
-      border: 1px dashed rgba(0,0,0,0.12);
-      box-shadow: 0 2px 0 rgba(0,0,0,0.06);
+      background: #fff;
+      border: 2px solid rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       position: relative;
     }
 
     .dialogueBox::after {
       content: "";
       position: absolute;
-      top: -8px;
-      right: 24px;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 8px solid rgba(255, 252, 245, 0.9);
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid #fff;
+      filter: drop-shadow(0 -1px 0 rgba(0,0,0,0.08));
     }
 
     #customerAvatar {
-      width: 40px;
-      height: 40px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ffe3d2 0, #e2a68a 60%);
       border: 2px solid rgba(0,0,0,0.1);
-      position: absolute;
-      top: 10px;
-      right: 10px;
+      position: relative;
+      margin: 0 auto 8px;
       box-shadow: 0 2px 0 rgba(0,0,0,0.08);
+    }
+
+    #customerAvatar::before {
+      content: "";
+      position: absolute;
+      top: 24px;
+      left: 20px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ink);
+      box-shadow: 24px 0 0 var(--ink);
+    }
+
+    #customerAvatar::after {
+      content: "";
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 8px;
+      border-radius: 0 0 10px 10px;
+      border-bottom: 2.5px solid var(--ink);
+      border-left: 1px solid transparent;
+      border-right: 1px solid transparent;
+    }
+
+    .avatar-neutral::after {
+      border-radius: 0 !important;
+      height: 0 !important;
+      border-bottom: 2.5px solid var(--ink) !important;
+      width: 16px !important;
+    }
+
+    .avatar-impatient::after {
+      border-radius: 10px 10px 0 0 !important;
+      border-bottom: none !important;
+      border-top: 2.5px solid var(--ink) !important;
+      height: 6px !important;
     }
 
     .ice-cream-visual {
@@ -184,58 +234,82 @@
     }
 
     #builderVisual {
-      margin-top: 18px;
-      margin-left: 24px;
-      min-height: 110px;
-      transform: scale(1.3);
-      transform-origin: top left;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      min-height: 240px;
+      margin: 12px auto;
+      position: relative;
     }
 
     .cone {
-      width: 42px;
-      height: 58px;
+      width: 80px;
+      height: 110px;
       background: linear-gradient(145deg, #f5c48d, #e39b51);
       clip-path: polygon(50% 100%, 0 0, 100% 0);
       box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
       position: absolute;
       bottom: 0;
-      left: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1;
     }
 
     .cup {
-      width: 54px;
-      height: 36px;
+      width: 100px;
+      height: 65px;
       background: linear-gradient(145deg, #fefefe, #f5f5f5);
-      border-radius: 0 0 14px 14px;
+      border-radius: 0 0 22px 22px;
       border: 1px solid rgba(0,0,0,0.06);
       box-shadow: 0 2px 0 rgba(0,0,0,0.08);
       position: absolute;
       bottom: 0;
-      left: 4px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1;
     }
 
     .scoop {
-      width: 46px;
-      height: 38px;
+      width: 88px;
+      height: 70px;
       border-radius: 60% 60% 45% 45%;
       position: absolute;
-      left: 0;
+      left: 50%;
+      transform: translateX(-50%);
       box-shadow: 0 2px 0 rgba(0,0,0,0.13);
       z-index: 2;
+      animation: scoopDrop 0.3s ease-out;
+    }
+
+    .scoop::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 15px;
+      width: 24px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .scoop::after {
       content: "";
       position: absolute;
-      left: 6px;
-      right: 6px;
-      bottom: -8px;
-      height: 12px;
-      border-radius: 0 0 16px 16px;
+      left: 10px;
+      right: 10px;
+      bottom: -12px;
+      height: 18px;
+      border-radius: 0 0 24px 24px;
       background: inherit;
       box-shadow: 0 3px 0 rgba(0,0,0,0.10);
+    }
+
+    @keyframes scoopDrop {
+      0% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+      60% { opacity: 1; transform: translateX(-50%) translateY(4px); }
+      80% { transform: translateX(-50%) translateY(-2px); }
+      100% { transform: translateX(-50%) translateY(0); }
     }
 
     .scoop-vanilla {
@@ -252,43 +326,46 @@
 
     .scoop-mint {
       background:
-        radial-gradient(circle at 15% 30%, rgba(92,60,36,0.7) 0, transparent 4px),
-        radial-gradient(circle at 70% 60%, rgba(92,60,36,0.6) 0, transparent 4px),
-        radial-gradient(circle at 40% 80%, rgba(92,60,36,0.5) 0, transparent 4px),
+        radial-gradient(circle at 15% 30%, rgba(92,60,36,0.7) 0, transparent 7px),
+        radial-gradient(circle at 70% 60%, rgba(92,60,36,0.6) 0, transparent 6px),
+        radial-gradient(circle at 40% 80%, rgba(92,60,36,0.5) 0, transparent 6px),
+        radial-gradient(circle at 85% 35%, rgba(92,60,36,0.5) 0, transparent 5px),
         radial-gradient(circle at 30% 30%, #d8ffe9 0, #96d6b3 65%);
     }
 
     .topping-chip {
       position: absolute;
-      width: 6px;
-      height: 22px;
+      width: 10px;
+      height: 40px;
       border-radius: 999px;
       background: #5b3b15;
-      top: 0;
-      left: 24px;
+      top: -8px;
+      left: 42px;
       transform: rotate(-35deg);
       box-shadow: 0 1px 0 rgba(0,0,0,0.25);
     }
 
     .sparkle {
       position: absolute;
-      width: 3px;
-      height: 10px;
+      width: 5px;
+      height: 14px;
       border-radius: 999px;
       background: linear-gradient(to bottom, #ff5f7e, #ffb05f);
       box-shadow:
-        6px -6px 0 #7ad6ff,
-        -7px -3px 0 #fff79c;
+        10px -10px 0 #7ad6ff,
+        -12px -5px 0 #fff79c,
+        18px 2px 0 #ff5f7e,
+        -4px -14px 0 #4caf50;
     }
 
     .drizzle {
       position: absolute;
-      width: 38px;
-      height: 8px;
+      width: 72px;
+      height: 14px;
       border-radius: 999px;
       background: rgba(139,69,19,0.8);
-      top: 14px;
-      left: 4px;
+      top: 20px;
+      left: 8px;
       filter: blur(0.3px);
       transform: rotate(-10deg);
     }
@@ -296,12 +373,12 @@
     .drizzle::before {
       content: "";
       position: absolute;
-      width: 30px;
-      height: 8px;
+      width: 56px;
+      height: 12px;
       border-radius: 999px;
       background: inherit;
-      top: 6px;
-      left: -4px;
+      top: 10px;
+      left: -6px;
       transform: rotate(18deg);
     }
 
@@ -607,6 +684,22 @@
       75% { transform: translateX(2px); }
     }
 
+    /* --- Customer slide animations --- */
+    #customerCard.entering {
+      animation: slideInCustomer 0.4s ease-out;
+    }
+    #customerCard.exiting {
+      animation: slideOutCustomer 0.3s ease-in forwards;
+    }
+    @keyframes slideInCustomer {
+      0% { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOutCustomer {
+      0% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(40px); }
+    }
+
     /* --- Ingredient bar & topping tiles --- */
     .ingredient-bar {
       display: flex;
@@ -842,14 +935,13 @@
     <div class="row">
       <div class="col">
         <div id="customerCard" class="card">
-          <h2>Customer</h2>
-          <div id="customerName">Shy Customer</div>
+          <div id="customerAvatar"></div>
+          <h2 id="customerName" style="text-align:center; font-size:1rem; margin:0 0 6px;">Shy Customer</h2>
           <div class="dialogueBox">
             <div id="customerOrderText">They haven't ordered yet…</div>
             <button id="okOrderBtn" class="primary hidden">Okay</button>
           </div>
           <div id="customerVisual" class="ice-cream-visual"></div>
-          <div id="customerAvatar"></div>
           <div id="customerProgress"></div>
         </div>
         <div id="notepadPanel" class="card hidden">
@@ -870,12 +962,9 @@
           <h2>Your Station</h2>
           <small id="builderHint">When the order disappears, build exactly what they asked for.</small>
 
-          <div id="orderTabs" class="hidden" style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;"></div>
+          <div id="builderVisual" class="ice-cream-visual"></div>
 
-          <div style="margin-top:6px;">
-            <strong>Ice cream you are building</strong>
-            <div id="builderVisual" class="ice-cream-visual"></div>
-          </div>
+          <div id="orderTabs" class="hidden" style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;"></div>
 
           <div style="margin-top:6px;">
             <strong>Container</strong>
@@ -1472,7 +1561,7 @@
         const scoop = document.createElement("div");
         scoop.classList.add("scoop");
         scoop.classList.add("scoop-" + flavour);
-        const verticalOffset = 32 + index * 26;
+        const verticalOffset = 60 + index * 50;
         scoop.style.bottom = verticalOffset + "px";
 
         if (toppingsArr.includes("flake") && index === scoops.length - 1) {
@@ -1483,15 +1572,15 @@
         if (toppingsArr.includes("sprinkles")) {
           const spr = document.createElement("div");
           spr.className = "sparkle";
-          spr.style.bottom = "44px";
-          spr.style.left = "18px";
+          spr.style.top = "6px";
+          spr.style.left = "30px";
           scoop.appendChild(spr);
         }
         if (toppingsArr.includes("caramel")) {
           const dr = document.createElement("div");
           dr.className = "drizzle";
           dr.style.background = "rgba(205,133,63,0.75)";
-          dr.style.top = "10px";
+          dr.style.top = "16px";
           dr.style.transform = "rotate(-12deg)";
           scoop.appendChild(dr);
         }
@@ -1499,7 +1588,7 @@
           const dr = document.createElement("div");
           dr.className = "drizzle";
           dr.style.background = "rgba(90,44,25,0.8)";
-          dr.style.top = "18px";
+          dr.style.top = "28px";
           dr.style.transform = "rotate(6deg)";
           scoop.appendChild(dr);
         }
@@ -1508,6 +1597,11 @@
       });
 
       builderVisualEl.appendChild(base);
+
+      // Set dynamic height based on scoop count
+      const totalHeight = container === "cone" ? 110 : 65;
+      const scoopHeight = 60 + (scoops.length > 0 ? scoops.length * 50 + 30 : 0);
+      builderVisualEl.style.minHeight = Math.max(totalHeight, scoopHeight) + "px";
     }
 
     function updateTopBar() {
@@ -1604,6 +1698,12 @@
       setBuilderEnabled(false);
       playDing();
       updateCustomerProgress();
+
+      // Slide-in animation
+      const customerCard = document.getElementById("customerCard");
+      customerCard.classList.remove("exiting");
+      customerCard.classList.add("entering");
+      setTimeout(() => customerCard.classList.remove("entering"), 400);
 
       // Show and clear notepad
       if (hasNotepad) {
@@ -1756,7 +1856,7 @@
         if (i === activeOrderIndex) return;
         if (!po.container && po.scoops.length === 0) return;
         const mini = document.createElement("div");
-        mini.style.cssText = "transform:scale(0.4); transform-origin:bottom left; width:60px; height:60px; position:relative; display:inline-block;";
+        mini.style.cssText = "transform:scale(0.25); transform-origin:bottom left; width:60px; height:60px; position:relative; display:inline-block;";
         if (po.container) {
           const base = document.createElement("div");
           base.classList.add(po.container === "cone" ? "cone" : "cup");
@@ -1765,7 +1865,7 @@
         po.scoops.forEach((f, si) => {
           const scoop = document.createElement("div");
           scoop.className = "scoop scoop-" + f;
-          scoop.style.bottom = (32 + si * 26) + "px";
+          scoop.style.bottom = (60 + si * 50) + "px";
           mini.appendChild(scoop);
         });
         previewEl.appendChild(mini);
@@ -1842,6 +1942,11 @@
       // Reset avatar patience state
       const avatar = document.getElementById("customerAvatar");
       avatar.classList.remove("avatar-neutral", "avatar-impatient");
+
+      // Slide-out animation
+      const customerCard = document.getElementById("customerCard");
+      customerCard.classList.add("exiting");
+      setTimeout(() => customerCard.classList.remove("exiting"), 300);
 
       // Save current active order state
       playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
