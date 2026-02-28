@@ -59,17 +59,18 @@
   <div id="gameRoot">
     <!-- Top bar -->
     <div id="topBar">
-      <div>
-        <div id="dayLabel">Day 1</div>
-        <div id="customerProgress"></div>
-        <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
-      </div>
-      <div>
-        <div id="moneyLabel">$0</div>
-        <div id="timer"></div>
+      <div id="dayLabel">Day 1</div>
+      <div style="flex:1; display:flex; align-items:center; gap:8px;">
+        <span id="timer" style="font-size:0.82rem; white-space:nowrap;"></span>
         <div id="timerBarContainer"><div id="timerBar"></div></div>
       </div>
+      <div id="moneyLabel">$0</div>
+      <div class="top-controls">
+        <button id="nextCustomerBtn" class="primary">Start Day 1</button>
+        <button id="openShopBtn" disabled>Shop</button>
+      </div>
     </div>
+    <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
 
     <!-- Three-column game layout -->
     <div class="game-columns">
@@ -84,6 +85,7 @@
           </div>
           <div id="customerVisual"></div>
           <div id="customerAvatar"></div>
+          <div id="customerProgress"></div>
         </div>
         <div id="notepadPanel" class="card hidden">
           <div class="notepad-header">
@@ -1828,7 +1830,7 @@
 
       timerEl.textContent = "Day: " + dayTimeLeft + "s";
       timerBarEl.style.width = "100%";
-      nextCustomerBtn.textContent = "Serve first customer of Day " + day;
+      nextCustomerBtn.textContent = "Start Day " + day;
       updateCustomerProgress();
 
       // Reset avatar
@@ -2140,35 +2142,32 @@
         scoreParts: totalScore, totalParts: totalMaxParts
       });
 
+      // Build short one-line result for the slim result bar
       let text = "";
       if (timeUp) {
-        text += "<span class='text-bad'>Day timer ran out!</span> ";
+        text += "<span class='text-bad'>Time's up!</span> ";
       }
-
       if (totalScore === totalMaxParts) {
-        text += "<span class='text-good'>Perfect order!</span> ";
-        // Celebrate!
+        text += "<span class='text-good'>Perfect!</span> ";
         const rect = builderDropZone.getBoundingClientRect();
         celebratePerfect(rect.left + rect.width/2, rect.top + rect.height/2);
       } else if (totalScore >= totalMaxParts * 0.66) {
-        text += "<span class='text-good'>Pretty close.</span> ";
+        text += "<span class='text-good'>Close!</span> ";
       } else if (totalScore >= totalMaxParts * 0.33) {
-        text += "<span class='text-bad'>Only some parts were right.</span> ";
+        text += "<span class='text-bad'>Partial.</span> ";
       } else {
-        text += "<span class='text-bad'>That was mostly wrong.</span> ";
-        // Shake on bad order
+        text += "<span class='text-bad'>Wrong.</span> ";
         document.getElementById("gameRoot").classList.add("wrong-shake");
         setTimeout(() => document.getElementById("gameRoot").classList.remove("wrong-shake"), 500);
       }
-      text += `You got ${totalScore}/${totalMaxParts} parts correct.`;
-
+      text += `${totalScore}/${totalMaxParts}`;
       if (refund > 0) {
-        text += ` The customer asked for a refund and you lost $${refund}.`;
+        text += ` −$${refund}`;
       } else {
-        text += ` You earned $${earnings}.`;
+        text += ` +$${earnings}`;
       }
       if (tip > 0) {
-        text += ` They also tipped you <strong>$${tip}</strong> for speedy service.`;
+        text += ` <span class='text-good'>+$${tip} tip</span>`;
       }
 
       for (let i = 0; i < numOrders; i++) {
@@ -2198,7 +2197,7 @@
         endDaySummary();
       } else {
         nextCustomerBtn.disabled = false;
-        nextCustomerBtn.textContent = "Next customer (" + customersServedToday + " served)";
+        nextCustomerBtn.textContent = "Next Customer";
       }
     }
 
@@ -2214,10 +2213,9 @@
 
       endOfDayPanelEl.classList.remove("hidden");
       endOfDayPanelEl.innerHTML =
-        `<strong>Day ${day} complete!</strong><br>` +
-        `You served ${customersServedToday} customers and now have <strong>$${money}</strong>.`;
+        `<strong>Day ${day} done!</strong> ${customersServedToday} served · <strong>$${money}</strong>`;
 
-      nextCustomerBtn.textContent = "Day finished";
+      nextCustomerBtn.textContent = "Day Over";
 
       let breakdownHtml = "";
       if (dayEarnings.length > 0) {
