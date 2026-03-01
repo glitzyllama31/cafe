@@ -237,6 +237,21 @@ h3 { font-size: 1rem; }
 
 #submitOrderBtn {
   margin-top: 6px;
+  padding: 14px 36px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: 16px;
+  min-width: 160px;
+}
+
+#nextCustomerBtn {
+  padding: 10px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 14px;
+  min-width: 140px;
 }
 
 /* --- Speech bubble (center) --- */
@@ -720,13 +735,14 @@ button.primary {
   background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 3px 0 rgba(200,60,90,0.35);
+  box-shadow: 0 4px 0 rgba(200,60,90,0.35);
   padding: 8px 18px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
 button.primary:hover {
   background: linear-gradient(135deg, #ff92c0, #ff8a9e);
-  box-shadow: 0 4px 0 rgba(200,60,90,0.4);
+  box-shadow: 0 5px 0 rgba(200,60,90,0.4);
 }
 
 button.primary:active {
@@ -734,12 +750,12 @@ button.primary:active {
 }
 
 button.primary:not([disabled]) {
-  animation: servePulse 2s infinite;
+  animation: servePulse 1.8s infinite;
 }
 
 @keyframes servePulse {
-  0%, 100% { box-shadow: 0 3px 0 rgba(200,60,90,0.35); }
-  50% { box-shadow: 0 3px 12px rgba(255,126,179,0.4); }
+  0%, 100% { box-shadow: 0 4px 0 rgba(200,60,90,0.35); }
+  50% { box-shadow: 0 4px 18px rgba(255,126,179,0.5); }
 }
 
 button[disabled] {
