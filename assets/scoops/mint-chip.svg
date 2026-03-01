@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" width="120" height="110">
+  <defs>
+    <radialGradient id="mg" cx="38%" cy="32%" r="62%">
+      <stop offset="0%" stop-color="#C0F0D4"/>
+      <stop offset="30%" stop-color="#A0E4B8"/>
+      <stop offset="60%" stop-color="#80D4A0"/>
+      <stop offset="100%" stop-color="#58B878"/>
+    </radialGradient>
+    <radialGradient id="mh" cx="30%" cy="22%" r="25%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ms" cx="60%" cy="70%" r="35%">
+      <stop offset="0%" stop-color="#286040" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#286040" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Main scoop blob -->
+  <path d="M 58,8 C 82,4 104,18 110,36 C 114,52 106,66 96,76 
+           C 90,82 82,88 74,90 Q 64,94 54,92 
+           C 40,88 26,76 18,64 C 10,50 12,34 20,22 
+           C 30,10 42,6 58,8 Z" 
+        fill="url(#mg)" stroke="#408860" stroke-width="1.2"/>
+  <!-- Creamy texture lumps -->
+  <path d="M 36,18 C 46,12 60,18 54,30 C 48,38 30,30 36,18 Z" fill="#C0F0D4" opacity="0.5"/>
+  <path d="M 66,16 C 80,14 92,28 84,38 C 76,44 58,34 66,16 Z" fill="#B0E8C4" opacity="0.45"/>
+  <path d="M 26,40 C 36,34 52,42 46,54 C 40,62 22,52 26,40 Z" fill="#A0DEB4" opacity="0.4"/>
+  <path d="M 70,48 C 84,42 96,56 88,66 C 80,72 64,60 70,48 Z" fill="#90D4A4" opacity="0.38"/>
+  <path d="M 48,62 C 58,56 72,64 66,74 C 58,82 40,72 48,62 Z" fill="#80C898" opacity="0.3"/>
+  <!-- Melty drip -->
+  <path d="M 92,70 Q 98,82 94,92 Q 92,96 88,92 Q 90,84 88,76 Z" fill="#80C898" opacity="0.5" stroke="#408860" stroke-width="0.6"/>
+  <!-- Chocolate chips - embedded in the scoop with shadows -->
+  <g>
+    <!-- Chip 1 -->
+    <ellipse cx="38" cy="46" rx="6" ry="4" fill="#2A1206" transform="rotate(-18 38 46)"/>
+    <ellipse cx="37" cy="45" rx="5.5" ry="3.5" fill="#4A2210" transform="rotate(-18 37 45)"/>
+    <ellipse cx="36" cy="44" rx="3" ry="1.5" fill="#6B3A1F" opacity="0.4" transform="rotate(-18 36 44)"/>
+    <!-- Chip 2 -->
+    <ellipse cx="72" cy="34" rx="5.5" ry="3.5" fill="#2A1206" transform="rotate(22 72 34)"/>
+    <ellipse cx="71" cy="33" rx="5" ry="3" fill="#4A2210" transform="rotate(22 71 33)"/>
+    <ellipse cx="70" cy="32" rx="2.8" ry="1.4" fill="#6B3A1F" opacity="0.4" transform="rotate(22 70 32)"/>
+    <!-- Chip 3 -->
+    <ellipse cx="54" cy="68" rx="6" ry="3.8" fill="#2A1206" transform="rotate(-5 54 68)"/>
+    <ellipse cx="53" cy="67" rx="5.5" ry="3.3" fill="#4A2210" transform="rotate(-5 53 67)"/>
+    <ellipse cx="52" cy="66" rx="3" ry="1.5" fill="#6B3A1F" opacity="0.4" transform="rotate(-5 52 66)"/>
+    <!-- Chip 4 -->
+    <ellipse cx="84" cy="56" rx="5" ry="3.2" fill="#2A1206" transform="rotate(30 84 56)"/>
+    <ellipse cx="83" cy="55" rx="4.5" ry="2.8" fill="#4A2210" transform="rotate(30 83 55)"/>
+    <!-- Chip 5 -->
+    <ellipse cx="30" cy="62" rx="4.5" ry="3" fill="#2A1206" transform="rotate(-28 30 62)"/>
+    <ellipse cx="29" cy="61" rx="4" ry="2.5" fill="#4A2210" transform="rotate(-28 29 61)"/>
+    <!-- Chip 6 -->
+    <ellipse cx="62" cy="48" rx="5" ry="3" fill="#2A1206" transform="rotate(10 62 48)"/>
+    <ellipse cx="61" cy="47" rx="4.5" ry="2.5" fill="#4A2210" transform="rotate(10 61 47)"/>
+    <!-- Chip 7 - partially hidden -->
+    <ellipse cx="46" cy="26" rx="4" ry="2.5" fill="#2A1206" transform="rotate(-12 46 26)"/>
+    <ellipse cx="45" cy="25" rx="3.5" ry="2" fill="#4A2210" transform="rotate(-12 45 25)"/>
+  </g>
+  <!-- Highlight -->
+  <path d="M 40,14 C 52,8 62,16 56,26 C 48,34 34,24 40,14 Z" fill="url(#mh)"/>
+  <!-- Bottom shadow -->
+  <path d="M 58,8 C 82,4 104,18 110,36 C 114,52 106,66 96,76 
+           C 90,82 82,88 74,90 Q 64,94 54,92 
+           C 40,88 26,76 18,64 C 10,50 12,34 20,22 
+           C 30,10 42,6 58,8 Z" 
+        fill="url(#ms)"/>
+</svg>

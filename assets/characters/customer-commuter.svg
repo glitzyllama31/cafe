@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 260" width="180" height="260">
+  <defs>
+    <radialGradient id="sk2" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#D8B088"/>
+      <stop offset="60%" stop-color="#C8A070"/>
+      <stop offset="100%" stop-color="#B88858"/>
+    </radialGradient>
+    <radialGradient id="bl2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D08060" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#D08060" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="suit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#485060"/>
+      <stop offset="100%" stop-color="#384048"/>
+    </linearGradient>
+  </defs>
+  <!-- Hair back -->
+  <ellipse cx="90" cy="60" rx="56" ry="52" fill="#1C1C24"/>
+  <!-- Neck -->
+  <path d="M 74,148 L 72,170 Q 74,176 82,178 L 98,178 Q 106,176 108,170 L 106,148" fill="url(#sk2)"/>
+  <!-- Body / dark suit jacket -->
+  <path d="M 36,176 Q 28,184 26,200 Q 24,230 34,260 L 146,260 
+           Q 156,230 154,200 Q 152,184 144,176 
+           Q 128,168 100,170 L 80,170 Q 52,168 36,176 Z" 
+        fill="url(#suit)" stroke="#2A3038" stroke-width="1.5"/>
+  <!-- Shirt collar -->
+  <path d="M 70,176 L 80,168 L 90,178 L 100,168 L 110,176" fill="white" stroke="#DDD" stroke-width="1"/>
+  <!-- Tie -->
+  <polygon points="87,178 93,178 92,196 90,200 88,196" fill="#C03030"/>
+  <polygon points="88,200 92,200 93,230 90,234 87,230" fill="#B02828"/>
+  <!-- Suit lapels -->
+  <path d="M 70,176 Q 60,190 56,210" fill="none" stroke="#2A3038" stroke-width="2"/>
+  <path d="M 110,176 Q 120,190 124,210" fill="none" stroke="#2A3038" stroke-width="2"/>
+  <!-- Face -->
+  <ellipse cx="90" cy="98" rx="50" ry="56" fill="url(#sk2)" stroke="#A08060" stroke-width="0.8"/>
+  <!-- Hair front - short professional cut -->
+  <path d="M 40,60 Q 46,20 90,14 Q 134,20 140,60 
+           Q 132,36 90,30 Q 48,36 40,60 Z" fill="#1C1C24"/>
+  <!-- Hair texture -->
+  <path d="M 50,50 Q 55,34 68,32" fill="none" stroke="#282830" stroke-width="1.5" opacity="0.4"/>
+  <path d="M 60,46 Q 65,32 78,30" fill="none" stroke="#282830" stroke-width="1.2" opacity="0.3"/>
+  <!-- Glasses -->
+  <g stroke="#505058" stroke-width="2.5" fill="none">
+    <rect x="56" y="86" width="28" height="22" rx="6" fill="white" fill-opacity="0.08"/>
+    <rect x="96" y="86" width="28" height="22" rx="6" fill="white" fill-opacity="0.08"/>
+    <line x1="84" y1="96" x2="96" y2="96"/>
+    <line x1="56" y1="94" x2="42" y2="88" stroke-width="2"/>
+    <line x1="124" y1="94" x2="138" y2="88" stroke-width="2"/>
+  </g>
+  <!-- Eyes behind glasses -->
+  <ellipse cx="70" cy="96" rx="7" ry="8" fill="white"/>
+  <circle cx="72" cy="97" r="5" fill="#2C1810"/>
+  <circle cx="72" cy="97" r="3" fill="#1A0C04"/>
+  <circle cx="70" cy="95" r="1.8" fill="white" opacity="0.8"/>
+  <ellipse cx="110" cy="96" rx="7" ry="8" fill="white"/>
+  <circle cx="112" cy="97" r="5" fill="#2C1810"/>
+  <circle cx="112" cy="97" r="3" fill="#1A0C04"/>
+  <circle cx="110" cy="95" r="1.8" fill="white" opacity="0.8"/>
+  <!-- Slightly furrowed eyebrows -->
+  <path d="M 54,80 Q 66,75 82,82" fill="none" stroke="#1C1C24" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M 98,82 Q 114,75 126,80" fill="none" stroke="#1C1C24" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Nose -->
+  <path d="M 88,104 Q 90,112 88,116 Q 86,118 84,116" fill="none" stroke="#A08060" stroke-width="1.5"/>
+  <!-- Mouth group (swappable for expressions) -->
+  <g data-mouth="true">
+    <path d="M 76,126 Q 90,134 104,126" fill="none" stroke="#906858" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+  <!-- Subtle cheek shadows -->
+  <circle cx="56" cy="114" r="10" fill="url(#bl2)"/>
+  <circle cx="124" cy="114" r="10" fill="url(#bl2)"/>
+  <!-- Five o'clock shadow hint -->
+  <ellipse cx="90" cy="136" rx="28" ry="14" fill="#1C1C24" opacity="0.04"/>
+</svg>
