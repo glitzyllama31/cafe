@@ -1,5 +1,5 @@
 /* ============================================================
-   Café Creamery — AAA Visual Overhaul
+   Cafe Creamery — Scene + Counter Layout
    ============================================================ */
 
 /* --- Design tokens --- */
@@ -21,6 +21,23 @@
   --chocolate-main: #7b4a2b; --chocolate-shadow: #4a2510; --chocolate-shine: #a06840;
   --strawberry-main: #ff8faa; --strawberry-shadow: #d4607a; --strawberry-shine: #ffb8cc;
   --mint-main: #8fe8c0; --mint-shadow: #5cb890; --mint-shine: #c0ffd8;
+
+  /* Wood & counter */
+  --wood-main: #8B6B3D;
+  --wood-light: #A98A5A;
+  --wood-dark: #5C4528;
+  --wood-highlight: #C9A86C;
+  --wood-edge: #4A3520;
+
+  /* Glass & metal */
+  --glass-tint: rgba(200,230,255,0.12);
+  --glass-reflection: rgba(255,255,255,0.25);
+  --metal-frame: #8A8A8A;
+  --bin-body: #4A4A4A;
+
+  /* Wall */
+  --wall-warm: #f5e6c8;
+  --wall-warm-light: #fdf3e0;
 }
 
 /* --- Reset & base --- */
@@ -38,19 +55,25 @@ body {
   margin: 0;
   padding: 0;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(255,200,120,0.12) 0%, transparent 60%),
+    /* Overhead pendant lamp glow */
+    radial-gradient(ellipse 40% 30% at 50% 8%, rgba(255,220,160,0.18) 0%, transparent 100%),
+    /* Vertical bead-board lines */
     repeating-linear-gradient(
       90deg,
-      rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px,
-      transparent 2px, transparent 28px
+      rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px,
+      transparent 1px, transparent 48px
     ),
+    /* Horizontal plank seams */
     repeating-linear-gradient(
       0deg,
       rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px,
-      transparent 1px, transparent 18px
+      transparent 1px, transparent 120px
     ),
-    linear-gradient(180deg, #3a2415 0%, var(--bg-shop) 30%, #1a0e06 100%);
-  color: var(--text-on-dark);
+    /* Corner vignette */
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.12) 100%),
+    /* Warm cafe wall */
+    linear-gradient(180deg, var(--wall-warm-light) 0%, var(--wall-warm) 55%, var(--wood-main) 70%, var(--wood-dark) 100%);
+  color: var(--ink);
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -72,41 +95,29 @@ h3 { font-size: 1rem; }
 #gameRoot {
   width: 100%;
   max-width: 1024px;
-  padding: 12px 14px 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-/* --- Card / panel --- */
-.card {
-  background: linear-gradient(170deg, #fdf6ee 0%, var(--bg-surface) 100%);
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.25),
-    0 1px 0 rgba(255,255,255,0.06) inset;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: var(--ink);
-  position: relative;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 12px; right: 12px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-  border-radius: 999px;
-}
-
-/* --- Top bar --- */
+/* --- Top bar (wooden plank) --- */
 #topBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  padding: 0 4px;
+  padding: 6px 14px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px,
+      transparent 1px, transparent 6px
+    ),
+    linear-gradient(180deg, var(--wood-highlight) 0%, var(--wood-main) 40%, var(--wood-dark) 100%);
+  border-bottom: 3px solid var(--wood-edge);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 10;
 }
 
 #topBar > div {
@@ -117,48 +128,43 @@ h3 { font-size: 1rem; }
 
 #dayLabel {
   font-family: "Fredoka", sans-serif;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
-  color: #fff;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.25);
+  color: var(--text-on-dark);
   font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 6px rgba(255,117,140,0.3);
+  font-size: 0.85rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 #moneyLabel {
   font-family: "Fredoka", sans-serif;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--gold-from), var(--gold-to));
-  color: #5a3a1a;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.25);
+  color: #FFD966;
   font-weight: 700;
   font-size: 0.9rem;
-  box-shadow: 0 2px 6px rgba(245,183,49,0.3);
-}
-
-#tutorialBanner {
-  font-size: 0.82rem;
-  opacity: 0.8;
-  font-style: italic;
-  color: var(--text-on-dark);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 #timer {
   font-family: "Fredoka", sans-serif;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--text-on-dark);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  white-space: nowrap;
 }
 
 /* --- Timer bar --- */
 #timerBarContainer {
   width: 100%;
   height: 6px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 #timerBar {
@@ -180,19 +186,175 @@ h3 { font-size: 1rem; }
   50% { opacity: 0.6; }
 }
 
+/* --- Top bar controls --- */
+.top-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* --- Tutorial banner --- */
+#tutorialBanner {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  font-style: italic;
+  color: var(--ink);
+  padding: 4px 14px;
+  text-align: center;
+}
+
+/* ============================================================
+   SCENE AREA — customer, speech bubble, built ice cream
+   ============================================================ */
+#sceneArea {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  position: relative;
+  padding: 12px 20px 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Builder area (left side of scene) --- */
+#builderArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding-bottom: 8px;
+  z-index: 2;
+}
+
+#builderVisual {
+  position: relative;
+  min-height: 100px;
+  display: inline-block;
+}
+
+#submitOrderBtn {
+  margin-top: 6px;
+}
+
+/* --- Speech bubble (center) --- */
+#speechBubble {
+  position: relative;
+  max-width: 320px;
+  flex: 1;
+  margin: 0 16px;
+  padding: 14px 18px;
+  border-radius: 18px 18px 18px 4px;
+  background: linear-gradient(170deg, #fff 0%, #FFF8F0 100%);
+  box-shadow:
+    0 2px 12px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  color: var(--ink);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  align-self: center;
+  z-index: 2;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Lined-paper rules */
+#speechBubble::before {
+  content: "";
+  position: absolute;
+  inset: 14px 18px;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 21px,
+    rgba(100,140,180,0.06) 21px, rgba(100,140,180,0.06) 22px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Speech tail pointing right toward customer */
+#speechBubble::after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  bottom: 24px;
+  width: 0;
+  height: 0;
+  border-left: 14px solid #FFF8F0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  filter: drop-shadow(2px 1px 2px rgba(0,0,0,0.06));
+}
+
+#speechBubble.fading {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+#speechBubble.hidden {
+  display: none !important;
+}
+
+#customerOrderText {
+  margin: 0;
+  font-size: 0.88rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Mini order preview inside speech bubble */
+#customerVisual {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Customer area (right side of scene) --- */
+#customerArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  padding-bottom: 8px;
+  z-index: 2;
+}
+
+#customerAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: none;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  border: 3px solid rgba(255,255,255,0.4);
+}
+
+#customerName {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+  margin-top: 4px;
+  text-align: center;
+}
+
 /* --- Customer progress dots --- */
 #customerProgress {
   display: flex;
-  gap: 5px;
-  margin-top: 0;
+  gap: 4px;
+  margin-top: 4px;
 }
 
 .progress-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.08);
   transition: background 0.3s ease;
 }
 
@@ -208,105 +370,7 @@ h3 { font-size: 1rem; }
   box-shadow: 0 0 6px rgba(255,217,102,0.5);
 }
 
-/* --- Three-column layout --- */
-.game-columns {
-  display: flex;
-  gap: 10px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.col-left {
-  flex: 0 0 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-}
-
-.col-center {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-}
-
-.col-right {
-  flex: 0 0 240px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-}
-
-/* --- Customer card --- */
-#customerCard {
-  position: relative;
-  min-height: 100px;
-}
-
-#customerCard h2 {
-  font-size: 1rem;
-  margin-bottom: 2px;
-}
-
-#customerName {
-  font-size: 0.85rem;
-  color: var(--ink-soft);
-  font-weight: 600;
-}
-
-.dialogueBox {
-  margin-top: 6px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: #fff;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  position: relative;
-  font-size: 0.88rem;
-  line-height: 1.45;
-  color: var(--ink);
-}
-
-.dialogueBox::after {
-  content: "";
-  position: absolute;
-  top: -8px;
-  right: 24px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid #fff;
-}
-
-#customerOrderText {
-  margin-top: 0;
-  font-size: 0.88rem;
-}
-
-#okOrderBtn {
-  margin-top: 8px;
-}
-
-/* --- Customer avatar --- */
-#customerAvatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffe3d2 0, #e2a68a 60%);
-  border: 3px solid rgba(255,255,255,0.3);
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-  overflow: hidden;
-}
-
+/* --- Avatar patience states --- */
 .avatar-neutral {
   background: radial-gradient(circle at 30% 30%, #ffe4c0 0, #e0a040 60%) !important;
 }
@@ -322,117 +386,312 @@ h3 { font-size: 1rem; }
   75% { transform: translateX(2px); }
 }
 
-/* --- Customer order visual (mini preview) --- */
-#customerVisual {
-  display: inline-block;
-  position: relative;
-  margin-top: 6px;
-}
-
-/* --- Builder zone --- */
-#builder.card {
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  opacity: 1;
-  transition: opacity 0.2s ease-out;
-}
-
-#builderHint {
-  font-size: 0.8rem;
-  color: var(--ink-soft);
-  display: block;
-  margin-bottom: 4px;
-}
-
-#builderDropZone {
-  min-height: 220px;
-  border: 2px dashed rgba(0,0,0,0.12);
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 16px 12px 20px;
-  margin: 8px 0;
-  position: relative;
-  transition: border-color 0.2s, background 0.2s, transform 0.15s;
-  background: rgba(255,255,255,0.3);
-}
-
-#builderDropZone .drop-hint {
-  font-size: 0.78rem;
-  color: var(--ink-soft);
-  opacity: 0.6;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  text-align: center;
-}
-
-#builderDropZone.has-container .drop-hint {
-  top: 16px;
-  transform: translateX(-50%);
-}
-
-#builderDropZone.drop-active {
-  border-color: var(--good);
-  background: rgba(67,181,129,0.08);
-  transform: scale(1.02);
-  box-shadow: 0 0 16px rgba(67,181,129,0.2);
-}
-
-#builderDropZone.drop-invalid {
-  border-color: var(--bad);
-  background: rgba(240,71,71,0.06);
-  animation: wrongShake 0.3s;
-}
-
-#builderVisual {
-  position: relative;
-  min-height: 140px;
-  display: inline-block;
-}
-
-/* --- Order tabs --- */
+/* --- Order tabs (between scene and counter) --- */
 #orderTabs {
   display: flex;
   gap: 4px;
-  margin-top: 4px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: 4px;
 }
 
 .order-tab {
-  padding: 5px 12px;
-  border-radius: 10px 10px 0 0;
-  border: 1px solid rgba(0,0,0,0.1);
+  padding: 4px 10px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid rgba(0,0,0,0.12);
   border-bottom: none;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.7);
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-family: "Fredoka", sans-serif;
   transition: background 0.15s;
+  color: var(--ink);
 }
 
 .order-tab:hover {
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.9);
 }
 
 .order-tab.active {
   background: rgba(255,255,255,0.95);
   font-weight: 600;
-  border-color: rgba(0,0,0,0.15);
+  border-color: rgba(0,0,0,0.18);
 }
 
 .order-tab .tab-status {
   margin-left: 4px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
 }
 
-/* --- Buttons --- */
+/* ============================================================
+   COUNTER SHELF — wooden shelf with counter items
+   ============================================================ */
+#counterShelf {
+  position: relative;
+  min-height: 80px;
+  padding: 8px 16px 4px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  /* Wood grain background */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px,
+      transparent 1px, transparent 5px
+    ),
+    linear-gradient(180deg,
+      var(--wood-highlight) 0%,
+      var(--wood-light) 15%,
+      var(--wood-main) 50%,
+      var(--wood-dark) 85%,
+      var(--wood-edge) 100%
+    );
+  border-top: 2px solid var(--wood-highlight);
+  border-bottom: 3px solid var(--wood-edge);
+  box-shadow:
+    0 -2px 8px rgba(0,0,0,0.15),
+    0 4px 12px rgba(0,0,0,0.3),
+    inset 0 2px 4px rgba(255,255,255,0.1);
+}
+
+/* Counter items (sauce bottles, containers) */
+.counter-item {
+  width: 56px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  transition: transform 0.15s;
+  padding-bottom: 2px;
+}
+
+.counter-item:hover {
+  transform: translateY(-3px);
+}
+
+.counter-item:active {
+  cursor: grabbing;
+}
+
+.counter-item .tile-label {
+  font-family: "Fredoka", sans-serif;
+  font-size: 0.62rem;
+  color: var(--text-on-dark);
+  text-align: center;
+  line-height: 1.1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  margin-top: 2px;
+}
+
+.counter-item[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: saturate(0.3);
+  pointer-events: none;
+}
+
+.counter-item.selected {
+  transform: translateY(-4px);
+  filter: brightness(1.1) drop-shadow(0 0 6px rgba(255,126,179,0.5));
+}
+
+/* ============================================================
+   INGREDIENT TRAY — glass display case
+   ============================================================ */
+#ingredientTray {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  background: #1A1A2A;
+  border: 3px solid var(--metal-frame);
+  border-radius: 4px;
+  position: relative;
+  box-shadow:
+    inset 0 4px 12px rgba(0,0,0,0.5),
+    inset 0 -2px 6px rgba(0,0,0,0.3),
+    0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Glass reflection streak */
+#ingredientTray::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 10%;
+  width: 60%;
+  height: 40%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Bottom frost gradient */
+#ingredientTray::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(180deg, transparent 0%, rgba(180,210,240,0.08) 100%);
+  pointer-events: none;
+  border-radius: 0 0 2px 2px;
+}
+
+/* Corner bolts on metal frame */
+#ingredientTray .corner-bolt {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #aaa 40%, #777 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3);
+}
+
+#flavourTubs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+#toppingItems {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-left: 2px solid rgba(138,138,138,0.3);
+  padding-left: 8px;
+  margin-left: 4px;
+}
+
+/* Tray items (flavour tubs, toppings) */
+.tray-item {
+  width: 72px;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border-radius: 6px;
+}
+
+.tray-item:hover {
+  transform: translateY(-2px);
+}
+
+.tray-item:active {
+  cursor: grabbing;
+}
+
+.tray-item .tile-label {
+  font-family: "Fredoka", sans-serif;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  line-height: 1.1;
+}
+
+.tray-item[disabled] {
+  opacity: 0.25;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: saturate(0.3);
+  pointer-events: none;
+}
+
+.tray-item.selected {
+  transform: translateY(-3px);
+  filter: brightness(1.15);
+}
+
+.tray-item.selected::after {
+  content: "\2713";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--good);
+  color: #fff;
+  font-size: 0.55rem;
+  border-radius: 999px;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ============================================================
+   RUBBISH BIN
+   ============================================================ */
+#rubbishBin {
+  width: 52px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+  transition: transform 0.15s, filter 0.15s;
+  flex-shrink: 0;
+}
+
+#rubbishBin:hover {
+  transform: scale(1.05);
+}
+
+#rubbishBin.drag-hover {
+  filter: drop-shadow(0 0 8px rgba(240,71,71,0.6));
+  transform: scale(1.08);
+}
+
+/* ============================================================
+   GHOST ELEMENT (drag)
+   ============================================================ */
+.drag-ghost {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.15s;
+  opacity: 0.95;
+  padding: 4px;
+}
+
+.drag-ghost.over-valid {
+  box-shadow: 0 8px 28px rgba(67,181,129,0.4);
+}
+
+.drag-ghost.over-bin {
+  box-shadow: 0 8px 28px rgba(240,71,71,0.4);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 button {
   font-family: "Fredoka", "Nunito", sans-serif;
   border-radius: 12px;
@@ -455,11 +714,6 @@ button:hover {
 button:active {
   transform: translateY(1px);
   box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-}
-
-button.selected {
-  background: linear-gradient(135deg, #ffe3b9, #ffd4e3);
-  box-shadow: 0 3px 0 rgba(0,0,0,0.18);
 }
 
 button.primary {
@@ -496,231 +750,30 @@ button[disabled] {
   animation: none !important;
 }
 
-/* --- Ingredient shelf (right panel) --- */
-#ingredientShelf {
-  padding: 8px;
-}
-
-.shelf-section {
-  background: linear-gradient(170deg, #fdf6ee 0%, var(--bg-surface) 100%);
-  border-radius: 14px;
-  padding: 10px;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.25),
-    0 1px 0 rgba(255,255,255,0.06) inset;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.shelf-section + .shelf-section {
-  margin-top: 6px;
-}
-
-.shelf-label {
-  font-family: "Fredoka", sans-serif;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--ink-soft);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.shelf-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* --- Drag item tiles (shared for containers, flavours, toppings) --- */
-.drag-item {
-  width: 72px;
-  height: 76px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  border-radius: 12px;
-  background: #fff;
-  cursor: grab;
-  font-size: 0.72rem;
-  font-family: "Fredoka", sans-serif;
-  font-weight: 500;
-  color: var(--ink);
-  padding: 4px 2px;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
-  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  position: relative;
-}
-
-.drag-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 8px rgba(0,0,0,0.12);
-}
-
-.drag-item:active {
-  cursor: grabbing;
-}
-
-.drag-item.selected {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 12px rgba(255,126,179,0.3);
-  background: linear-gradient(135deg, #fff5f8, #fff0f4);
-}
-
-.drag-item[disabled] {
-  opacity: 0.35;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.06) !important;
-  filter: saturate(0.3);
-  pointer-events: none;
-}
-
-.drag-item .tile-badge {
-  display: none;
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: var(--good);
-  color: #fff;
-  font-size: 0.58rem;
-  border-radius: 999px;
-  padding: 1px 5px;
-  font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.drag-item.selected .tile-badge {
-  display: block;
-}
-
-.drag-item .tile-illust {
-  width: 36px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.drag-item .tile-label {
-  line-height: 1.1;
-  text-align: center;
-  font-size: 0.68rem;
-}
-
-/* Container tile special colors */
-.drag-item[data-type="container"][data-value="cone"] {
-  background: linear-gradient(145deg, #fff3e0, #ffe0b2);
-}
-.drag-item[data-type="container"][data-value="cup"] {
-  background: linear-gradient(145deg, #f5f5f5, #e8e8e8);
-}
-
-/* --- Clear button (shelf) --- */
-.shelf-clear-btn {
-  width: 100%;
-  padding: 6px;
-  border-radius: 10px;
-  background: rgba(240,71,71,0.08);
-  color: var(--bad);
-  font-size: 0.75rem;
-  font-weight: 600;
-  box-shadow: none;
-  margin-top: 4px;
-}
-
-.shelf-clear-btn:hover {
-  background: rgba(240,71,71,0.15);
-  box-shadow: none;
-}
-
-/* --- Ghost element (drag) --- */
-.drag-ghost {
-  position: fixed;
-  z-index: 9999;
-  pointer-events: none;
-  width: 72px;
-  height: 76px;
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: box-shadow 0.15s;
-  opacity: 0.95;
-}
-
-.drag-ghost.over-valid {
-  box-shadow: 0 8px 28px rgba(67,181,129,0.35);
-}
-
-/* --- Stations --- */
-#stations {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 0.8rem;
-}
-
-.station {
-  flex: 1;
-  min-height: 42px;
-  border-radius: 12px;
-  border: 1px dashed rgba(0,0,0,0.15);
-  padding: 4px 6px;
-  position: relative;
-}
-
-.station-label {
-  font-family: "Fredoka", sans-serif;
-  font-weight: 600;
-  margin-bottom: 2px;
-  font-size: 0.78rem;
-}
-
-.station-badge {
-  position: absolute;
-  right: 6px;
-  top: 4px;
-  font-size: 0.65rem;
-  opacity: 0.7;
-}
-
-/* --- Top bar controls --- */
-.top-controls {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
 /* --- Result bar (slim feedback strip) --- */
 #resultBar {
-  margin-top: 6px;
-  padding: 6px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.07);
-  font-size: 0.82rem;
-  color: var(--text-on-dark);
+  padding: 5px 14px;
+  background: rgba(0,0,0,0.06);
+  font-size: 0.8rem;
+  color: var(--ink);
   flex-shrink: 0;
   line-height: 1.5;
+  border-top: 1px solid rgba(0,0,0,0.05);
 }
 
 #resultText {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   line-height: 1.4;
 }
 
 #endOfDayPanel {
   margin-top: 4px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
-/* --- Overlays --- */
+/* ============================================================
+   OVERLAYS
+   ============================================================ */
 
 /* Day-end overlay */
 #dayEndOverlay {
@@ -748,6 +801,11 @@ button[disabled] {
   text-align: center;
   transform: scale(0.9) translateY(20px);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(170deg, #fdf6ee 0%, var(--bg-surface) 100%);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  color: var(--ink);
 }
 
 #dayEndOverlay.active #dayEndPanel {
@@ -758,7 +816,9 @@ button[disabled] {
   font-family: "Fredoka", sans-serif;
 }
 
-/* Shop overlay */
+/* ============================================================
+   SHOP OVERLAY — Parchment scroll
+   ============================================================ */
 #shopOverlay {
   position: fixed;
   inset: 0;
@@ -779,14 +839,62 @@ button[disabled] {
 }
 
 #shopPanel {
-  max-width: 520px;
+  max-width: 480px;
   width: 100%;
   transform: translateY(20px) scale(0.95);
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  /* Parchment body */
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.15) 0%, transparent 50%),
+    linear-gradient(170deg, #f5e6c8 0%, #e8d4a8 40%, #dbc49a 100%);
+  border-radius: 4px;
+  padding: 28px 24px 20px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.35),
+    inset 0 0 20px rgba(139,99,49,0.1);
+  color: var(--ink);
+  border: 2px solid rgba(139,99,49,0.2);
+  /* SVG filter for paper texture is applied via JS */
+}
+
+/* Wooden roller bar at top */
+#shopPanel::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -6px;
+  right: -6px;
+  height: 18px;
+  background:
+    linear-gradient(180deg, var(--wood-highlight) 0%, var(--wood-main) 50%, var(--wood-dark) 100%);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Wooden roller bar at bottom */
+#shopPanel::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: -6px;
+  right: -6px;
+  height: 18px;
+  background:
+    linear-gradient(180deg, var(--wood-highlight) 0%, var(--wood-main) 50%, var(--wood-dark) 100%);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 #shopOverlay.active #shopPanel {
   transform: translateY(0) scale(1);
+}
+
+#shopPanel h2 {
+  font-family: "Fredoka", sans-serif;
+  text-align: center;
+  color: var(--wood-dark);
+  margin-bottom: 4px;
 }
 
 .shop-item {
@@ -794,8 +902,8 @@ button[disabled] {
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  font-size: 0.88rem;
+  border-bottom: 2px dashed rgba(139,99,49,0.2);
+  font-size: 0.85rem;
 }
 
 .shop-item:last-child {
@@ -805,7 +913,7 @@ button[disabled] {
 .shop-cost {
   font-family: "Fredoka", sans-serif;
   font-weight: bold;
-  color: #5a3a1a;
+  color: var(--wood-dark);
   margin-right: 8px;
 }
 
@@ -813,12 +921,39 @@ button[disabled] {
   font-family: "Fredoka", sans-serif;
   font-weight: bold;
   margin-bottom: 6px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  color: var(--wood-dark);
+  text-align: center;
 }
 
-/* --- Notepad --- */
+/* Shop close button — wood-brown style */
+#shopCloseBtn {
+  background: linear-gradient(135deg, var(--wood-light), var(--wood-main));
+  color: var(--text-on-dark);
+  border: none;
+  padding: 8px 20px;
+  font-weight: 600;
+}
+
+#shopCloseBtn:hover {
+  background: linear-gradient(135deg, var(--wood-highlight), var(--wood-light));
+}
+
+/* ============================================================
+   NOTEPAD (floating overlay)
+   ============================================================ */
 #notepadPanel {
-  margin-top: 0;
+  position: fixed;
+  bottom: 100px;
+  left: 12px;
+  z-index: 50;
+  width: 200px;
+  background: linear-gradient(170deg, #fdf6ee 0%, var(--bg-surface) 100%);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: var(--ink);
 }
 
 #notepadPanel .notepad-header {
@@ -832,12 +967,12 @@ button[disabled] {
 #notepadPanel .notepad-header strong {
   margin-right: auto;
   font-family: "Fredoka", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .notepad-color-btn {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 2px solid rgba(0,0,0,0.12) !important;
   cursor: pointer;
@@ -858,8 +993,8 @@ button[disabled] {
 
 #notepadCanvas {
   width: 100%;
-  height: 100px;
-  border-radius: 8px;
+  height: 80px;
+  border-radius: 6px;
   background: #fffef6;
   border: 1px dashed rgba(0,0,0,0.1);
   cursor: crosshair;
@@ -867,7 +1002,9 @@ button[disabled] {
   display: block;
 }
 
-/* --- Scoop animations --- */
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
 @keyframes scoopDrop {
   0% { transform: scale(0.3) translateY(-20px); opacity: 0; }
   30% { transform: scale(0.8) translateY(0); opacity: 1; }
@@ -880,7 +1017,6 @@ button[disabled] {
   animation: scoopDrop 0.35s ease-out;
 }
 
-/* --- Screen shake for wrong orders --- */
 @keyframes wrongShake {
   0%, 100% { transform: translateX(0); }
   10% { transform: translateX(-4px); }
@@ -897,7 +1033,6 @@ button[disabled] {
   animation: wrongShake 0.5s ease-out;
 }
 
-/* --- Money bounce --- */
 @keyframes coinBounce {
   0% { transform: scale(1); }
   25% { transform: scale(1.25); }
@@ -907,17 +1042,6 @@ button[disabled] {
 
 .coin-bounce {
   animation: coinBounce 0.4s ease-out;
-}
-
-/* --- Flavour swatch (legacy support) --- */
-.flavour-swatch {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 4px;
-  vertical-align: middle;
-  border: 1px solid rgba(0,0,0,0.15);
 }
 
 /* --- Particle canvas --- */
@@ -941,47 +1065,37 @@ button[disabled] {
 .text-good { color: var(--good); font-weight: 600; }
 .text-bad { color: var(--bad); font-weight: 600; }
 
-/* legacy support */
-.btn-row {
-  margin: 4px 0 8px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.col {
-  flex: 1 1 0;
-  min-width: 220px;
-}
-
 /* --- Responsive (non-iPad) --- */
 @media (max-width: 800px) {
-  .game-columns {
+  #sceneArea {
     flex-direction: column;
+    align-items: center;
+    min-height: auto;
   }
-  .col-left, .col-right {
-    flex: none;
-    width: 100%;
-  }
-  .col-right {
-    flex-direction: row;
+
+  #counterShelf {
     flex-wrap: wrap;
+    justify-content: center;
   }
-  .shelf-section {
-    flex: 1 1 auto;
-    min-width: 140px;
+
+  #ingredientTray {
+    flex-wrap: wrap;
+    justify-content: center;
   }
+
   #gameRoot {
     height: auto;
     min-height: 100vh;
   }
+
   body {
     overflow: auto;
+  }
+
+  #notepadPanel {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: 100%;
   }
 }

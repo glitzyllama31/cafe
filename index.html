@@ -50,6 +50,32 @@
         <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(139,99,49,0.3)" stroke-width="1"/>
         <line x1="0" y1="0" x2="8" y2="0" stroke="rgba(139,99,49,0.3)" stroke-width="1"/>
       </pattern>
+
+      <!-- Wood grain filter -->
+      <filter id="woodGrain" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.15" numOctaves="3" seed="5" result="grain"/>
+        <feBlend in="SourceGraphic" in2="grain" mode="soft-light"/>
+      </filter>
+
+      <!-- Paper texture filter -->
+      <filter id="paperTexture" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="8" result="paper"/>
+        <feBlend in="SourceGraphic" in2="paper" mode="multiply"/>
+      </filter>
+
+      <!-- Subtle bevel for bottles/tubs -->
+      <filter id="subtleBevel" x="-10%" y="-10%" width="120%" height="120%">
+        <feSpecularLighting result="specOut" specularExponent="20" lighting-color="#fff">
+          <fePointLight x="30" y="10" z="40"/>
+        </feSpecularLighting>
+        <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="0.15" k4="0"/>
+      </filter>
+
+      <!-- Frost filter for display case -->
+      <filter id="frostFilter" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="12" result="frost"/>
+        <feBlend in="SourceGraphic" in2="frost" mode="screen"/>
+      </filter>
     </defs>
   </svg>
 
@@ -72,86 +98,45 @@
     </div>
     <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
 
-    <!-- Three-column game layout -->
-    <div class="game-columns">
-      <!-- LEFT: Customer -->
-      <div class="col-left">
-        <div id="customerCard" class="card">
-          <h2>Customer</h2>
-          <div id="customerName">Shy Customer</div>
-          <div class="dialogueBox">
-            <div id="customerOrderText">They haven't ordered yet…</div>
-            <button id="okOrderBtn" class="primary hidden">Okay</button>
-          </div>
-          <div id="customerVisual"></div>
-          <div id="customerAvatar"></div>
-          <div id="customerProgress"></div>
-        </div>
-        <div id="notepadPanel" class="card hidden">
-          <div class="notepad-header">
-            <strong>Notepad</strong>
-            <button class="notepad-color-btn active" data-color="#2c1810" style="background:#2c1810"></button>
-            <button class="notepad-color-btn" data-color="#f04747" style="background:#f04747"></button>
-            <button class="notepad-color-btn" data-color="#43b581" style="background:#43b581"></button>
-            <button class="notepad-color-btn" data-color="eraser" style="background:#fffef6; border-style:dashed;">&#x1f6ab;</button>
-            <button class="notepad-color-btn" data-color="clear" style="background:#fff; font-size:0.6rem;">CLR</button>
-          </div>
-          <canvas id="notepadCanvas"></canvas>
-        </div>
+    <!-- Scene area: customer, speech bubble, built ice cream -->
+    <div id="sceneArea">
+      <div id="builderArea">
+        <div id="orderTabs" class="hidden"></div>
+        <div id="builderVisual"></div>
+        <button id="submitOrderBtn" class="primary" disabled>Serve</button>
       </div>
-
-      <!-- CENTER: Builder -->
-      <div class="col-center">
-        <div id="builder" class="card">
-          <h2>Your Station</h2>
-          <small id="builderHint">When the order disappears, build exactly what they asked for.</small>
-
-          <div id="orderTabs" class="hidden"></div>
-
-          <div id="builderDropZone">
-            <span class="drop-hint">Drag a cone or cup here to start</span>
-            <div id="builderVisual"></div>
-          </div>
-
-          <div id="stations">
-            <div class="station" id="station1">
-              <div class="station-label">Station A</div>
-              <div class="station-badge">Base station</div>
-              <div id="station1Desc">Single scoop, classic service.</div>
-            </div>
-            <div class="station" id="station2">
-              <div class="station-label">Station B</div>
-              <div class="station-badge" id="station2Badge">Locked</div>
-              <div id="station2Desc">Buy an extra station in the shop!</div>
-              <div id="station2Content" class="hidden">
-                <div id="station2Hint" style="margin-top:4px; min-height:30px;"></div>
-                <div id="station2Preview" style="margin-top:4px; display:flex; gap:4px;"></div>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:8px;">
-            <button id="submitOrderBtn" class="primary" disabled>Serve Ice Cream</button>
-          </div>
-        </div>
+      <div id="speechBubble">
+        <div id="customerOrderText">They haven't ordered yet...</div>
+        <div id="customerVisual"></div>
       </div>
-
-      <!-- RIGHT: Ingredient shelf -->
-      <div class="col-right" id="ingredientShelf">
-        <div class="shelf-section" id="shelfContainers">
-          <div class="shelf-label">Container</div>
-          <div class="shelf-grid" id="containerGrid"></div>
-        </div>
-        <div class="shelf-section" id="shelfFlavours">
-          <div class="shelf-label" id="flavourLabel">Flavours <span id="scoopCount">0/3</span></div>
-          <div class="shelf-grid" id="flavourGrid"></div>
-          <button class="shelf-clear-btn" id="clearScoopsBtn">Clear scoops</button>
-        </div>
-        <div class="shelf-section" id="shelfToppings">
-          <div class="shelf-label">Toppings</div>
-          <div class="shelf-grid" id="toppingGrid"></div>
-        </div>
+      <div id="customerArea">
+        <div id="customerAvatar"></div>
+        <div id="customerName">Shy Customer</div>
+        <div id="customerProgress"></div>
       </div>
+    </div>
+
+    <!-- Counter shelf: wooden shelf with sauce bottles + containers -->
+    <div id="counterShelf"></div>
+
+    <!-- Ingredient tray: glass display case with flavour tubs + toppings + bin -->
+    <div id="ingredientTray">
+      <div id="flavourTubs"></div>
+      <div id="toppingItems"></div>
+      <div id="rubbishBin"></div>
+    </div>
+
+    <!-- Notepad (floating overlay) -->
+    <div id="notepadPanel" class="hidden">
+      <div class="notepad-header">
+        <strong>Notepad</strong>
+        <button class="notepad-color-btn active" data-color="#2c1810" style="background:#2c1810"></button>
+        <button class="notepad-color-btn" data-color="#f04747" style="background:#f04747"></button>
+        <button class="notepad-color-btn" data-color="#43b581" style="background:#43b581"></button>
+        <button class="notepad-color-btn" data-color="eraser" style="background:#fffef6; border-style:dashed;">&#x1f6ab;</button>
+        <button class="notepad-color-btn" data-color="clear" style="background:#fff; font-size:0.6rem;">CLR</button>
+      </div>
+      <canvas id="notepadCanvas"></canvas>
     </div>
 
     <!-- Result bar -->
@@ -172,14 +157,14 @@
     </div>
   </div>
 
-  <!-- Shop overlay -->
+  <!-- Shop overlay (parchment scroll) -->
   <div id="shopOverlay">
-    <div id="shopPanel" class="card">
+    <div id="shopPanel">
       <h2>Evening Upgrades</h2>
       <div id="shopMoney"></div>
       <div id="shopItems"></div>
-      <div style="margin-top:10px; text-align:right;">
-        <button id="shopCloseBtn" class="primary">Sleep &amp; Next Day</button>
+      <div style="margin-top:12px; text-align:center;">
+        <button id="shopCloseBtn">Sleep &amp; Next Day</button>
       </div>
     </div>
   </div>
@@ -229,13 +214,14 @@
     const customerOrderTextEl = document.getElementById("customerOrderText");
     const customerVisualEl = document.getElementById("customerVisual");
     const builderVisualEl = document.getElementById("builderVisual");
-    const okOrderBtn = document.getElementById("okOrderBtn");
-    const builderDropZone = document.getElementById("builderDropZone");
+    const speechBubble = document.getElementById("speechBubble");
 
-    const containerGrid = document.getElementById("containerGrid");
-    const flavourGrid = document.getElementById("flavourGrid");
-    const toppingGrid = document.getElementById("toppingGrid");
-    const scoopCountEl = document.getElementById("scoopCount");
+    const sceneArea = document.getElementById("sceneArea");
+    const counterShelf = document.getElementById("counterShelf");
+    const ingredientTray = document.getElementById("ingredientTray");
+    const flavourTubs = document.getElementById("flavourTubs");
+    const toppingItems = document.getElementById("toppingItems");
+    const rubbishBinEl = document.getElementById("rubbishBin");
 
     const submitOrderBtn = document.getElementById("submitOrderBtn");
     const nextCustomerBtn = document.getElementById("nextCustomerBtn");
@@ -243,8 +229,6 @@
 
     const resultTextEl = document.getElementById("resultText");
     const endOfDayPanelEl = document.getElementById("endOfDayPanel");
-    const station2El = document.getElementById("station2");
-    const station2DescEl = document.getElementById("station2Desc");
 
     const shopOverlay = document.getElementById("shopOverlay");
     const shopMoneyEl = document.getElementById("shopMoney");
@@ -256,8 +240,8 @@
     const dayEndTitle = document.getElementById("dayEndTitle");
     const dayEndStats = document.getElementById("dayEndStats");
     const dayEndContinueBtn = document.getElementById("dayEndContinueBtn");
-    const clearScoopsBtn = document.getElementById("clearScoopsBtn");
-    const ingredientShelf = document.getElementById("ingredientShelf");
+
+    const SAUCE_TOPPINGS = new Set(["caramel", "choc_sauce"]);
 
     // ====================================================================
     //  SVG ICE CREAM RENDERING (Phase 3)
@@ -729,6 +713,490 @@
     }
 
     // ====================================================================
+    //  NEW SVG ITEMS: Bottles, Tubs, Bin (Scene Layout)
+    // ====================================================================
+    function createSauceBottleSVG(type) {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 56 70");
+      svg.setAttribute("width", "56");
+      svg.setAttribute("height", "70");
+
+      const color = type === "caramel" ? "#DAA520" : "#3B1E08";
+      const colorLight = type === "caramel" ? "#F0C040" : "#5C3018";
+      const colorDark = type === "caramel" ? "#B8860B" : "#1A0800";
+      const labelText = type === "caramel" ? "Caramel" : "Choc";
+
+      // Ground shadow
+      const shadow = document.createElementNS(ns, "ellipse");
+      shadow.setAttribute("cx", "28"); shadow.setAttribute("cy", "66");
+      shadow.setAttribute("rx", "14"); shadow.setAttribute("ry", "3");
+      shadow.setAttribute("fill", "rgba(0,0,0,0.2)");
+      svg.appendChild(shadow);
+
+      // Bottle body (tapered)
+      const body = document.createElementNS(ns, "path");
+      body.setAttribute("d", "M18,22 L16,58 Q16,62 20,62 L36,62 Q40,62 40,58 L38,22 Z");
+      body.setAttribute("fill", color);
+      body.setAttribute("stroke", colorDark);
+      body.setAttribute("stroke-width", "0.5");
+      svg.appendChild(body);
+
+      // Cylindrical gradient overlay
+      const grad = document.createElementNS(ns, "path");
+      grad.setAttribute("d", "M18,22 L16,58 Q16,62 20,62 L36,62 Q40,62 40,58 L38,22 Z");
+      grad.setAttribute("fill", "url(#bottleGrad-" + type + ")");
+      grad.setAttribute("opacity", "0.3");
+      svg.appendChild(grad);
+
+      // Left highlight edge
+      const hl = document.createElementNS(ns, "line");
+      hl.setAttribute("x1", "19"); hl.setAttribute("y1", "24");
+      hl.setAttribute("x2", "17.5"); hl.setAttribute("y2", "56");
+      hl.setAttribute("stroke", "rgba(255,255,255,0.3)");
+      hl.setAttribute("stroke-width", "1.5");
+      hl.setAttribute("stroke-linecap", "round");
+      svg.appendChild(hl);
+
+      // Liquid level line
+      const level = document.createElementNS(ns, "line");
+      level.setAttribute("x1", "18"); level.setAttribute("y1", "35");
+      level.setAttribute("x2", "38"); level.setAttribute("y2", "35");
+      level.setAttribute("stroke", colorDark);
+      level.setAttribute("stroke-width", "0.5");
+      level.setAttribute("opacity", "0.4");
+      svg.appendChild(level);
+
+      // Air bubble
+      const bubble = document.createElementNS(ns, "circle");
+      bubble.setAttribute("cx", "30"); bubble.setAttribute("cy", "30");
+      bubble.setAttribute("r", "2");
+      bubble.setAttribute("fill", "rgba(255,255,255,0.15)");
+      svg.appendChild(bubble);
+
+      // Label band
+      const label = document.createElementNS(ns, "rect");
+      label.setAttribute("x", "17"); label.setAttribute("y", "42");
+      label.setAttribute("width", "22"); label.setAttribute("height", "10");
+      label.setAttribute("rx", "2");
+      label.setAttribute("fill", "#fff");
+      label.setAttribute("opacity", "0.85");
+      svg.appendChild(label);
+
+      // Label text
+      const text = document.createElementNS(ns, "text");
+      text.setAttribute("x", "28"); text.setAttribute("y", "50");
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("font-size", "6");
+      text.setAttribute("font-family", "Fredoka, sans-serif");
+      text.setAttribute("fill", colorDark);
+      text.textContent = labelText;
+      svg.appendChild(text);
+
+      // Nozzle / cap
+      const cap = document.createElementNS(ns, "path");
+      cap.setAttribute("d", "M24,22 L24,14 Q24,12 26,10 L30,10 Q32,12 32,14 L32,22 Z");
+      cap.setAttribute("fill", colorDark);
+      svg.appendChild(cap);
+
+      // Cap highlight
+      const capHL = document.createElementNS(ns, "line");
+      capHL.setAttribute("x1", "25"); capHL.setAttribute("y1", "13");
+      capHL.setAttribute("x2", "25"); capHL.setAttribute("y2", "20");
+      capHL.setAttribute("stroke", "rgba(255,255,255,0.2)");
+      capHL.setAttribute("stroke-width", "1");
+      svg.appendChild(capHL);
+
+      return svg;
+    }
+
+    function createStandingConeSVG() {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 56 70");
+      svg.setAttribute("width", "56");
+      svg.setAttribute("height", "70");
+
+      // Ground shadow
+      const shadow = document.createElementNS(ns, "ellipse");
+      shadow.setAttribute("cx", "28"); shadow.setAttribute("cy", "67");
+      shadow.setAttribute("rx", "10"); shadow.setAttribute("ry", "2.5");
+      shadow.setAttribute("fill", "rgba(0,0,0,0.15)");
+      svg.appendChild(shadow);
+
+      // Cone body
+      const cone = document.createElementNS(ns, "polygon");
+      cone.setAttribute("points", "14,18 42,18 28,66");
+      cone.setAttribute("fill", "#e8a84c");
+      cone.setAttribute("stroke", "#c4863a");
+      cone.setAttribute("stroke-width", "1");
+      svg.appendChild(cone);
+
+      // Waffle pattern
+      const overlay = document.createElementNS(ns, "polygon");
+      overlay.setAttribute("points", "14,18 42,18 28,66");
+      overlay.setAttribute("fill", "url(#wafflePattern)");
+      overlay.setAttribute("opacity", "0.6");
+      svg.appendChild(overlay);
+
+      // Rim ellipse
+      const rim = document.createElementNS(ns, "ellipse");
+      rim.setAttribute("cx", "28"); rim.setAttribute("cy", "18");
+      rim.setAttribute("rx", "14"); rim.setAttribute("ry", "4");
+      rim.setAttribute("fill", "#d4943e");
+      rim.setAttribute("stroke", "#c4863a");
+      rim.setAttribute("stroke-width", "0.5");
+      svg.appendChild(rim);
+
+      // Inner shadow
+      const inner = document.createElementNS(ns, "ellipse");
+      inner.setAttribute("cx", "28"); inner.setAttribute("cy", "18");
+      inner.setAttribute("rx", "12"); inner.setAttribute("ry", "3");
+      inner.setAttribute("fill", "rgba(0,0,0,0.15)");
+      svg.appendChild(inner);
+
+      // Left highlight
+      const hl = document.createElementNS(ns, "line");
+      hl.setAttribute("x1", "16"); hl.setAttribute("y1", "20");
+      hl.setAttribute("x2", "27"); hl.setAttribute("y2", "62");
+      hl.setAttribute("stroke", "rgba(255,255,255,0.25)");
+      hl.setAttribute("stroke-width", "2");
+      hl.setAttribute("stroke-linecap", "round");
+      svg.appendChild(hl);
+
+      return svg;
+    }
+
+    function createCupStackSVG() {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 56 70");
+      svg.setAttribute("width", "56");
+      svg.setAttribute("height", "70");
+
+      // Stack of 3 cups (back to front)
+      const offsets = [{dx:4, dy:0, op:0.4}, {dx:2, dy:3, op:0.65}, {dx:0, dy:6, op:1}];
+      offsets.forEach(({dx, dy, op}) => {
+        const g = document.createElementNS(ns, "g");
+        g.setAttribute("opacity", String(op));
+
+        const cup = document.createElementNS(ns, "path");
+        cup.setAttribute("d", `M${12+dx},${18+dy} L${15+dx},${58+dy} Q${15+dx},${62+dy} ${19+dx},${62+dy} L${37+dx},${62+dy} Q${41+dx},${62+dy} ${41+dx},${58+dy} L${44+dx},${18+dy} Z`);
+        cup.setAttribute("fill", "#fafafa");
+        cup.setAttribute("stroke", "#ddd");
+        cup.setAttribute("stroke-width", "1");
+        g.appendChild(cup);
+
+        // Pink stripe
+        const stripe = document.createElementNS(ns, "rect");
+        stripe.setAttribute("x", String(15+dx)); stripe.setAttribute("y", String(35+dy));
+        stripe.setAttribute("width", "26"); stripe.setAttribute("height", "4");
+        stripe.setAttribute("rx", "2");
+        stripe.setAttribute("fill", "var(--primary-from)");
+        stripe.setAttribute("opacity", "0.35");
+        g.appendChild(stripe);
+
+        // Rim ellipse
+        const rim = document.createElementNS(ns, "ellipse");
+        rim.setAttribute("cx", String(28+dx)); rim.setAttribute("cy", String(18+dy));
+        rim.setAttribute("rx", "16"); rim.setAttribute("ry", "4");
+        rim.setAttribute("fill", "#f0f0f0");
+        rim.setAttribute("stroke", "#ddd");
+        rim.setAttribute("stroke-width", "0.5");
+        g.appendChild(rim);
+
+        // Side highlight
+        if (op === 1) {
+          const hl = document.createElementNS(ns, "line");
+          hl.setAttribute("x1", String(14+dx)); hl.setAttribute("y1", String(22+dy));
+          hl.setAttribute("x2", String(16.5+dx)); hl.setAttribute("y2", String(55+dy));
+          hl.setAttribute("stroke", "rgba(255,255,255,0.5)");
+          hl.setAttribute("stroke-width", "1.5");
+          hl.setAttribute("stroke-linecap", "round");
+          g.appendChild(hl);
+        }
+
+        svg.appendChild(g);
+      });
+
+      return svg;
+    }
+
+    function createFlavourTubSVG(flavour) {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 72 56");
+      svg.setAttribute("width", "72");
+      svg.setAttribute("height", "56");
+
+      const c = FLAVOUR_COLORS[flavour] || FLAVOUR_COLORS.vanilla;
+
+      // Steel tray rim
+      const tray = document.createElementNS(ns, "rect");
+      tray.setAttribute("x", "2"); tray.setAttribute("y", "10");
+      tray.setAttribute("width", "68"); tray.setAttribute("height", "42");
+      tray.setAttribute("rx", "4");
+      tray.setAttribute("fill", "#C0C0C0");
+      tray.setAttribute("stroke", "#999");
+      tray.setAttribute("stroke-width", "1");
+      svg.appendChild(tray);
+
+      // Ice cream fill
+      const fill = document.createElementNS(ns, "rect");
+      fill.setAttribute("x", "5"); fill.setAttribute("y", "13");
+      fill.setAttribute("width", "62"); fill.setAttribute("height", "36");
+      fill.setAttribute("rx", "3");
+      fill.setAttribute("fill", `url(#grad-${flavour})`);
+      svg.appendChild(fill);
+
+      // Scooped-out depression
+      const dep = document.createElementNS(ns, "ellipse");
+      dep.setAttribute("cx", "36"); dep.setAttribute("cy", "28");
+      dep.setAttribute("rx", "20"); dep.setAttribute("ry", "10");
+      dep.setAttribute("fill", c.shadow);
+      dep.setAttribute("opacity", "0.5");
+      svg.appendChild(dep);
+
+      // Scoop marks (white crescents)
+      const marks = [{cx:28, cy:25}, {cx:44, cy:30}];
+      marks.forEach(m => {
+        const mark = document.createElementNS(ns, "path");
+        mark.setAttribute("d", `M${m.cx-6},${m.cy} Q${m.cx},${m.cy-5} ${m.cx+6},${m.cy}`);
+        mark.setAttribute("stroke", c.shine);
+        mark.setAttribute("stroke-width", "1.5");
+        mark.setAttribute("fill", "none");
+        mark.setAttribute("opacity", "0.4");
+        svg.appendChild(mark);
+      });
+
+      // Specular shine
+      const shine = document.createElementNS(ns, "ellipse");
+      shine.setAttribute("cx", "22"); shine.setAttribute("cy", "20");
+      shine.setAttribute("rx", "10"); shine.setAttribute("ry", "5");
+      shine.setAttribute("fill", c.shine);
+      shine.setAttribute("opacity", "0.3");
+      shine.setAttribute("filter", "url(#shineBlur)");
+      svg.appendChild(shine);
+
+      // Per-flavour texture
+      if (flavour === "vanilla") {
+        // Bean specks
+        [{ x: 18, y: 22 }, { x: 40, y: 35 }, { x: 52, y: 24 }, { x: 30, y: 38 }].forEach(p => {
+          const speck = document.createElementNS(ns, "circle");
+          speck.setAttribute("cx", String(p.x)); speck.setAttribute("cy", String(p.y));
+          speck.setAttribute("r", "0.8");
+          speck.setAttribute("fill", "#8B7355");
+          speck.setAttribute("opacity", "0.5");
+          svg.appendChild(speck);
+        });
+      } else if (flavour === "chocolate") {
+        // Fudge veins
+        const vein = document.createElementNS(ns, "path");
+        vein.setAttribute("d", "M15,30 Q25,22 38,32 Q50,38 58,28");
+        vein.setAttribute("stroke", c.shine);
+        vein.setAttribute("stroke-width", "1");
+        vein.setAttribute("fill", "none");
+        vein.setAttribute("opacity", "0.25");
+        svg.appendChild(vein);
+      } else if (flavour === "strawberry") {
+        // Fruit chunks
+        [{x:20,y:26}, {x:42,y:32}, {x:54,y:22}].forEach(p => {
+          const chunk = document.createElementNS(ns, "ellipse");
+          chunk.setAttribute("cx", String(p.x)); chunk.setAttribute("cy", String(p.y));
+          chunk.setAttribute("rx", "2.5"); chunk.setAttribute("ry", "2");
+          chunk.setAttribute("fill", "#d4607a");
+          chunk.setAttribute("opacity", "0.5");
+          svg.appendChild(chunk);
+        });
+      } else if (flavour === "mint") {
+        // Choc chips
+        [{x:22,y:24,r:20}, {x:38,y:34,r:-15}, {x:50,y:26,r:35}, {x:30,y:20,r:-30}].forEach(p => {
+          const chip = document.createElementNS(ns, "ellipse");
+          chip.setAttribute("cx", String(p.x)); chip.setAttribute("cy", String(p.y));
+          chip.setAttribute("rx", "3"); chip.setAttribute("ry", "2");
+          chip.setAttribute("fill", "#4a2510");
+          chip.setAttribute("opacity", "0.6");
+          chip.setAttribute("transform", `rotate(${p.r} ${p.x} ${p.y})`);
+          svg.appendChild(chip);
+        });
+      }
+
+      return svg;
+    }
+
+    function createSprinklesPileSVG() {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 56 56");
+      svg.setAttribute("width", "56");
+      svg.setAttribute("height", "56");
+
+      // Ceramic dish
+      const dish = document.createElementNS(ns, "ellipse");
+      dish.setAttribute("cx", "28"); dish.setAttribute("cy", "38");
+      dish.setAttribute("rx", "22"); dish.setAttribute("ry", "12");
+      dish.setAttribute("fill", "#e8e0d4");
+      dish.setAttribute("stroke", "#c0b4a4");
+      dish.setAttribute("stroke-width", "1");
+      svg.appendChild(dish);
+
+      // Dish inner shadow
+      const inner = document.createElementNS(ns, "ellipse");
+      inner.setAttribute("cx", "28"); inner.setAttribute("cy", "36");
+      inner.setAttribute("rx", "18"); inner.setAttribute("ry", "8");
+      inner.setAttribute("fill", "rgba(0,0,0,0.06)");
+      svg.appendChild(inner);
+
+      // Sprinkles pile
+      const colors = ["#ff5f7e", "#4ea6ff", "#ffe040", "#43b581", "#ff8bb0", "#7ad6ff"];
+      const positions = [
+        {x:18,y:30,r:25}, {x:24,y:28,r:-20}, {x:32,y:27,r:40},
+        {x:38,y:30,r:-35}, {x:22,y:35,r:15}, {x:28,y:33,r:-10},
+        {x:34,y:35,r:55}, {x:40,y:33,r:-45}, {x:26,y:38,r:30},
+        {x:30,y:36,r:-25}, {x:20,y:33,r:50}, {x:36,y:28,r:-40}
+      ];
+      positions.forEach((p, i) => {
+        const rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("x", String(p.x - 1.5));
+        rect.setAttribute("y", String(p.y - 2.5));
+        rect.setAttribute("width", "3");
+        rect.setAttribute("height", "5");
+        rect.setAttribute("rx", "1.5");
+        rect.setAttribute("fill", colors[i % colors.length]);
+        rect.setAttribute("transform", `rotate(${p.r} ${p.x} ${p.y})`);
+        svg.appendChild(rect);
+      });
+
+      return svg;
+    }
+
+    function createFlakeItemSVG() {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 56 56");
+      svg.setAttribute("width", "56");
+      svg.setAttribute("height", "56");
+
+      // Paper wrapper
+      const wrapper = document.createElementNS(ns, "rect");
+      wrapper.setAttribute("x", "10"); wrapper.setAttribute("y", "32");
+      wrapper.setAttribute("width", "36"); wrapper.setAttribute("height", "18");
+      wrapper.setAttribute("rx", "2");
+      wrapper.setAttribute("fill", "#f0e8d8");
+      wrapper.setAttribute("stroke", "#d4c8b4");
+      wrapper.setAttribute("stroke-width", "0.5");
+      svg.appendChild(wrapper);
+
+      // Flake stick
+      const flake = document.createElementNS(ns, "rect");
+      flake.setAttribute("x", "20"); flake.setAttribute("y", "6");
+      flake.setAttribute("width", "10"); flake.setAttribute("height", "38");
+      flake.setAttribute("rx", "2");
+      flake.setAttribute("fill", "#8B6914");
+      flake.setAttribute("transform", "rotate(-8 25 25)");
+      svg.appendChild(flake);
+
+      // Ridge lines
+      for (let i = 0; i < 6; i++) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", "21"); line.setAttribute("y1", String(10 + i * 6));
+        line.setAttribute("x2", "29"); line.setAttribute("y2", String(10 + i * 6));
+        line.setAttribute("stroke", "rgba(255,255,255,0.2)");
+        line.setAttribute("stroke-width", "0.5");
+        line.setAttribute("transform", "rotate(-8 25 25)");
+        svg.appendChild(line);
+      }
+
+      // Crumbly top edge
+      [{x:21,y:7}, {x:26,y:5}, {x:29,y:8}].forEach(p => {
+        const crumb = document.createElementNS(ns, "circle");
+        crumb.setAttribute("cx", String(p.x)); crumb.setAttribute("cy", String(p.y));
+        crumb.setAttribute("r", "1.5");
+        crumb.setAttribute("fill", "#8B6914");
+        crumb.setAttribute("opacity", "0.6");
+        svg.appendChild(crumb);
+      });
+
+      // Crumb fragments
+      [{x:14,y:44}, {x:38,y:42}].forEach(p => {
+        const crumb = document.createElementNS(ns, "circle");
+        crumb.setAttribute("cx", String(p.x)); crumb.setAttribute("cy", String(p.y));
+        crumb.setAttribute("r", "1");
+        crumb.setAttribute("fill", "#8B6914");
+        crumb.setAttribute("opacity", "0.4");
+        svg.appendChild(crumb);
+      });
+
+      return svg;
+    }
+
+    function createRubbishBinSVG(isOpen) {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 52 60");
+      svg.setAttribute("width", "52");
+      svg.setAttribute("height", "60");
+
+      // Bin body (tapered cylinder)
+      const body = document.createElementNS(ns, "path");
+      body.setAttribute("d", "M12,18 L14,54 Q14,56 16,56 L36,56 Q38,56 38,54 L40,18 Z");
+      body.setAttribute("fill", "#555");
+      body.setAttribute("stroke", "#444");
+      body.setAttribute("stroke-width", "0.5");
+      svg.appendChild(body);
+
+      // Horizontal gradient overlay for 3D
+      const bodyHL = document.createElementNS(ns, "path");
+      bodyHL.setAttribute("d", "M12,18 L14,54 Q14,56 16,56 L36,56 Q38,56 38,54 L40,18 Z");
+      bodyHL.setAttribute("fill", "linear-gradient(90deg, #666 0%, #555 40%, #444 100%)");
+      bodyHL.setAttribute("opacity", "0.3");
+      svg.appendChild(bodyHL);
+
+      // Left highlight edge
+      const hl = document.createElementNS(ns, "line");
+      hl.setAttribute("x1", "14"); hl.setAttribute("y1", "20");
+      hl.setAttribute("x2", "15"); hl.setAttribute("y2", "52");
+      hl.setAttribute("stroke", "rgba(255,255,255,0.15)");
+      hl.setAttribute("stroke-width", "1.5");
+      svg.appendChild(hl);
+
+      // Vertical ridge lines
+      [20, 26, 32].forEach(x => {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", String(x)); line.setAttribute("y1", "20");
+        line.setAttribute("x2", String(x + 0.5)); line.setAttribute("y2", "54");
+        line.setAttribute("stroke", "rgba(0,0,0,0.1)");
+        line.setAttribute("stroke-width", "0.5");
+        svg.appendChild(line);
+      });
+
+      // Lid
+      const lidRotation = isOpen ? "rotate(-30 26 16)" : "";
+      const lidG = document.createElementNS(ns, "g");
+      if (lidRotation) lidG.setAttribute("transform", lidRotation);
+
+      const lid = document.createElementNS(ns, "ellipse");
+      lid.setAttribute("cx", "26"); lid.setAttribute("cy", "16");
+      lid.setAttribute("rx", "16"); lid.setAttribute("ry", "5");
+      lid.setAttribute("fill", "#666");
+      lid.setAttribute("stroke", "#555");
+      lid.setAttribute("stroke-width", "0.5");
+      lidG.appendChild(lid);
+
+      // Lid handle
+      const handle = document.createElementNS(ns, "rect");
+      handle.setAttribute("x", "22"); handle.setAttribute("y", "10");
+      handle.setAttribute("width", "8"); handle.setAttribute("height", "4");
+      handle.setAttribute("rx", "2");
+      handle.setAttribute("fill", "#777");
+      lidG.appendChild(handle);
+
+      svg.appendChild(lidG);
+
+      return svg;
+    }
+
+    // ====================================================================
     //  SVG CHARACTER AVATAR SYSTEM (Phase 5a)
     // ====================================================================
     const SKIN_TONES = ["#FFDBB4", "#EDB98A", "#C68642", "#8D5524", "#4A2912"];
@@ -1130,11 +1598,11 @@
     }
 
     // ====================================================================
-    //  INGREDIENT SHELF & BUILDER STEPS (Phase 2)
+    //  INGREDIENT / BUILDER STEPS
     // ====================================================================
     function setBuilderEnabled(enabled) {
-      ingredientShelf.querySelectorAll(".drag-item").forEach(b => b.disabled = !enabled);
-      clearScoopsBtn.disabled = !enabled;
+      counterShelf.querySelectorAll(".counter-item").forEach(b => b.disabled = !enabled);
+      ingredientTray.querySelectorAll(".tray-item").forEach(b => b.disabled = !enabled);
       if (!enabled) submitOrderBtn.disabled = true;
       updateBuilderSteps();
     }
@@ -1144,46 +1612,48 @@
       const hasScoops = playerOrder.scoops.length > 0;
       const maxScoops = playerOrder.scoops.length >= 3;
 
-      // Containers always enabled (if builder is enabled)
-      containerGrid.querySelectorAll(".drag-item").forEach(b => {
-        // containers are always usable
-      });
-
-      // Flavours: need container first
-      flavourGrid.querySelectorAll(".drag-item").forEach(b => {
+      // Flavour tubs: need container first
+      flavourTubs.querySelectorAll(".tray-item").forEach(b => {
         b.disabled = !hasContainer || maxScoops;
       });
 
-      // Toppings: need at least one scoop
-      toppingGrid.querySelectorAll(".drag-item").forEach(b => {
+      // Toppings in tray: need at least one scoop
+      toppingItems.querySelectorAll(".tray-item").forEach(b => {
         b.disabled = !hasScoops;
       });
 
-      // Scoop count label
-      scoopCountEl.textContent = playerOrder.scoops.length + "/3";
-
-      // Drop zone state
-      if (hasContainer) {
-        builderDropZone.classList.add("has-container");
-        const hint = builderDropZone.querySelector(".drop-hint");
-        if (hint) {
-          if (!hasScoops) hint.textContent = "Add scoops!";
-          else hint.textContent = "";
-        }
-      } else {
-        builderDropZone.classList.remove("has-container");
-        const hint = builderDropZone.querySelector(".drop-hint");
-        if (hint) hint.textContent = "Drag a cone or cup here to start";
-      }
+      // Sauce bottles on counter: need at least one scoop
+      counterShelf.querySelectorAll('.counter-item[data-type="topping"]').forEach(b => {
+        b.disabled = !hasScoops;
+      });
     }
 
     function addIngredient(type, value) {
+      // Auto-dismiss dialogue on first ingredient add
+      if (phase === "dialogue") {
+        phase = "build";
+        roundActive = true;
+        customerBuildStart = Date.now();
+        setBuilderEnabled(true);
+        speechBubble.classList.add("fading");
+        setTimeout(() => {
+          speechBubble.classList.add("hidden");
+          customerVisualEl.innerHTML = "";
+        }, 400);
+        if (day === 1 && customersServedToday === 0) {
+          setTutorialMessage("Now rebuild the ice cream from memory. Drag or tap ingredients!");
+        } else {
+          setTutorialMessage("Rebuild the order before the timer runs out.");
+        }
+        renderOrderTabs();
+      }
+
       if (phase !== "build" || !roundActive) return false;
 
       if (type === "container") {
         playerOrder.container = value;
         playSound("drop");
-        const rect = builderDropZone.getBoundingClientRect();
+        const rect = builderVisualEl.getBoundingClientRect();
         scoopPlaceEffect(rect.left + rect.width/2, rect.top + rect.height * 0.7,
           value === "cone" ? "#e8a84c" : "#ddd");
       } else if (type === "flavour") {
@@ -1192,7 +1662,7 @@
         playerOrder.scoops.push(value);
         playSound("drop");
         const c = FLAVOUR_COLORS[value] || FLAVOUR_COLORS.vanilla;
-        const rect = builderDropZone.getBoundingClientRect();
+        const rect = builderVisualEl.getBoundingClientRect();
         scoopPlaceEffect(rect.left + rect.width/2, rect.top + rect.height * 0.4, c.main);
       } else if (type === "topping") {
         if (playerOrder.scoops.length === 0) { playSound("invalid"); return false; }
@@ -1213,96 +1683,102 @@
     }
 
     // ====================================================================
-    //  SHELF RENDERING
+    //  COUNTER / TRAY RENDERING
     // ====================================================================
-    function refreshShelfContainers() {
-      containerGrid.innerHTML = "";
+    function refreshCounterShelf() {
+      counterShelf.innerHTML = "";
+
+      // Containers: standing cone, cup stack
       ["cone", "cup"].forEach(val => {
         const tile = document.createElement("div");
-        tile.className = "drag-item";
+        tile.className = "counter-item";
         tile.dataset.type = "container";
         tile.dataset.value = val;
-
-        const illust = document.createElement("div");
-        illust.className = "tile-illust";
-        illust.appendChild(createMiniContainerSVG(val));
-        tile.appendChild(illust);
-
+        tile.appendChild(val === "cone" ? createStandingConeSVG() : createCupStackSVG());
         const label = document.createElement("span");
         label.className = "tile-label";
         label.textContent = val === "cone" ? "Cone" : "Cup";
         tile.appendChild(label);
-
         tile.addEventListener("pointerdown", handlePointerDown);
-        containerGrid.appendChild(tile);
+        counterShelf.appendChild(tile);
+      });
+
+      // Sauce toppings go on the counter shelf as bottles
+      allUnlockedToppings().filter(t => SAUCE_TOPPINGS.has(t)).forEach(t => {
+        const tile = document.createElement("div");
+        tile.className = "counter-item";
+        tile.dataset.type = "topping";
+        tile.dataset.value = t;
+        tile.appendChild(createSauceBottleSVG(t));
+        const label = document.createElement("span");
+        label.className = "tile-label";
+        label.textContent = t === "caramel" ? "Caramel" : "Choc";
+        tile.appendChild(label);
+        tile.addEventListener("pointerdown", handlePointerDown);
+        counterShelf.appendChild(tile);
       });
     }
 
-    function refreshShelfFlavours() {
-      flavourGrid.innerHTML = "";
+    function refreshIngredientTray() {
+      flavourTubs.innerHTML = "";
+      toppingItems.innerHTML = "";
+
+      // Flavour tubs
       allUnlockedFlavours().forEach(f => {
         const tile = document.createElement("div");
-        tile.className = "drag-item";
+        tile.className = "tray-item";
         tile.dataset.type = "flavour";
         tile.dataset.value = f;
-
-        const illust = document.createElement("div");
-        illust.className = "tile-illust";
-        illust.appendChild(createMiniScoopSVG(f));
-        tile.appendChild(illust);
-
+        tile.appendChild(createFlavourTubSVG(f));
         const label = document.createElement("span");
         label.className = "tile-label";
         label.textContent = labelForFlavour(f);
         tile.appendChild(label);
-
         tile.addEventListener("pointerdown", handlePointerDown);
-        flavourGrid.appendChild(tile);
+        flavourTubs.appendChild(tile);
       });
-    }
 
-    function refreshShelfToppings() {
-      toppingGrid.innerHTML = "";
-      allUnlockedToppings().forEach(t => {
+      // Non-sauce toppings in tray
+      allUnlockedToppings().filter(t => !SAUCE_TOPPINGS.has(t)).forEach(t => {
         const tile = document.createElement("div");
-        tile.className = "drag-item";
+        tile.className = "tray-item";
         tile.dataset.type = "topping";
         tile.dataset.value = t;
-
-        const illust = document.createElement("div");
-        illust.className = "tile-illust";
-        illust.appendChild(createMiniToppingSVG(t));
-        tile.appendChild(illust);
-
+        if (t === "sprinkles") {
+          tile.appendChild(createSprinklesPileSVG());
+        } else if (t === "flake") {
+          tile.appendChild(createFlakeItemSVG());
+        }
         const label = document.createElement("span");
         label.className = "tile-label";
         label.textContent = labelForTopping(t).split(" ").pop();
         tile.appendChild(label);
-
-        const badge = document.createElement("span");
-        badge.className = "tile-badge";
-        badge.textContent = "\u2713";
-        tile.appendChild(badge);
-
         tile.addEventListener("pointerdown", handlePointerDown);
-        toppingGrid.appendChild(tile);
+        toppingItems.appendChild(tile);
       });
+
+      // Render rubbish bin
+      rubbishBinEl.innerHTML = "";
+      rubbishBinEl.appendChild(createRubbishBinSVG(false));
     }
 
     function refreshSelectionStates() {
-      // Container tiles
-      containerGrid.querySelectorAll(".drag-item").forEach(tile => {
+      // Container items on counter
+      counterShelf.querySelectorAll('.counter-item[data-type="container"]').forEach(tile => {
         tile.classList.toggle("selected", tile.dataset.value === playerOrder.container);
       });
 
-      // Flavour tiles — no "selected" highlight since scoops stack
-      flavourGrid.querySelectorAll(".drag-item").forEach(tile => {
+      // Flavour tubs
+      flavourTubs.querySelectorAll(".tray-item").forEach(tile => {
         const count = playerOrder.scoops.filter(s => s === tile.dataset.value).length;
         tile.classList.toggle("selected", count > 0);
       });
 
-      // Topping tiles
-      toppingGrid.querySelectorAll(".drag-item").forEach(tile => {
+      // Topping items (tray + counter sauces)
+      toppingItems.querySelectorAll(".tray-item").forEach(tile => {
+        tile.classList.toggle("selected", playerOrder.toppings.has(tile.dataset.value));
+      });
+      counterShelf.querySelectorAll('.counter-item[data-type="topping"]').forEach(tile => {
         tile.classList.toggle("selected", playerOrder.toppings.has(tile.dataset.value));
       });
     }
@@ -1323,9 +1799,8 @@
     };
 
     function handlePointerDown(e) {
-      if (e.target.closest(".drag-item")?.disabled) return;
-      const tile = e.target.closest(".drag-item");
-      if (!tile) return;
+      const tile = e.target.closest(".counter-item, .tray-item");
+      if (!tile || tile.disabled) return;
 
       e.preventDefault();
       tile.setPointerCapture(e.pointerId);
@@ -1357,11 +1832,11 @@
         document.body.style.touchAction = "none";
         playSound("pickup");
 
-        // Create ghost
+        // Create ghost from source SVG
         const ghost = document.createElement("div");
         ghost.className = "drag-ghost";
-        const illust = DragManager.sourceEl.querySelector(".tile-illust");
-        if (illust) ghost.appendChild(illust.cloneNode(true));
+        const svgEl = DragManager.sourceEl.querySelector("svg");
+        if (svgEl) ghost.appendChild(svgEl.cloneNode(true));
         document.body.appendChild(ghost);
         DragManager.ghostEl = ghost;
       }
@@ -1371,29 +1846,38 @@
         ghost.style.left = (e.clientX - 36) + "px";
         ghost.style.top = (e.clientY - 38) + "px";
 
-        // Slight tilt based on horizontal velocity
         const tilt = Math.max(-15, Math.min(15, dx * 0.3));
         ghost.style.transform = `rotate(${tilt}deg)`;
 
-        // Hit-test drop zone
+        // Hit-test
         ghost.style.display = "none";
         const elBelow = document.elementFromPoint(e.clientX, e.clientY);
         ghost.style.display = "";
 
-        const overDropZone = elBelow && (
-          elBelow.id === "builderDropZone" ||
-          elBelow.closest("#builderDropZone")
+        const overScene = elBelow && (
+          elBelow.id === "sceneArea" || elBelow.closest("#sceneArea") ||
+          elBelow.id === "builderArea" || elBelow.closest("#builderArea") ||
+          elBelow.id === "builderVisual" || elBelow.closest("#builderVisual")
         );
 
-        if (overDropZone) {
-          const valid = canDrop(DragManager.dragType, DragManager.dragValue);
-          builderDropZone.classList.toggle("drop-active", valid);
-          builderDropZone.classList.toggle("drop-invalid", !valid);
-          ghost.classList.toggle("over-valid", valid);
+        const overBin = elBelow && (
+          elBelow.id === "rubbishBin" || elBelow.closest("#rubbishBin")
+        );
+
+        // Bin hover state
+        rubbishBinEl.classList.toggle("drag-hover", !!overBin);
+        if (overBin) {
+          rubbishBinEl.innerHTML = "";
+          rubbishBinEl.appendChild(createRubbishBinSVG(true));
         } else {
-          builderDropZone.classList.remove("drop-active", "drop-invalid");
-          ghost.classList.remove("over-valid");
+          if (rubbishBinEl.querySelector("svg")) {
+            rubbishBinEl.innerHTML = "";
+            rubbishBinEl.appendChild(createRubbishBinSVG(false));
+          }
         }
+
+        ghost.classList.toggle("over-valid", !!overScene && canDrop(DragManager.dragType, DragManager.dragValue));
+        ghost.classList.toggle("over-bin", !!overBin);
       }
     }
 
@@ -1405,26 +1889,39 @@
       tile.removeEventListener("pointerup", handlePointerUp);
       tile.removeEventListener("pointercancel", handlePointerUp);
 
-      builderDropZone.classList.remove("drop-active", "drop-invalid");
+      rubbishBinEl.classList.remove("drag-hover");
+      rubbishBinEl.innerHTML = "";
+      rubbishBinEl.appendChild(createRubbishBinSVG(false));
       document.body.style.touchAction = "";
 
       if (!DragManager.isDragging) {
         // Tap: add ingredient directly
         addIngredient(DragManager.dragType, DragManager.dragValue);
       } else if (DragManager.ghostEl) {
-        // Check if over drop zone
         const ghost = DragManager.ghostEl;
         ghost.style.display = "none";
         const elBelow = document.elementFromPoint(e.clientX, e.clientY);
         ghost.style.display = "";
 
-        const overDropZone = elBelow && (
-          elBelow.id === "builderDropZone" ||
-          elBelow.closest("#builderDropZone")
+        const overBin = elBelow && (
+          elBelow.id === "rubbishBin" || elBelow.closest("#rubbishBin")
         );
 
-        if (overDropZone && canDrop(DragManager.dragType, DragManager.dragValue)) {
-          // Successful drop — snap-in animation
+        const overScene = elBelow && (
+          elBelow.id === "sceneArea" || elBelow.closest("#sceneArea") ||
+          elBelow.id === "builderArea" || elBelow.closest("#builderArea") ||
+          elBelow.id === "builderVisual" || elBelow.closest("#builderVisual")
+        );
+
+        if (overBin) {
+          // Drag over bin cancels - shrink ghost
+          ghost.style.transition = "transform 0.15s ease-out, opacity 0.15s ease-out";
+          ghost.style.transform = "scale(0.2)";
+          ghost.style.opacity = "0";
+          setTimeout(() => ghost.remove(), 160);
+          playSound("invalid");
+        } else if (overScene && canDrop(DragManager.dragType, DragManager.dragValue)) {
+          // Successful drop
           ghost.style.transition = "transform 0.15s ease-out, opacity 0.15s ease-out";
           ghost.style.transform = "scale(0.3)";
           ghost.style.opacity = "0";
@@ -1451,7 +1948,8 @@
     }
 
     function canDrop(type, value) {
-      if (phase !== "build" || !roundActive) return false;
+      if (phase !== "build" && phase !== "dialogue") return false;
+      if (!roundActive && phase !== "dialogue") return false;
       if (type === "container") return true;
       if (type === "flavour") return !!playerOrder.container && playerOrder.scoops.length < 3;
       if (type === "topping") return playerOrder.scoops.length > 0;
@@ -1794,12 +2292,11 @@
       nextCustomerBtn.disabled = false;
       roundActive = false;
       phase = "idle";
-      okOrderBtn.classList.add("hidden");
       timerBarEl.style.width = "0%";
       timerBarEl.className = "";
-      customerOrderTextEl.classList.remove("hidden");
-      customerOrderTextEl.style.opacity = "1";
-      customerOrderTextEl.textContent = "\u201CServe first customer\u201D to start the day!";
+      // Reset speech bubble
+      speechBubble.classList.remove("fading", "hidden");
+      customerOrderTextEl.textContent = "Press \"Start Day\" to begin!";
       customerVisualEl.innerHTML = "";
       setBuilderEnabled(false);
       updateTopBar();
@@ -1814,13 +2311,13 @@
 
       if (day === 1) {
         inTutorial = true;
-        setTutorialMessage("Day 1: Watch the order, then click to build it.");
+        setTutorialMessage("Day 1: Watch the order, then start building from the ingredients below.");
       } else {
         inTutorial = false;
         setTutorialMessage("A new day! More customers, maybe trickier orders.");
       }
 
-      timerEl.textContent = "Day: " + dayTimeLeft + "s";
+      updateTimerDisplay();
       timerBarEl.style.width = "100%";
       nextCustomerBtn.textContent = "Start Day " + day;
       updateCustomerProgress();
@@ -1829,12 +2326,20 @@
       renderCharacterAvatar("happy");
     }
 
+    function updateTimerDisplay() {
+      const pct = Math.round((dayTimeLeft / dayTimerSeconds) * 100);
+      const face = pct > 60 ? "\uD83D\uDE0A" : pct > 30 ? "\uD83D\uDE10" : pct > 15 ? "\uD83D\uDE1F" : "\uD83D\uDE28";
+      timerEl.textContent = `${face} ${pct}%`;
+    }
+
     function renderCharacterAvatar(patience) {
       const avatarEl = document.getElementById("customerAvatar");
       avatarEl.innerHTML = "";
       avatarEl.className = "";
       avatarEl.style.background = "none";
       const svg = createCharacterSVG(currentCustomerSeed, patience);
+      svg.setAttribute("width", "80");
+      svg.setAttribute("height", "80");
       avatarEl.appendChild(svg);
     }
 
@@ -1843,9 +2348,11 @@
 
       resetPlayerOrder();
       resultTextEl.textContent = "Watch the order carefully\u2026";
-      roundActive = false;
       phase = "dialogue";
-      customerOrderTextEl.classList.remove("hidden");
+      roundActive = false;
+
+      // Show speech bubble with order
+      speechBubble.classList.remove("fading", "hidden");
       customerOrderTextEl.style.opacity = "1";
 
       currentOrders = generateCustomerOrders();
@@ -1862,17 +2369,17 @@
       currentCustomerSeed = day * 100 + customersServedToday + Date.now() % 1000;
       renderCharacterAvatar("happy");
 
-      // Typewriter effect
+      // Typewriter effect — no "Okay" button, auto-dismiss on first ingredient
       const dialogue = generateDialogue(currentOrders, currentCustomerName);
       typewriterEffect(customerOrderTextEl, dialogue, 20, () => {
-        okOrderBtn.classList.remove("hidden");
-        okOrderBtn.disabled = false;
+        // Dialogue finished — builder is already enabled for auto-dismiss
       });
 
       // Show customer visual during dialogue
       renderCustomerVisual();
 
-      setBuilderEnabled(false);
+      // Enable builder so player can start adding ingredients immediately
+      setBuilderEnabled(true);
       playSound("ding");
       updateCustomerProgress();
 
@@ -1882,50 +2389,22 @@
       }
 
       if (day === 1 && customersServedToday === 0) {
-        setTutorialMessage("Memorise container, flavour and toppings. They will vanish soon!");
+        setTutorialMessage("Read the order, then tap an ingredient to start building!");
       }
 
       if (customersServedToday === 0 && !dayTimerId) {
         startDayTimer();
       }
 
-      timerEl.textContent = "Day: " + dayTimeLeft + "s";
+      updateTimerDisplay();
       submitOrderBtn.disabled = true;
     }
-
-    okOrderBtn.addEventListener("click", () => {
-      if (phase !== "dialogue") return;
-      okOrderBtn.disabled = true;
-      okOrderBtn.classList.add("hidden");
-
-      // Hide customer visual + dialogue
-      customerOrderTextEl.style.opacity = "0";
-      customerVisualEl.style.opacity = "0";
-      setTimeout(() => {
-        customerOrderTextEl.classList.add("hidden");
-        customerVisualEl.innerHTML = "";
-        customerVisualEl.style.opacity = "1";
-      }, 220);
-
-      if (day === 1 && customersServedToday === 0) {
-        setTutorialMessage("Now rebuild the ice cream from memory. Drag or tap ingredients!");
-      } else {
-        setTutorialMessage("Rebuild the order before the timer runs out.");
-      }
-
-      phase = "build";
-      roundActive = true;
-      setBuilderEnabled(true);
-      customerBuildStart = Date.now();
-      renderOrderTabs();
-      updateStation2Hint();
-    });
 
     function startDayTimer() {
       clearInterval(dayTimerId);
       dayTimerId = setInterval(() => {
         dayTimeLeft--;
-        timerEl.textContent = "Day: " + dayTimeLeft + "s";
+        updateTimerDisplay();
         const pct = (dayTimeLeft / dayTimerSeconds) * 100;
         timerBarEl.style.width = pct + "%";
         if (pct <= 15) {
@@ -1963,7 +2442,7 @@
         evaluateOrder(true);
       } else if (phase === "dialogue") {
         phase = "idle";
-        okOrderBtn.classList.add("hidden");
+        speechBubble.classList.add("hidden");
         endDaySummary();
       } else {
         endDaySummary();
@@ -2011,33 +2490,11 @@
     }
 
     function updateStation2Preview() {
-      if (!hasSecondStation || currentOrders.length <= 1) return;
-      const previewEl = document.getElementById("station2Preview");
-      if (!previewEl) return;
-      previewEl.innerHTML = "";
-      playerOrders.forEach((po, i) => {
-        if (i === activeOrderIndex) return;
-        if (!po.container && po.scoops.length === 0) return;
-        const svg = createIceCreamSVG(po.container, po.scoops, Array.from(po.toppings), 0.4);
-        svg.style.display = "inline-block";
-        previewEl.appendChild(svg);
-      });
+      // Station panels removed in scene layout — no-op
     }
 
     function updateStation2Hint() {
-      if (!hasSecondStation) return;
-      const hintEl = document.getElementById("station2Hint");
-      const previewEl = document.getElementById("station2Preview");
-      if (!hintEl) return;
-
-      hintEl.innerHTML = "";
-      previewEl.innerHTML = "";
-
-      if (phase === "build" && currentOrder) {
-        const svg = createIceCreamSVG(currentOrder.container, [], [], 0.4);
-        svg.style.opacity = "0.25";
-        hintEl.appendChild(svg);
-      }
+      // Station panels removed in scene layout — no-op
     }
 
     function maybeEnableServe() {
@@ -2141,7 +2598,7 @@
       }
       if (totalScore === totalMaxParts) {
         text += "<span class='text-good'>Perfect!</span> ";
-        const rect = builderDropZone.getBoundingClientRect();
+        const rect = builderVisualEl.getBoundingClientRect();
         celebratePerfect(rect.left + rect.width/2, rect.top + rect.height/2);
       } else if (totalScore >= totalMaxParts * 0.66) {
         text += "<span class='text-good'>Close!</span> ";
@@ -2289,10 +2746,6 @@
           if (money >= stationCost && !hasSecondStation) {
             money -= stationCost;
             hasSecondStation = true;
-            station2El.style.borderStyle = "solid";
-            document.getElementById("station2Badge").textContent = "Active";
-            station2DescEl.textContent = "Advanced orders + build hints";
-            document.getElementById("station2Content").classList.remove("hidden");
             updateTopBar();
             renderShopItems();
           }
@@ -2350,7 +2803,7 @@
             money -= cost;
             unlockedFlavours.add(f);
             updateTopBar();
-            refreshShelfFlavours();
+            refreshIngredientTray();
             renderShopItems();
           }
         });
@@ -2379,7 +2832,8 @@
             money -= cost;
             unlockedToppings.add(t);
             updateTopBar();
-            refreshShelfToppings();
+            refreshCounterShelf();
+            refreshIngredientTray();
             renderShopItems();
           }
         });
@@ -2531,12 +2985,18 @@
       setTimeout(() => { openShop(); }, 300);
     });
 
-    clearScoopsBtn.addEventListener("click", () => {
+    // Rubbish bin tap — clear entire order
+    rubbishBinEl.addEventListener("click", () => {
+      if (phase !== "build" || !roundActive) return;
+      playerOrder.container = null;
       playerOrder.scoops = [];
+      playerOrder.toppings.clear();
       refreshSelectionStates();
       updateBuilderSteps();
       maybeEnableServe();
       renderBuilderVisual();
+      renderOrderTabs();
+      playSound("invalid");
     });
 
     // ====================================================================
@@ -2554,9 +3014,8 @@
     // ====================================================================
     //  INIT
     // ====================================================================
-    refreshShelfContainers();
-    refreshShelfFlavours();
-    refreshShelfToppings();
+    refreshCounterShelf();
+    refreshIngredientTray();
     setBuilderEnabled(false);
     startDay();
   </script>
