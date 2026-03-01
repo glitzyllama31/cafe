@@ -1,6 +1,6 @@
 # Cafe Creamery
 
-A browser-based memory game where customers order ice cream and you rebuild their orders from memory. Features a cafe scene layout with wooden counter, glass display case, drag-and-drop building, SVG illustrations, particle effects, and randomized character avatars.
+A browser-based memory game where customers order ice cream and you rebuild their orders from memory. Features a cafe scene layout with wooden counter, glass display case, drag-and-drop building, hand-crafted SVG character and food assets, particle effects, and illustrated customer characters.
 
 ## How to Play
 
@@ -14,7 +14,7 @@ A browser-based memory game where customers order ice cream and you rebuild thei
 ## Game Mechanics
 
 ### Day System
-Each day has a countdown timer (100 seconds on Day 1, scaling down to a minimum of 60 seconds). Serve as many customers as possible before time runs out. The timer shows an emoji face that changes with remaining time.
+Each day has a countdown timer (100 seconds on Day 1, scaling down to a minimum of 60 seconds). Serve as many customers as possible before time runs out. The timer shows an SVG face icon (happy/neutral/sad) that changes with remaining time.
 
 ### Scoring
 - Orders have 3 scored parts: **container** (cone/cup), **scoops** (flavor + count), **toppings**
@@ -32,7 +32,7 @@ Each day has a countdown timer (100 seconds on Day 1, scaling down to a minimum 
 | 7+  | 3 (if 3+ flavors) | Always mixed | 1 |
 
 ### Customer Patience
-During the build phase, the SVG customer avatar (80px) changes expression — smiling under 8 seconds, neutral at 8-15 seconds, and frowning beyond 15 seconds.
+During the build phase, the illustrated customer character (120px) changes mouth expression — smiling under 8 seconds, neutral at 8-15 seconds, and frowning beyond 15 seconds. There are 4 unique character designs mapped to the 7 personality types.
 
 ### Multi-Ice-Cream Orders
 Starting at Day 5 (requires Station B upgrade), customers may order 2 or 3 ice creams. A tab system lets you switch between orders during the build phase.
@@ -46,7 +46,7 @@ Between days a parchment-scroll shop overlay lets you spend earnings:
 | Extra Station (B) | $60 | Unlocks multi-ice-cream orders |
 | Notepad | $45 | Floating drawing canvas for scribbling notes during orders |
 | New Flavors | $30 each | Adds strawberry or mint chip to the order pool |
-| New Toppings | $22 each | Adds chocolate flake, caramel drizzle, or chocolate sauce |
+| New Toppings | $22 each | Adds chocolate flake, caramel drizzle, chocolate sauce, or cookie |
 
 ## Layout
 
@@ -68,7 +68,7 @@ Between days a parchment-scroll shop overlay lets you spend earnings:
 - **HTML + JS** in `index.html` (~3000 lines) — all game logic inline
 - **CSS** in `style.css` — scene layout with premium wood/glass visuals
 - **Google Fonts**: Fredoka (display) + Nunito (body)
-- **SVG** ice cream illustrations, flavour tubs, sauce bottles, rubbish bin, character avatars
+- **SVG assets** in `assets/` — hand-crafted ice cream scoops, containers, toppings, character illustrations, UI icons
 - **Pointer Events** drag-and-drop system (mouse + touch, tap fallback, bin hit-testing)
 - **Canvas** particle system (confetti, scoop bursts, money sparkles) + notepad drawing
 - **Web Audio API** for sound effects (pickup, drop, invalid, ding)
@@ -81,6 +81,12 @@ Between days a parchment-scroll shop overlay lets you spend earnings:
 cafe/
   index.html                        # HTML structure + all JS
   style.css                         # All CSS — scene layout + premium styles
+  assets/                           # Hand-crafted SVG assets
+    containers/                     #   cone.svg, cup.svg
+    scoops/                         #   vanilla, chocolate, strawberry, mint-chip
+    toppings/                       #   sprinkles, flake, caramel-drizzle, chocolate-sauce, cookie
+    characters/                     #   4 illustrated customer designs (student, commuter, kid, teen)
+    ui/                             #   coin, face-happy/neutral/sad, speech-bubble, etc.
   .github/workflows/pr-preview.yml  # PR preview deployment to GitHub Pages
   README.md                         # This file
   CLAUDE.md                         # Development guide for AI assistants

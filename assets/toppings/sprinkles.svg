@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 90" width="110" height="90">
+  <!-- Colorful sprinkles/jimmies scattered organically - each one is a small rounded rectangle -->
+  <g>
+    <!-- Red/pink sprinkles -->
+    <rect x="12" y="10" width="9" height="3.5" rx="1.7" fill="#E84060" transform="rotate(-32 16 12)" opacity="0.92"/>
+    <rect x="58" y="6" width="8" height="3.2" rx="1.6" fill="#F04868" transform="rotate(18 62 8)" opacity="0.88"/>
+    <rect x="35" y="48" width="9" height="3.5" rx="1.7" fill="#E84060" transform="rotate(-12 40 50)" opacity="0.9"/>
+    <rect x="80" y="42" width="8" height="3.2" rx="1.6" fill="#F04868" transform="rotate(42 84 44)" opacity="0.85"/>
+    <rect x="18" y="70" width="9" height="3.5" rx="1.7" fill="#E84060" transform="rotate(8 22 72)" opacity="0.87"/>
+    <!-- Yellow/gold sprinkles -->
+    <rect x="28" y="8" width="8" height="3.2" rx="1.6" fill="#F8C830" transform="rotate(22 32 10)" opacity="0.9"/>
+    <rect x="72" y="18" width="9" height="3.5" rx="1.7" fill="#FFD040" transform="rotate(-28 76 20)" opacity="0.88"/>
+    <rect x="48" y="38" width="8" height="3.2" rx="1.6" fill="#F8C830" transform="rotate(55 52 40)" opacity="0.85"/>
+    <rect x="92" y="58" width="9" height="3.5" rx="1.7" fill="#FFD040" transform="rotate(-15 96 60)" opacity="0.9"/>
+    <rect x="60" y="72" width="8" height="3.2" rx="1.6" fill="#F8C830" transform="rotate(35 64 74)" opacity="0.86"/>
+    <!-- Blue sprinkles -->
+    <rect x="44" y="14" width="8" height="3.2" rx="1.6" fill="#40A0E8" transform="rotate(-8 48 16)" opacity="0.9"/>
+    <rect x="88" y="28" width="9" height="3.5" rx="1.7" fill="#4098E0" transform="rotate(38 92 30)" opacity="0.86"/>
+    <rect x="22" y="36" width="8" height="3.2" rx="1.6" fill="#40A0E8" transform="rotate(-42 26 38)" opacity="0.88"/>
+    <rect x="68" y="54" width="9" height="3.5" rx="1.7" fill="#4098E0" transform="rotate(12 72 56)" opacity="0.85"/>
+    <rect x="40" y="76" width="8" height="3.2" rx="1.6" fill="#40A0E8" transform="rotate(-25 44 78)" opacity="0.87"/>
+    <!-- Green sprinkles -->
+    <rect x="8" y="26" width="9" height="3.5" rx="1.7" fill="#48C060" transform="rotate(30 12 28)" opacity="0.88"/>
+    <rect x="52" y="26" width="8" height="3.2" rx="1.6" fill="#50C868" transform="rotate(-48 56 28)" opacity="0.85"/>
+    <rect x="96" y="46" width="9" height="3.5" rx="1.7" fill="#48C060" transform="rotate(20 100 48)" opacity="0.9"/>
+    <rect x="30" y="60" width="8" height="3.2" rx="1.6" fill="#50C868" transform="rotate(-18 34 62)" opacity="0.86"/>
+    <rect x="78" y="68" width="9" height="3.5" rx="1.7" fill="#48C060" transform="rotate(48 82 70)" opacity="0.88"/>
+    <!-- Purple/violet sprinkles -->
+    <rect x="16" y="50" width="8" height="3.2" rx="1.6" fill="#A060D0" transform="rotate(15 20 52)" opacity="0.87"/>
+    <rect x="62" y="38" width="9" height="3.5" rx="1.7" fill="#9858C8" transform="rotate(-35 66 40)" opacity="0.85"/>
+    <rect x="84" y="10" width="8" height="3.2" rx="1.6" fill="#A060D0" transform="rotate(28 88 12)" opacity="0.9"/>
+    <rect x="50" y="60" width="8" height="3.2" rx="1.6" fill="#9858C8" transform="rotate(-22 54 62)" opacity="0.86"/>
+    <!-- Orange sprinkles -->
+    <rect x="38" y="22" width="9" height="3.5" rx="1.7" fill="#F08030" transform="rotate(-38 42 24)" opacity="0.88"/>
+    <rect x="76" y="32" width="8" height="3.2" rx="1.6" fill="#E87828" transform="rotate(8 80 34)" opacity="0.9"/>
+    <rect x="10" y="42" width="8" height="3.2" rx="1.6" fill="#F08030" transform="rotate(52 14 44)" opacity="0.85"/>
+    <rect x="56" y="80" width="9" height="3.5" rx="1.7" fill="#E87828" transform="rotate(-10 60 82)" opacity="0.87"/>
+    <!-- White sprinkles for pop -->
+    <rect x="46" y="4" width="7" height="3" rx="1.5" fill="#FFF8F0" transform="rotate(25 50 6)" opacity="0.75"/>
+    <rect x="82" y="52" width="7" height="3" rx="1.5" fill="#FFF8F0" transform="rotate(-30 86 54)" opacity="0.7"/>
+    <rect x="24" y="80" width="7" height="3" rx="1.5" fill="#FFF8F0" transform="rotate(40 28 82)" opacity="0.72"/>
+  </g>
+</svg>

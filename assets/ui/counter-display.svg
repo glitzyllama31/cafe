@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 280" width="900" height="280">
+  <defs>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B8C0C8"/>
+      <stop offset="30%" stop-color="#A0A8B0"/>
+      <stop offset="70%" stop-color="#B0B8C0"/>
+      <stop offset="100%" stop-color="#909898"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E8F0F8" stop-opacity="0.35"/>
+      <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.12"/>
+      <stop offset="70%" stop-color="#D8E8F4" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#C8D8E8" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="counterBase" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8B6B4A"/>
+      <stop offset="100%" stop-color="#6B4D2E"/>
+    </linearGradient>
+    <!-- Ice cream tub gradients -->
+    <linearGradient id="tubPink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0A0B8"/>
+      <stop offset="100%" stop-color="#E080A0"/>
+    </linearGradient>
+    <linearGradient id="tubVanilla" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8D8"/>
+      <stop offset="100%" stop-color="#F0E4B0"/>
+    </linearGradient>
+    <linearGradient id="tubMint" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A0E8B8"/>
+      <stop offset="100%" stop-color="#70D090"/>
+    </linearGradient>
+    <linearGradient id="tubGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#80D898"/>
+      <stop offset="100%" stop-color="#58C070"/>
+    </linearGradient>
+    <linearGradient id="tubChoco" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6B3A1F"/>
+      <stop offset="100%" stop-color="#4A2510"/>
+    </linearGradient>
+    <linearGradient id="tubStrawb" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F07088"/>
+      <stop offset="100%" stop-color="#D85068"/>
+    </linearGradient>
+  </defs>
+
+  <!-- === COUNTER SHELF (top section with containers) === -->
+  <rect x="0" y="0" width="900" height="80" fill="url(#counterBase)" rx="3"/>
+  <!-- Shelf top highlight -->
+  <rect x="0" y="0" width="900" height="4" fill="url(#metal)" rx="2"/>
+  <!-- Shelf bottom edge -->
+  <rect x="0" y="76" width="900" height="4" fill="#5A3D20"/>
+
+  <!-- === GLASS DISPLAY CASE (bottom section with tubs) === -->
+  <!-- Case frame -->
+  <rect x="0" y="80" width="900" height="200" fill="#888" rx="2"/>
+  <!-- Inner case -->
+  <rect x="6" y="84" width="888" height="190" fill="#F0F0F0" rx="2"/>
+  
+  <!-- Ice cream tubs - each is a colored column -->
+  <!-- Tub 1: Strawberry/Pink -->
+  <rect x="10" y="88" width="120" height="182" rx="3" fill="url(#tubPink)"/>
+  <rect x="10" y="88" width="120" height="20" fill="#E898B0" opacity="0.4"/>
+  <path d="M 30,140 Q 50,130 70,142 Q 90,150 110,138" fill="none" stroke="#D07090" stroke-width="1.5" opacity="0.3"/>
+  
+  <!-- Tub 2: Vanilla -->
+  <rect x="134" y="88" width="120" height="182" rx="3" fill="url(#tubVanilla)"/>
+  <rect x="134" y="88" width="120" height="20" fill="#F0E8C8" opacity="0.4"/>
+  <!-- Vanilla bean specks -->
+  <g fill="#8B7040" opacity="0.3">
+    <circle cx="160" cy="140" r="1.5"/><circle cx="190" cy="160" r="1.2"/>
+    <circle cx="210" cy="130" r="1.3"/><circle cx="175" cy="200" r="1.4"/>
+    <circle cx="230" cy="180" r="1.1"/><circle cx="150" cy="220" r="1.3"/>
+  </g>
+  
+  <!-- Tub 3: Mint Chip -->
+  <rect x="258" y="88" width="120" height="182" rx="3" fill="url(#tubMint)"/>
+  <rect x="258" y="88" width="120" height="20" fill="#90E0A8" opacity="0.4"/>
+  <!-- Chocolate chip specks -->
+  <g fill="#3E1A0A" opacity="0.6">
+    <ellipse cx="285" cy="140" rx="4" ry="3" transform="rotate(-15 285 140)"/>
+    <ellipse cx="320" cy="165" rx="3.5" ry="2.5" transform="rotate(20 320 165)"/>
+    <ellipse cx="295" cy="200" rx="4" ry="3" transform="rotate(-8 295 200)"/>
+    <ellipse cx="350" cy="145" rx="3" ry="2" transform="rotate(30 350 145)"/>
+    <ellipse cx="310" cy="230" rx="3.5" ry="2.5" transform="rotate(-20 310 230)"/>
+    <ellipse cx="340" cy="195" rx="3" ry="2.5" transform="rotate(12 340 195)"/>
+    <ellipse cx="275" cy="180" rx="3.5" ry="2.5" transform="rotate(-10 275 180)"/>
+    <ellipse cx="360" cy="220" rx="3" ry="2" transform="rotate(25 360 220)"/>
+  </g>
+  
+  <!-- Tub 4: Bright Green (pistachio) -->
+  <rect x="382" y="88" width="120" height="182" rx="3" fill="url(#tubGreen)"/>
+  <rect x="382" y="88" width="120" height="20" fill="#70C888" opacity="0.4"/>
+  
+  <!-- Tub 5: Strawberry Red -->
+  <rect x="506" y="88" width="120" height="182" rx="3" fill="url(#tubStrawb)"/>
+  <rect x="506" y="88" width="120" height="20" fill="#E86880" opacity="0.4"/>
+  <!-- Fruit chunks -->
+  <g fill="#C04050" opacity="0.4">
+    <ellipse cx="540" cy="150" rx="5" ry="3.5" transform="rotate(-10 540 150)"/>
+    <ellipse cx="580" cy="190" rx="4" ry="3" transform="rotate(15 580 190)"/>
+    <ellipse cx="550" cy="230" rx="4.5" ry="3" transform="rotate(-20 550 230)"/>
+    <ellipse cx="600" cy="160" rx="4" ry="3" transform="rotate(8 600 160)"/>
+  </g>
+
+  <!-- Tub 6: Chocolate -->
+  <rect x="630" y="88" width="120" height="182" rx="3" fill="url(#tubChoco)"/>
+  <rect x="630" y="88" width="120" height="20" fill="#5C3018" opacity="0.4"/>
+  <!-- Chocolate swirl texture -->
+  <path d="M 650,150 Q 670,140 690,155 Q 710,165 730,150" fill="none" stroke="#7B4828" stroke-width="2" opacity="0.25"/>
+  <path d="M 650,200 Q 670,190 690,205 Q 710,215 730,200" fill="none" stroke="#7B4828" stroke-width="2" opacity="0.2"/>
+
+  <!-- Divider lines between tubs -->
+  <g stroke="#C0C0C0" stroke-width="1.5" opacity="0.5">
+    <line x1="132" y1="86" x2="132" y2="272"/>
+    <line x1="256" y1="86" x2="256" y2="272"/>
+    <line x1="380" y1="86" x2="380" y2="272"/>
+    <line x1="504" y1="86" x2="504" y2="272"/>
+    <line x1="628" y1="86" x2="628" y2="272"/>
+    <line x1="752" y1="86" x2="752" y2="272"/>
+  </g>
+
+  <!-- Topping area (right side) -->
+  <rect x="756" y="88" width="135" height="182" rx="3" fill="#E8E0D8"/>
+  <!-- Toppings label area -->
+  <text x="823" y="110" text-anchor="middle" font-family="system-ui" font-size="13" fill="#8B7355" font-weight="600">TOPPINGS</text>
+  <!-- Sprinkles preview -->
+  <g transform="translate(770,120)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#FFF8F0" stroke="#D4C4A8" stroke-width="1"/>
+    <g transform="scale(0.4) translate(10,10)">
+      <rect x="15" y="12" width="8" height="3" rx="1.5" fill="#FF4D6A" transform="rotate(-30 19 14)"/>
+      <rect x="30" y="8" width="7" height="3" rx="1.5" fill="#FFD93D" transform="rotate(15 34 10)"/>
+      <rect x="45" y="16" width="8" height="3" rx="1.5" fill="#4DC9F6" transform="rotate(-10 49 18)"/>
+      <rect x="60" y="10" width="7" height="3" rx="1.5" fill="#73D16C" transform="rotate(40 64 12)"/>
+      <rect x="20" y="30" width="7" height="3" rx="1.5" fill="#B87DFF" transform="rotate(20 24 32)"/>
+      <rect x="40" y="26" width="8" height="3" rx="1.5" fill="#FF4D6A" transform="rotate(-45 44 28)"/>
+      <rect x="58" y="32" width="7" height="3" rx="1.5" fill="#FFD93D" transform="rotate(5 62 34)"/>
+      <rect x="30" y="44" width="8" height="3" rx="1.5" fill="#73D16C" transform="rotate(25 34 46)"/>
+      <rect x="50" y="42" width="7" height="3" rx="1.5" fill="#4DC9F6" transform="rotate(-20 54 44)"/>
+    </g>
+  </g>
+  <!-- Flake preview -->
+  <g transform="translate(835,120)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#FFF8F0" stroke="#D4C4A8" stroke-width="1"/>
+    <rect x="20" y="8" width="10" height="34" rx="2" fill="#5C3018"/>
+    <g stroke="#3A1808" stroke-width="0.6" opacity="0.4">
+      <line x1="20" y1="14" x2="30" y2="14"/>
+      <line x1="20" y1="20" x2="30" y2="20"/>
+      <line x1="20" y1="26" x2="30" y2="26"/>
+      <line x1="20" y1="32" x2="30" y2="32"/>
+      <line x1="20" y1="38" x2="30" y2="38"/>
+    </g>
+  </g>
+  <!-- Caramel preview -->
+  <g transform="translate(770,178)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#FFF8F0" stroke="#D4C4A8" stroke-width="1"/>
+    <path d="M 10,18 Q 18,10 26,20 Q 34,28 42,16" fill="none" stroke="#D09018" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 8,32 Q 18,24 28,34 Q 36,40 44,30" fill="none" stroke="#D09018" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Chocolate sauce preview -->
+  <g transform="translate(835,178)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#FFF8F0" stroke="#D4C4A8" stroke-width="1"/>
+    <path d="M 10,18 Q 18,10 26,20 Q 34,28 42,16" fill="none" stroke="#4A2210" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 8,32 Q 18,24 28,34 Q 36,40 44,30" fill="none" stroke="#4A2210" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Glass overlay - the transparent front panel -->
+  <rect x="6" y="84" width="888" height="190" fill="url(#glass)" rx="2"/>
+  <!-- Glass reflection streaks -->
+  <line x1="30" y1="92" x2="350" y2="92" stroke="white" stroke-width="2.5" opacity="0.25" stroke-linecap="round"/>
+  <line x1="400" y1="96" x2="650" y2="96" stroke="white" stroke-width="1.8" opacity="0.18" stroke-linecap="round"/>
+  <line x1="20" y1="180" x2="200" y2="180" stroke="white" stroke-width="1" opacity="0.1" stroke-linecap="round"/>
+  
+  <!-- Metal frame edges -->
+  <rect x="0" y="80" width="900" height="6" fill="url(#metal)" rx="2"/>
+  <rect x="0" y="272" width="900" height="8" fill="url(#metal)" rx="2"/>
+  <rect x="0" y="80" width="6" height="200" fill="url(#metal)"/>
+  <rect x="894" y="80" width="6" height="200" fill="url(#metal)"/>
+</svg>
