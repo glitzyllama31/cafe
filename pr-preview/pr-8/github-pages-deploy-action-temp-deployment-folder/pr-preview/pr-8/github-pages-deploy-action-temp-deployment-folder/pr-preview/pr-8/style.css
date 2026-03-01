@@ -1073,14 +1073,6 @@ button[disabled] {
   overflow: visible;
 }
 
-/* --- Asset-based ice cream composition --- */
-.ice-cream-asset {
-  pointer-events: none;
-}
-.ice-cream-asset img {
-  display: block;
-}
-
 /* --- Utility --- */
 .hidden {
   display: none !important;

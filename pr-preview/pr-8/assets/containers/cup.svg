@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 130" width="160" height="130">
+  <defs>
+    <linearGradient id="cupBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F0D8D8"/>
+      <stop offset="15%" stop-color="#FCEEF0"/>
+      <stop offset="50%" stop-color="#FFF5F6"/>
+      <stop offset="85%" stop-color="#FCEEF0"/>
+      <stop offset="100%" stop-color="#E8C8C8"/>
+    </linearGradient>
+    <linearGradient id="cupRim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0F2"/>
+      <stop offset="100%" stop-color="#F0D0D4"/>
+    </linearGradient>
+    <pattern id="wavePattern" patternUnits="userSpaceOnUse" width="24" height="12" patternTransform="rotate(0)">
+      <path d="M 0,6 Q 6,0 12,6 Q 18,12 24,6" fill="none" stroke="#E8A0A8" stroke-width="1.8" opacity="0.45"/>
+    </pattern>
+  </defs>
+  <!-- Cup shadow -->
+  <ellipse cx="82" cy="124" rx="55" ry="5" fill="#00000010"/>
+  <!-- Cup body - slightly tapered -->
+  <path d="M 22,22 L 16,112 Q 14,124 30,126 L 130,126 Q 146,124 144,112 L 138,22 Z" 
+        fill="url(#cupBody)" stroke="#D0A0A8" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Wave decoration pattern -->
+  <g clip-path="url(#cupClip)">
+    <rect x="16" y="22" width="128" height="106" fill="url(#wavePattern)"/>
+  </g>
+  <clipPath id="cupClip">
+    <path d="M 22,22 L 16,112 Q 14,124 30,126 L 130,126 Q 146,124 144,112 L 138,22 Z"/>
+  </clipPath>
+  <!-- Horizontal stripe bands -->
+  <g opacity="0.12" clip-path="url(#cupClip)">
+    <rect x="14" y="40" width="132" height="14" fill="#D06878"/>
+    <rect x="14" y="68" width="132" height="14" fill="#D06878"/>
+    <rect x="14" y="96" width="132" height="14" fill="#D06878"/>
+  </g>
+  <!-- Left edge shadow -->
+  <path d="M 22,22 L 16,112 Q 14,124 30,126 L 36,126 Q 22,124 24,112 L 30,22 Z" fill="#D0A0A8" opacity="0.2"/>
+  <!-- Rim - thick rolled edge with scallops -->
+  <ellipse cx="80" cy="22" rx="60" ry="10" fill="url(#cupRim)" stroke="#D0A0A8" stroke-width="2"/>
+  <!-- Scalloped rim top edge -->
+  <path d="M 22,16 Q 30,10 38,16 Q 46,10 54,16 Q 62,10 70,16 Q 78,10 86,16 Q 94,10 102,16 Q 110,10 118,16 Q 126,10 134,16 Q 138,12 140,16" 
+        fill="none" stroke="#E0B0B8" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Inner rim shadow -->
+  <ellipse cx="80" cy="24" rx="54" ry="6" fill="#D8A8B0" opacity="0.25"/>
+  <!-- Rim highlight -->
+  <ellipse cx="78" cy="19" rx="40" ry="4" fill="white" opacity="0.35"/>
+</svg>

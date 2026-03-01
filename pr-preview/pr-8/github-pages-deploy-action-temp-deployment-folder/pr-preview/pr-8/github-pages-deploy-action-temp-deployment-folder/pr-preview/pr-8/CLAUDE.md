@@ -2,7 +2,7 @@
 
 ## Overview
 
-Cafe Creamery is a browser game with `index.html` (HTML + JS, ~3200 lines), `style.css` (~1000 lines), and hand-crafted SVG assets in `assets/`. There is no build step — open `index.html` directly in a browser to test. Optimized for iPad landscape.
+Cafe Creamery is a browser game split across two files: `index.html` (HTML + JS, ~3000 lines) and `style.css` (~700 lines). There is no build step — open `index.html` directly in a browser to test. Optimized for iPad landscape.
 
 ## File Layout
 
@@ -18,7 +18,7 @@ index.html
 style.css
   ├── :root       Design tokens (colors, flavour triads, wood, glass, metal)
   ├── Base         Reset, body (warm cafe wall bg), typography
-  ├── Top bar      #topBar (wooden plank), SVG face timer, coin+money labels
+  ├── Top bar      #topBar (wooden plank), emoji timer, day/money labels
   ├── Scene area   #sceneArea (customer, speech bubble, builder)
   ├── Counter      #counterShelf (wood-grain shelf with containers + sauces)
   ├── Tray         #ingredientTray (glass display case with tubs + toppings + bin)
@@ -26,13 +26,6 @@ style.css
   ├── Notepad      #notepadPanel (floating overlay)
   ├── Animations   scoopDrop, servePulse, dangerPulse, wrongShake, coinBounce
   └── Responsive   @media (max-width: 800px) for non-iPad screens
-
-assets/
-  ├── containers/    cone.svg (140×220), cup.svg (160×130)
-  ├── scoops/        vanilla, chocolate, strawberry, mint-chip (120×110 each)
-  ├── toppings/      sprinkles, chocolate-flake, caramel-drizzle, chocolate-sauce, cookie
-  ├── characters/    customer-student, commuter, kid, teen (180×260 each, with data-mouth groups)
-  └── ui/            coin, face-happy/neutral/sad, speech-bubble, counter-display, bg-tile
 
 .github/workflows/pr-preview.yml
   └── PR preview deployment to GitHub Pages via rossjrw/pr-preview-action
@@ -87,15 +80,11 @@ Overlays (fixed, z-index 100): `#dayEndOverlay`, `#shopOverlay` (parchment scrol
 - `currentCustomerSeed` — seeded random for deterministic character appearance
 - `audioCtx` — Web Audio context (lazy-initialized)
 - `SAUCE_TOPPINGS` — `Set` of toppings rendered as bottles on counter shelf
-- `svgCache` — preloaded SVG DOM templates (path → Element)
 
 ### Constants
-- `ALL_FLAVOURS` / `ALL_TOPPINGS` — full arrays of game items (toppings includes "cookie")
-- `ASSET_PATHS` — paths to all SVG assets by category
-- `CHARACTER_MAP` — maps 7 personality names → 4 character asset keys
-- `CHARACTER_MOUTHS` — happy/neutral/impatient mouth SVG HTML per character
-- `ICE_CREAM_LAYOUTS` — positioning rules for asset-based ice cream composition
-- `FLAVOUR_COLORS` — main/shadow/shine triads per flavour (legacy, used by shelf items)
+- `ALL_FLAVOURS` / `ALL_TOPPINGS` — full arrays of game items
+- `FLAVOUR_COLORS` — main/shadow/shine triads per flavour (for SVG rendering)
+- `SKIN_TONES`, `HAIR_COLORS`, `SHIRT_COLORS` — character avatar randomization pools
 
 ### Order Object Shape
 ```js
@@ -127,21 +116,18 @@ Overlays (fixed, z-index 100): `#dayEndOverlay`, `#shopOverlay` (parchment scrol
 | `renderOrderTabs()` | Draw tab buttons for multi-ice-cream orders |
 | `switchToOrder(i)` | Save current builder state, load order `i` |
 | `maybeEnableServe()` | Check if all orders are ready and enable Serve button |
-| **Asset system** | |
-| `preloadSVGAssets()` | Fetch + cache all SVG assets at startup |
-| `getSVGElement(path)` | Clone cached SVG template for DOM insertion |
-| `createIceCreamElement(container, scoops, toppings, scale)` | Compose ice cream from asset images (div-based layering) |
-| `createCharacterFromAsset(characterKey, patience)` | Clone character SVG, swap mouth for expression |
-| **SVG rendering (shelf items)** | |
+| **SVG rendering** | |
+| `createIceCreamSVG(container, scoops, toppings, scale)` | Full ice cream with gradients + toppings |
 | `createSauceBottleSVG(type)` | 56×70 sauce bottle for counter shelf |
 | `createStandingConeSVG()` | 56×70 upright cone for counter shelf |
 | `createCupStackSVG()` | 56×70 stacked cups for counter shelf |
 | `createFlavourTubSVG(flavour)` | 72×56 ice cream tub for ingredient tray |
 | `createSprinklesPileSVG()` | 56×56 sprinkles in bowl for tray |
 | `createFlakeItemSVG()` | 56×56 flake on wrapper for tray |
-| `createCookieItemSVG()` | 56×56 cookie for tray |
 | `createRubbishBinSVG(isOpen)` | 52×60 bin with open/closed lid states |
-| `renderCharacterAvatar(patience)` | Render asset character into `#customerAvatar` |
+| `createCharacterSVG(seed, patience)` | Randomized SVG character bust (80px) |
+| `renderCharacterAvatar(patience)` | Render SVG avatar into `#customerAvatar` |
+| `appendSprinklesSVG/FlakeSVG/DrizzleSVG()` | Topping overlays on top scoop |
 | **Counter/Tray** | |
 | `refreshCounterShelf()` | Render containers + sauce bottles on wooden counter |
 | `refreshIngredientTray()` | Render flavour tubs + non-sauce toppings + bin in glass tray |
@@ -214,18 +200,9 @@ pointerdown on .counter-item / .tray-item → record start position, capture poi
 - `touch-action: manipulation` on `html` + JS `touchend` handler to prevent iOS double-tap zoom
 - `@media (max-width: 800px)` responsive layout
 
-## SVG Asset System
+## SVG System
 
-Ice cream visuals are composed from hand-crafted SVG assets in `assets/`:
-- **Scoops** (120×110, organic blob shapes): vanilla, chocolate, strawberry, mint-chip
-- **Containers** (cone 140×220, cup 160×130): waffle crosshatch, scalloped pink cup
-- **Toppings**: sprinkles overlay, chocolate flake stick, caramel/choc drizzle, cookie
-- **Characters** (180×260): 4 illustrated busts with swappable mouth expressions
-- **UI**: coin icon, face-happy/neutral/sad timer icons
-
-Assets are preloaded at startup via `preloadSVGAssets()` → parsed by DOMParser → cached in `svgCache`. Ice cream composition uses `createIceCreamElement()` which creates a div with absolutely-positioned `<img>` elements layered per `ICE_CREAM_LAYOUTS`.
-
-Inline `<defs>` block provides shared resources for shelf item SVGs:
+Inline `<defs>` block provides shared resources:
 - `<radialGradient id="grad-{flavour}">` — uses CSS variable triads
 - `<filter id="scoopShadow">` — drop shadow for depth
 - `<filter id="shineBlur">` — gaussian blur for specular highlights
@@ -235,7 +212,7 @@ Inline `<defs>` block provides shared resources for shelf item SVGs:
 - `<filter id="subtleBevel">` — specular lighting for 3D sheen
 - `<filter id="frostFilter">` — fractalNoise + screen for frost effect
 
-Character avatars use 4 hand-crafted SVG assets in `assets/characters/` (student, commuter, kid, teen), mapped to the 7 personality types via `CHARACTER_MAP`. Each SVG has a `<g data-mouth="true">` group that gets swapped by `createCharacterFromAsset()` with happy/neutral/impatient mouth HTML from `CHARACTER_MOUTHS`. Rendered at 120px wide in the scene. Old `createCharacterSVG()` is kept as fallback if assets fail to load.
+Character avatars are generated via `createCharacterSVG(seed, patience)` with seeded randomization for: skin tone (5), hair color (5), hair style (5), glasses, hats, shirt color (6). Mouth path changes with patience state (smile → flat → frown). Rendered at 80×80px in the scene.
 
 ## Customer Personality System
 
@@ -246,18 +223,18 @@ Character avatars use 4 hand-crafted SVG assets in `assets/characters/` (student
 Open `index.html` in a browser (ideally iPad Safari or browser with touch simulation). Key scenarios:
 
 1. Warm cafe wall background, wooden counter shelf, glass display tray visible
-2. Top bar shows wooden plank with SVG face timer, day label, coin icon + money
+2. Top bar shows wooden plank with emoji timer, day label, gold money
 3. Counter shelf shows sauce bottles + cup stack + cone with wood grain texture
 4. Tray shows flavour tubs with per-flavour textures, sprinkles in bowl, flake on wrapper
-5. Drag item from counter/tray → ghost follows → drop on scene → asset-based ice cream renders
+5. Drag item from counter/tray → ghost follows → drop on scene → ice cream renders
 6. Speech bubble auto-fades on first ingredient add (no "Okay" button)
 7. Tap (without dragging) also adds ingredients as fallback
 8. Sequential gating: flavours disabled until container selected, toppings until scoops added
 9. Tap rubbish bin → clears entire order with "invalid" sound
 10. Drag item over bin mid-drag → bin glows red + lid opens → release cancels add
-11. Day timer counts down with SVG face icons (green/yellow/red), bar changes color
+11. Day timer counts down with emoji faces, bar changes color (green → orange → red)
 12. Serving perfect order triggers confetti particles; bad order triggers screen shake
-13. Customer is one of 4 illustrated characters (120px), changes mouth expression with patience
+13. Customer avatar is 80px in scene, changes expression with patience
 14. Customer progress dots below avatar (served = green, current = gold)
 15. Result text appears in slim result bar below tray
 16. Day-end overlay shows per-customer earnings breakdown
@@ -268,8 +245,6 @@ Open `index.html` in a browser (ideally iPad Safari or browser with touch simula
 21. Timer expiry mid-build auto-submits; mid-dialogue ends day
 22. No double-tap zoom on iPad/iPhone
 23. Tutorial banner shows contextual hints on Day 1
-24. Cookie topping appears in shop, can be purchased, renders on top of scoop
-25. SVG assets preload at startup without console errors
 
 ## CI / Deployment
 
