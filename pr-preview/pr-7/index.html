@@ -1,0 +1,2564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Café Creamery – Memory Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- SVG Defs (shared gradients, filters, patterns) -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden;">
+    <defs>
+      <!-- Flavour gradients -->
+      <radialGradient id="grad-vanilla" cx="35%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="var(--vanilla-shine)"/>
+        <stop offset="50%" stop-color="var(--vanilla-main)"/>
+        <stop offset="100%" stop-color="var(--vanilla-shadow)"/>
+      </radialGradient>
+      <radialGradient id="grad-chocolate" cx="35%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="var(--chocolate-shine)"/>
+        <stop offset="50%" stop-color="var(--chocolate-main)"/>
+        <stop offset="100%" stop-color="var(--chocolate-shadow)"/>
+      </radialGradient>
+      <radialGradient id="grad-strawberry" cx="35%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="var(--strawberry-shine)"/>
+        <stop offset="50%" stop-color="var(--strawberry-main)"/>
+        <stop offset="100%" stop-color="var(--strawberry-shadow)"/>
+      </radialGradient>
+      <radialGradient id="grad-mint" cx="35%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="var(--mint-shine)"/>
+        <stop offset="50%" stop-color="var(--mint-main)"/>
+        <stop offset="100%" stop-color="var(--mint-shadow)"/>
+      </radialGradient>
+
+      <!-- Scoop drop shadow -->
+      <filter id="scoopShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.2)"/>
+      </filter>
+
+      <!-- Shine blur for specular highlight -->
+      <filter id="shineBlur">
+        <feGaussianBlur stdDeviation="1.5"/>
+      </filter>
+
+      <!-- Waffle cone pattern -->
+      <pattern id="wafflePattern" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(139,99,49,0.3)" stroke-width="1"/>
+        <line x1="0" y1="0" x2="8" y2="0" stroke="rgba(139,99,49,0.3)" stroke-width="1"/>
+      </pattern>
+    </defs>
+  </svg>
+
+  <!-- Particle overlay canvas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <div id="gameRoot">
+    <!-- Top bar -->
+    <div id="topBar">
+      <div id="dayLabel">Day 1</div>
+      <div style="flex:1; display:flex; align-items:center; gap:8px;">
+        <span id="timer" style="font-size:0.82rem; white-space:nowrap;"></span>
+        <div id="timerBarContainer"><div id="timerBar"></div></div>
+      </div>
+      <div id="moneyLabel">$0</div>
+      <div class="top-controls">
+        <button id="nextCustomerBtn" class="primary">Start Day 1</button>
+        <button id="openShopBtn" disabled>Shop</button>
+      </div>
+    </div>
+    <div id="tutorialBanner">Welcome! Watch the order carefully, then rebuild it.</div>
+
+    <!-- Three-column game layout -->
+    <div class="game-columns">
+      <!-- LEFT: Customer -->
+      <div class="col-left">
+        <div id="customerCard" class="card">
+          <h2>Customer</h2>
+          <div id="customerName">Shy Customer</div>
+          <div class="dialogueBox">
+            <div id="customerOrderText">They haven't ordered yet…</div>
+            <button id="okOrderBtn" class="primary hidden">Okay</button>
+          </div>
+          <div id="customerVisual"></div>
+          <div id="customerAvatar"></div>
+          <div id="customerProgress"></div>
+        </div>
+        <div id="notepadPanel" class="card hidden">
+          <div class="notepad-header">
+            <strong>Notepad</strong>
+            <button class="notepad-color-btn active" data-color="#2c1810" style="background:#2c1810"></button>
+            <button class="notepad-color-btn" data-color="#f04747" style="background:#f04747"></button>
+            <button class="notepad-color-btn" data-color="#43b581" style="background:#43b581"></button>
+            <button class="notepad-color-btn" data-color="eraser" style="background:#fffef6; border-style:dashed;">&#x1f6ab;</button>
+            <button class="notepad-color-btn" data-color="clear" style="background:#fff; font-size:0.6rem;">CLR</button>
+          </div>
+          <canvas id="notepadCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- CENTER: Builder -->
+      <div class="col-center">
+        <div id="builder" class="card">
+          <h2>Your Station</h2>
+          <small id="builderHint">When the order disappears, build exactly what they asked for.</small>
+
+          <div id="orderTabs" class="hidden"></div>
+
+          <div id="builderDropZone">
+            <span class="drop-hint">Drag a cone or cup here to start</span>
+            <div id="builderVisual"></div>
+          </div>
+
+          <div id="stations">
+            <div class="station" id="station1">
+              <div class="station-label">Station A</div>
+              <div class="station-badge">Base station</div>
+              <div id="station1Desc">Single scoop, classic service.</div>
+            </div>
+            <div class="station" id="station2">
+              <div class="station-label">Station B</div>
+              <div class="station-badge" id="station2Badge">Locked</div>
+              <div id="station2Desc">Buy an extra station in the shop!</div>
+              <div id="station2Content" class="hidden">
+                <div id="station2Hint" style="margin-top:4px; min-height:30px;"></div>
+                <div id="station2Preview" style="margin-top:4px; display:flex; gap:4px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px;">
+            <button id="submitOrderBtn" class="primary" disabled>Serve Ice Cream</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Ingredient shelf -->
+      <div class="col-right" id="ingredientShelf">
+        <div class="shelf-section" id="shelfContainers">
+          <div class="shelf-label">Container</div>
+          <div class="shelf-grid" id="containerGrid"></div>
+        </div>
+        <div class="shelf-section" id="shelfFlavours">
+          <div class="shelf-label" id="flavourLabel">Flavours <span id="scoopCount">0/3</span></div>
+          <div class="shelf-grid" id="flavourGrid"></div>
+          <button class="shelf-clear-btn" id="clearScoopsBtn">Clear scoops</button>
+        </div>
+        <div class="shelf-section" id="shelfToppings">
+          <div class="shelf-label">Toppings</div>
+          <div class="shelf-grid" id="toppingGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result bar -->
+    <div id="resultBar">
+      <span id="resultText">Serve your first customer to see how you did!</span>
+      <div id="endOfDayPanel" class="hidden"></div>
+    </div>
+  </div>
+
+  <!-- Day-end overlay -->
+  <div id="dayEndOverlay">
+    <div id="dayEndPanel" class="card">
+      <h2 id="dayEndTitle">Day Complete!</h2>
+      <div id="dayEndStats"></div>
+      <div style="margin-top:10px; text-align:center;">
+        <button id="dayEndContinueBtn" class="primary">Continue to Shop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shop overlay -->
+  <div id="shopOverlay">
+    <div id="shopPanel" class="card">
+      <h2>Evening Upgrades</h2>
+      <div id="shopMoney"></div>
+      <div id="shopItems"></div>
+      <div style="margin-top:10px; text-align:right;">
+        <button id="shopCloseBtn" class="primary">Sleep &amp; Next Day</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====================================================================
+    //  DATA & STATE
+    // ====================================================================
+    const ALL_FLAVOURS = ["vanilla", "chocolate", "strawberry", "mint"];
+    const ALL_TOPPINGS = ["sprinkles", "flake", "caramel", "choc_sauce"];
+
+    let unlockedFlavours = new Set(["vanilla", "chocolate"]);
+    let unlockedToppings = new Set(["sprinkles"]);
+    let hasSecondStation = false;
+
+    let day = 1;
+    let money = 0;
+    let customersServedToday = 0;
+
+    let currentOrder = null;
+    let currentOrders = [];
+    let playerOrders = [];
+    let activeOrderIndex = 0;
+    let playerOrder = { container: null, scoops: [], toppings: new Set() };
+    let showPhaseSeconds = 4;
+    let dayTimerSeconds = 100;
+    let dayTimeLeft = 0;
+    let dayTimerId = null;
+    let customerBuildStart = null;
+    let roundActive = false;
+    let inTutorial = true;
+    let audioCtx = null;
+    let phase = "idle";
+    let currentCustomerName = null;
+    let hasNotepad = false;
+    let dayEarnings = [];
+
+    // ====================================================================
+    //  DOM REFS
+    // ====================================================================
+    const dayLabel = document.getElementById("dayLabel");
+    const moneyLabel = document.getElementById("moneyLabel");
+    const tutorialBanner = document.getElementById("tutorialBanner");
+    const timerEl = document.getElementById("timer");
+
+    const customerNameEl = document.getElementById("customerName");
+    const customerOrderTextEl = document.getElementById("customerOrderText");
+    const customerVisualEl = document.getElementById("customerVisual");
+    const builderVisualEl = document.getElementById("builderVisual");
+    const okOrderBtn = document.getElementById("okOrderBtn");
+    const builderDropZone = document.getElementById("builderDropZone");
+
+    const containerGrid = document.getElementById("containerGrid");
+    const flavourGrid = document.getElementById("flavourGrid");
+    const toppingGrid = document.getElementById("toppingGrid");
+    const scoopCountEl = document.getElementById("scoopCount");
+
+    const submitOrderBtn = document.getElementById("submitOrderBtn");
+    const nextCustomerBtn = document.getElementById("nextCustomerBtn");
+    const openShopBtn = document.getElementById("openShopBtn");
+
+    const resultTextEl = document.getElementById("resultText");
+    const endOfDayPanelEl = document.getElementById("endOfDayPanel");
+    const station2El = document.getElementById("station2");
+    const station2DescEl = document.getElementById("station2Desc");
+
+    const shopOverlay = document.getElementById("shopOverlay");
+    const shopMoneyEl = document.getElementById("shopMoney");
+    const shopItemsEl = document.getElementById("shopItems");
+    const shopCloseBtn = document.getElementById("shopCloseBtn");
+    const timerBarEl = document.getElementById("timerBar");
+    const customerProgressEl = document.getElementById("customerProgress");
+    const dayEndOverlay = document.getElementById("dayEndOverlay");
+    const dayEndTitle = document.getElementById("dayEndTitle");
+    const dayEndStats = document.getElementById("dayEndStats");
+    const dayEndContinueBtn = document.getElementById("dayEndContinueBtn");
+    const clearScoopsBtn = document.getElementById("clearScoopsBtn");
+    const ingredientShelf = document.getElementById("ingredientShelf");
+
+    // ====================================================================
+    //  SVG ICE CREAM RENDERING (Phase 3)
+    // ====================================================================
+    const FLAVOUR_COLORS = {
+      vanilla:    { main: "#fff5d6", shadow: "#e8d5a0", shine: "#fffef4" },
+      chocolate:  { main: "#7b4a2b", shadow: "#4a2510", shine: "#a06840" },
+      strawberry: { main: "#ff8faa", shadow: "#d4607a", shine: "#ffb8cc" },
+      mint:       { main: "#8fe8c0", shadow: "#5cb890", shine: "#c0ffd8" }
+    };
+
+    function createIceCreamSVG(container, scoops, toppingsArr, scale) {
+      scale = scale || 1;
+      const w = 90 * scale;
+      const scoopH = 32 * scale;
+      const scoopW = 50 * scale;
+      const containerH = container === "cone" ? 65 * scale : 38 * scale;
+      const totalH = containerH + scoops.length * (scoopH * 0.7) + scoopH * 0.4;
+      const svgH = totalH + 10 * scale;
+
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", `0 0 ${w} ${svgH}`);
+      svg.setAttribute("width", w);
+      svg.setAttribute("height", svgH);
+      svg.classList.add("ice-cream-svg");
+
+      const cx = w / 2;
+      const containerBottom = svgH - 4 * scale;
+      const containerTop = containerBottom - containerH;
+
+      // Container
+      if (container === "cone") {
+        // Cone body
+        const cone = document.createElementNS(ns, "polygon");
+        const coneW = 44 * scale;
+        cone.setAttribute("points",
+          `${cx - coneW/2},${containerTop} ${cx + coneW/2},${containerTop} ${cx},${containerBottom}`);
+        cone.setAttribute("fill", "#e8a84c");
+        cone.setAttribute("stroke", "#c4863a");
+        cone.setAttribute("stroke-width", "1");
+        svg.appendChild(cone);
+
+        // Waffle pattern overlay
+        const coneRect = document.createElementNS(ns, "polygon");
+        coneRect.setAttribute("points",
+          `${cx - coneW/2},${containerTop} ${cx + coneW/2},${containerTop} ${cx},${containerBottom}`);
+        coneRect.setAttribute("fill", "url(#wafflePattern)");
+        coneRect.setAttribute("opacity", "0.6");
+        svg.appendChild(coneRect);
+
+        // Cone edge highlight
+        const highlight = document.createElementNS(ns, "line");
+        highlight.setAttribute("x1", cx - coneW/2 + 3*scale);
+        highlight.setAttribute("y1", containerTop + 2*scale);
+        highlight.setAttribute("x2", cx - 1*scale);
+        highlight.setAttribute("y2", containerBottom - 3*scale);
+        highlight.setAttribute("stroke", "rgba(255,255,255,0.3)");
+        highlight.setAttribute("stroke-width", 1.5 * scale);
+        highlight.setAttribute("stroke-linecap", "round");
+        svg.appendChild(highlight);
+      } else {
+        // Cup body
+        const cupW = 52 * scale;
+        const cupTopW = cupW;
+        const cupBotW = cupW * 0.75;
+        const cup = document.createElementNS(ns, "path");
+        const cupR = 8 * scale;
+        cup.setAttribute("d",
+          `M${cx - cupTopW/2},${containerTop}
+           L${cx - cupBotW/2},${containerBottom - cupR}
+           Q${cx - cupBotW/2},${containerBottom} ${cx - cupBotW/2 + cupR},${containerBottom}
+           L${cx + cupBotW/2 - cupR},${containerBottom}
+           Q${cx + cupBotW/2},${containerBottom} ${cx + cupBotW/2},${containerBottom - cupR}
+           L${cx + cupTopW/2},${containerTop} Z`);
+        cup.setAttribute("fill", "#fafafa");
+        cup.setAttribute("stroke", "#ddd");
+        cup.setAttribute("stroke-width", "1");
+        svg.appendChild(cup);
+
+        // Cup stripe
+        const stripe = document.createElementNS(ns, "rect");
+        const stripeY = containerTop + containerH * 0.35;
+        stripe.setAttribute("x", cx - cupTopW/2 + 4*scale);
+        stripe.setAttribute("y", stripeY);
+        stripe.setAttribute("width", cupTopW - 8*scale);
+        stripe.setAttribute("height", 4*scale);
+        stripe.setAttribute("rx", 2*scale);
+        stripe.setAttribute("fill", "var(--primary-from)");
+        stripe.setAttribute("opacity", "0.4");
+        svg.appendChild(stripe);
+
+        // Rim ellipse
+        const rim = document.createElementNS(ns, "ellipse");
+        rim.setAttribute("cx", cx);
+        rim.setAttribute("cy", containerTop);
+        rim.setAttribute("rx", cupTopW / 2);
+        rim.setAttribute("ry", 4 * scale);
+        rim.setAttribute("fill", "#f0f0f0");
+        rim.setAttribute("stroke", "#ddd");
+        rim.setAttribute("stroke-width", "0.5");
+        svg.appendChild(rim);
+
+        // Cup side highlight
+        const cupHL = document.createElementNS(ns, "line");
+        cupHL.setAttribute("x1", cx - cupTopW/2 + 3*scale);
+        cupHL.setAttribute("y1", containerTop + 5*scale);
+        cupHL.setAttribute("x2", cx - cupBotW/2 + 3*scale);
+        cupHL.setAttribute("y2", containerBottom - 8*scale);
+        cupHL.setAttribute("stroke", "rgba(255,255,255,0.6)");
+        cupHL.setAttribute("stroke-width", 1.5 * scale);
+        cupHL.setAttribute("stroke-linecap", "round");
+        svg.appendChild(cupHL);
+      }
+
+      // Scoops (bottom to top)
+      scoops.forEach((flavour, index) => {
+        const c = FLAVOUR_COLORS[flavour] || FLAVOUR_COLORS.vanilla;
+        const scoopY = containerTop - index * (scoopH * 0.7);
+        const scoopCY = scoopY - scoopH * 0.3;
+
+        const g = document.createElementNS(ns, "g");
+        g.setAttribute("filter", "url(#scoopShadow)");
+
+        // Bottom bulge
+        const bulge = document.createElementNS(ns, "ellipse");
+        bulge.setAttribute("cx", cx);
+        bulge.setAttribute("cy", scoopY + 2*scale);
+        bulge.setAttribute("rx", scoopW * 0.42);
+        bulge.setAttribute("ry", scoopH * 0.25);
+        bulge.setAttribute("fill", c.shadow);
+        g.appendChild(bulge);
+
+        // Main scoop body
+        const body = document.createElementNS(ns, "ellipse");
+        body.setAttribute("cx", cx);
+        body.setAttribute("cy", scoopCY);
+        body.setAttribute("rx", scoopW / 2);
+        body.setAttribute("ry", scoopH / 2);
+        body.setAttribute("fill", `url(#grad-${flavour})`);
+        g.appendChild(body);
+
+        // Specular shine
+        const shine = document.createElementNS(ns, "ellipse");
+        shine.setAttribute("cx", cx - scoopW * 0.15);
+        shine.setAttribute("cy", scoopCY - scoopH * 0.15);
+        shine.setAttribute("rx", scoopW * 0.18);
+        shine.setAttribute("ry", scoopH * 0.15);
+        shine.setAttribute("fill", c.shine);
+        shine.setAttribute("opacity", "0.5");
+        shine.setAttribute("filter", "url(#shineBlur)");
+        g.appendChild(shine);
+
+        // Mint chip details
+        if (flavour === "mint") {
+          const chipPositions = [
+            { dx: -0.2, dy: 0.05 }, { dx: 0.15, dy: -0.1 }, { dx: 0.05, dy: 0.15 }
+          ];
+          chipPositions.forEach(p => {
+            const chip = document.createElementNS(ns, "ellipse");
+            chip.setAttribute("cx", cx + scoopW * p.dx);
+            chip.setAttribute("cy", scoopCY + scoopH * p.dy);
+            chip.setAttribute("rx", 2.5 * scale);
+            chip.setAttribute("ry", 2 * scale);
+            chip.setAttribute("fill", "#4a2510");
+            chip.setAttribute("opacity", "0.7");
+            g.appendChild(chip);
+          });
+        }
+
+        svg.appendChild(g);
+
+        // Toppings on top scoop only
+        if (index === scoops.length - 1) {
+          const topY = scoopCY;
+          if (toppingsArr.includes("sprinkles")) {
+            appendSprinklesSVG(svg, cx, topY, scoopW, scale);
+          }
+          if (toppingsArr.includes("flake")) {
+            appendFlakeSVG(svg, cx, topY, scale);
+          }
+          if (toppingsArr.includes("caramel")) {
+            appendDrizzleSVG(svg, cx, topY, scoopW, "#DAA520", scale);
+          }
+          if (toppingsArr.includes("choc_sauce")) {
+            appendDrizzleSVG(svg, cx, topY - 3*scale, scoopW, "#3B1E08", scale);
+          }
+        }
+      });
+
+      return svg;
+    }
+
+    function appendSprinklesSVG(svg, cx, cy, scoopW, scale) {
+      const ns = "http://www.w3.org/2000/svg";
+      const colors = ["#ff5f7e", "#4ea6ff", "#ffe040", "#43b581", "#ff8bb0", "#7ad6ff"];
+      const positions = [
+        { dx: -0.25, dy: -0.2, r: 25 }, { dx: 0.15, dy: -0.3, r: -20 },
+        { dx: -0.1, dy: -0.1, r: 40 }, { dx: 0.25, dy: -0.15, r: -35 },
+        { dx: 0, dy: -0.35, r: 15 }, { dx: -0.2, dy: -0.3, r: -10 },
+        { dx: 0.1, dy: -0.05, r: 55 }, { dx: 0.3, dy: -0.25, r: -45 }
+      ];
+      positions.forEach((p, i) => {
+        const rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("x", cx + scoopW * p.dx - 1.5*scale);
+        rect.setAttribute("y", cy + scoopW * p.dy * 0.6 - 3*scale);
+        rect.setAttribute("width", 3 * scale);
+        rect.setAttribute("height", 6 * scale);
+        rect.setAttribute("rx", 1.5 * scale);
+        rect.setAttribute("fill", colors[i % colors.length]);
+        rect.setAttribute("transform", `rotate(${p.r} ${cx + scoopW * p.dx} ${cy + scoopW * p.dy * 0.6})`);
+        svg.appendChild(rect);
+      });
+    }
+
+    function appendFlakeSVG(svg, cx, cy, scale) {
+      const ns = "http://www.w3.org/2000/svg";
+      const g = document.createElementNS(ns, "g");
+      g.setAttribute("transform", `rotate(15 ${cx + 4*scale} ${cy - 5*scale})`);
+
+      const flake = document.createElementNS(ns, "rect");
+      flake.setAttribute("x", cx + 2*scale);
+      flake.setAttribute("y", cy - 32*scale);
+      flake.setAttribute("width", 7 * scale);
+      flake.setAttribute("height", 30 * scale);
+      flake.setAttribute("rx", 1.5 * scale);
+      flake.setAttribute("fill", "#8B6914");
+      g.appendChild(flake);
+
+      // Ridges
+      for (let i = 0; i < 5; i++) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", cx + 2.5*scale);
+        line.setAttribute("y1", cy - 28*scale + i * 6*scale);
+        line.setAttribute("x2", cx + 8.5*scale);
+        line.setAttribute("y2", cy - 28*scale + i * 6*scale);
+        line.setAttribute("stroke", "rgba(255,255,255,0.2)");
+        line.setAttribute("stroke-width", 0.5 * scale);
+        g.appendChild(line);
+      }
+
+      // Highlight edge
+      const hl = document.createElementNS(ns, "line");
+      hl.setAttribute("x1", cx + 2.5*scale);
+      hl.setAttribute("y1", cy - 31*scale);
+      hl.setAttribute("x2", cx + 2.5*scale);
+      hl.setAttribute("y2", cy - 3*scale);
+      hl.setAttribute("stroke", "rgba(255,255,255,0.15)");
+      hl.setAttribute("stroke-width", scale);
+      g.appendChild(hl);
+
+      svg.appendChild(g);
+    }
+
+    function appendDrizzleSVG(svg, cx, cy, scoopW, color, scale) {
+      const ns = "http://www.w3.org/2000/svg";
+      const hw = scoopW * 0.4;
+      const path = document.createElementNS(ns, "path");
+      path.setAttribute("d",
+        `M${cx - hw},${cy - 2*scale}
+         Q${cx - hw*0.5},${cy - 6*scale} ${cx},${cy - 3*scale}
+         Q${cx + hw*0.5},${cy} ${cx + hw},${cy - 4*scale}`);
+      path.setAttribute("stroke", color);
+      path.setAttribute("stroke-width", 2.5 * scale);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke-linecap", "round");
+      path.setAttribute("opacity", "0.8");
+      svg.appendChild(path);
+
+      // Second drizzle line
+      const path2 = document.createElementNS(ns, "path");
+      path2.setAttribute("d",
+        `M${cx - hw*0.7},${cy + 2*scale}
+         Q${cx - hw*0.2},${cy - 2*scale} ${cx + hw*0.3},${cy + 1*scale}
+         Q${cx + hw*0.6},${cy + 3*scale} ${cx + hw*0.8},${cy - 1*scale}`);
+      path2.setAttribute("stroke", color);
+      path2.setAttribute("stroke-width", 2 * scale);
+      path2.setAttribute("fill", "none");
+      path2.setAttribute("stroke-linecap", "round");
+      path2.setAttribute("opacity", "0.6");
+      svg.appendChild(path2);
+    }
+
+    // Mini scoop SVG for shelf tiles
+    function createMiniScoopSVG(flavour) {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 36 28");
+      svg.setAttribute("width", "36");
+      svg.setAttribute("height", "28");
+
+      const c = FLAVOUR_COLORS[flavour] || FLAVOUR_COLORS.vanilla;
+
+      // Shadow
+      const shadow = document.createElementNS(ns, "ellipse");
+      shadow.setAttribute("cx", "18");
+      shadow.setAttribute("cy", "20");
+      shadow.setAttribute("rx", "14");
+      shadow.setAttribute("ry", "5");
+      shadow.setAttribute("fill", c.shadow);
+      svg.appendChild(shadow);
+
+      // Body
+      const body = document.createElementNS(ns, "ellipse");
+      body.setAttribute("cx", "18");
+      body.setAttribute("cy", "14");
+      body.setAttribute("rx", "15");
+      body.setAttribute("ry", "11");
+      body.setAttribute("fill", `url(#grad-${flavour})`);
+      svg.appendChild(body);
+
+      // Shine
+      const shine = document.createElementNS(ns, "ellipse");
+      shine.setAttribute("cx", "14");
+      shine.setAttribute("cy", "10");
+      shine.setAttribute("rx", "5");
+      shine.setAttribute("ry", "4");
+      shine.setAttribute("fill", c.shine);
+      shine.setAttribute("opacity", "0.5");
+      shine.setAttribute("filter", "url(#shineBlur)");
+      svg.appendChild(shine);
+
+      // Mint chips
+      if (flavour === "mint") {
+        const chip = document.createElementNS(ns, "ellipse");
+        chip.setAttribute("cx", "22");
+        chip.setAttribute("cy", "13");
+        chip.setAttribute("rx", "2");
+        chip.setAttribute("ry", "1.5");
+        chip.setAttribute("fill", "#4a2510");
+        chip.setAttribute("opacity", "0.7");
+        svg.appendChild(chip);
+      }
+
+      return svg;
+    }
+
+    // Mini topping SVG for shelf tiles
+    function createMiniToppingSVG(topping) {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 36 28");
+      svg.setAttribute("width", "36");
+      svg.setAttribute("height", "28");
+
+      if (topping === "sprinkles") {
+        const colors = ["#ff5f7e", "#4ea6ff", "#ffe040", "#43b581", "#ff8bb0"];
+        const positions = [
+          { x: 8, y: 8, r: 25 }, { x: 18, y: 5, r: -20 }, { x: 28, y: 9, r: 40 },
+          { x: 12, y: 18, r: -30 }, { x: 24, y: 17, r: 15 }, { x: 17, y: 22, r: -45 }
+        ];
+        positions.forEach((p, i) => {
+          const rect = document.createElementNS(ns, "rect");
+          rect.setAttribute("x", p.x - 1.5);
+          rect.setAttribute("y", p.y - 3);
+          rect.setAttribute("width", "3");
+          rect.setAttribute("height", "6");
+          rect.setAttribute("rx", "1.5");
+          rect.setAttribute("fill", colors[i % colors.length]);
+          rect.setAttribute("transform", `rotate(${p.r} ${p.x} ${p.y})`);
+          svg.appendChild(rect);
+        });
+      } else if (topping === "flake") {
+        const rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("x", "14");
+        rect.setAttribute("y", "2");
+        rect.setAttribute("width", "7");
+        rect.setAttribute("height", "24");
+        rect.setAttribute("rx", "1.5");
+        rect.setAttribute("fill", "#8B6914");
+        rect.setAttribute("transform", "rotate(12 17 14)");
+        svg.appendChild(rect);
+        // Ridges
+        for (let i = 0; i < 4; i++) {
+          const line = document.createElementNS(ns, "line");
+          line.setAttribute("x1", "14.5");
+          line.setAttribute("y1", String(5 + i * 5.5));
+          line.setAttribute("x2", "20.5");
+          line.setAttribute("y2", String(5 + i * 5.5));
+          line.setAttribute("stroke", "rgba(255,255,255,0.2)");
+          line.setAttribute("stroke-width", "0.5");
+          line.setAttribute("transform", "rotate(12 17 14)");
+          svg.appendChild(line);
+        }
+      } else if (topping === "caramel") {
+        const path = document.createElementNS(ns, "path");
+        path.setAttribute("d", "M6,12 Q12,6 18,11 Q24,16 30,10");
+        path.setAttribute("stroke", "#DAA520");
+        path.setAttribute("stroke-width", "3");
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke-linecap", "round");
+        svg.appendChild(path);
+        const path2 = document.createElementNS(ns, "path");
+        path2.setAttribute("d", "M8,18 Q15,14 22,19 Q28,22 32,16");
+        path2.setAttribute("stroke", "#DAA520");
+        path2.setAttribute("stroke-width", "2.5");
+        path2.setAttribute("fill", "none");
+        path2.setAttribute("stroke-linecap", "round");
+        path2.setAttribute("opacity", "0.7");
+        svg.appendChild(path2);
+      } else if (topping === "choc_sauce") {
+        const path = document.createElementNS(ns, "path");
+        path.setAttribute("d", "M6,12 Q12,6 18,11 Q24,16 30,10");
+        path.setAttribute("stroke", "#3B1E08");
+        path.setAttribute("stroke-width", "3");
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke-linecap", "round");
+        svg.appendChild(path);
+        const path2 = document.createElementNS(ns, "path");
+        path2.setAttribute("d", "M8,18 Q15,14 22,19 Q28,22 32,16");
+        path2.setAttribute("stroke", "#3B1E08");
+        path2.setAttribute("stroke-width", "2.5");
+        path2.setAttribute("fill", "none");
+        path2.setAttribute("stroke-linecap", "round");
+        path2.setAttribute("opacity", "0.7");
+        svg.appendChild(path2);
+      }
+
+      return svg;
+    }
+
+    // Mini container SVG for shelf tiles
+    function createMiniContainerSVG(type) {
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 36 32");
+      svg.setAttribute("width", "36");
+      svg.setAttribute("height", "32");
+
+      if (type === "cone") {
+        const cone = document.createElementNS(ns, "polygon");
+        cone.setAttribute("points", "6,6 30,6 18,30");
+        cone.setAttribute("fill", "#e8a84c");
+        cone.setAttribute("stroke", "#c4863a");
+        cone.setAttribute("stroke-width", "1");
+        svg.appendChild(cone);
+        const overlay = document.createElementNS(ns, "polygon");
+        overlay.setAttribute("points", "6,6 30,6 18,30");
+        overlay.setAttribute("fill", "url(#wafflePattern)");
+        overlay.setAttribute("opacity", "0.5");
+        svg.appendChild(overlay);
+      } else {
+        const cup = document.createElementNS(ns, "path");
+        cup.setAttribute("d", "M6,8 L10,28 Q10,30 12,30 L24,30 Q26,30 26,28 L30,8 Z");
+        cup.setAttribute("fill", "#fafafa");
+        cup.setAttribute("stroke", "#ddd");
+        cup.setAttribute("stroke-width", "1");
+        svg.appendChild(cup);
+        const stripe = document.createElementNS(ns, "rect");
+        stripe.setAttribute("x", "9");
+        stripe.setAttribute("y", "16");
+        stripe.setAttribute("width", "18");
+        stripe.setAttribute("height", "3");
+        stripe.setAttribute("rx", "1.5");
+        stripe.setAttribute("fill", "var(--primary-from)");
+        stripe.setAttribute("opacity", "0.4");
+        svg.appendChild(stripe);
+        const rim = document.createElementNS(ns, "ellipse");
+        rim.setAttribute("cx", "18");
+        rim.setAttribute("cy", "8");
+        rim.setAttribute("rx", "12");
+        rim.setAttribute("ry", "3");
+        rim.setAttribute("fill", "#f0f0f0");
+        rim.setAttribute("stroke", "#ddd");
+        rim.setAttribute("stroke-width", "0.5");
+        svg.appendChild(rim);
+      }
+      return svg;
+    }
+
+    // ====================================================================
+    //  SVG CHARACTER AVATAR SYSTEM (Phase 5a)
+    // ====================================================================
+    const SKIN_TONES = ["#FFDBB4", "#EDB98A", "#C68642", "#8D5524", "#4A2912"];
+    const HAIR_COLORS = ["#2C1810", "#8B4513", "#DAA520", "#C0392B", "#5B2C6F"];
+    const SHIRT_COLORS = ["#3498DB", "#E74C3C", "#2ECC71", "#9B59B6", "#F39C12", "#1ABC9C"];
+
+    function seededRandom(seed) {
+      let s = seed;
+      return function() {
+        s = (s * 16807 + 0) % 2147483647;
+        return (s - 1) / 2147483646;
+      };
+    }
+
+    function createCharacterSVG(seed, patience) {
+      const rng = seededRandom(seed);
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "0 0 52 52");
+      svg.setAttribute("width", "52");
+      svg.setAttribute("height", "52");
+      svg.style.borderRadius = "50%";
+
+      const skinTone = SKIN_TONES[Math.floor(rng() * SKIN_TONES.length)];
+      const hairColor = HAIR_COLORS[Math.floor(rng() * HAIR_COLORS.length)];
+      const shirtColor = SHIRT_COLORS[Math.floor(rng() * SHIRT_COLORS.length)];
+      const hasGlasses = rng() > 0.7;
+      const hasHat = rng() > 0.8;
+      const hairStyle = Math.floor(rng() * 5);
+
+      // Background circle
+      const bg = document.createElementNS(ns, "circle");
+      bg.setAttribute("cx", "26");
+      bg.setAttribute("cy", "26");
+      bg.setAttribute("r", "26");
+      bg.setAttribute("fill", shirtColor);
+      bg.setAttribute("opacity", "0.2");
+      svg.appendChild(bg);
+
+      // Shirt/body
+      const body = document.createElementNS(ns, "ellipse");
+      body.setAttribute("cx", "26");
+      body.setAttribute("cy", "52");
+      body.setAttribute("rx", "22");
+      body.setAttribute("ry", "16");
+      body.setAttribute("fill", shirtColor);
+      svg.appendChild(body);
+
+      // Face
+      const face = document.createElementNS(ns, "ellipse");
+      face.setAttribute("cx", "26");
+      face.setAttribute("cy", "24");
+      face.setAttribute("rx", "14");
+      face.setAttribute("ry", "16");
+      face.setAttribute("fill", skinTone);
+      svg.appendChild(face);
+
+      // Hair
+      const hair = document.createElementNS(ns, "g");
+      if (hairStyle === 0) {
+        // Short top
+        const h = document.createElementNS(ns, "ellipse");
+        h.setAttribute("cx", "26");
+        h.setAttribute("cy", "13");
+        h.setAttribute("rx", "15");
+        h.setAttribute("ry", "8");
+        h.setAttribute("fill", hairColor);
+        hair.appendChild(h);
+      } else if (hairStyle === 1) {
+        // Side part
+        const h = document.createElementNS(ns, "path");
+        h.setAttribute("d", "M11,18 Q11,6 26,6 Q41,6 41,18 Q38,10 26,12 Q14,14 11,18 Z");
+        h.setAttribute("fill", hairColor);
+        hair.appendChild(h);
+      } else if (hairStyle === 2) {
+        // Curly/afro
+        const h = document.createElementNS(ns, "ellipse");
+        h.setAttribute("cx", "26");
+        h.setAttribute("cy", "14");
+        h.setAttribute("rx", "17");
+        h.setAttribute("ry", "12");
+        h.setAttribute("fill", hairColor);
+        hair.appendChild(h);
+      } else if (hairStyle === 3) {
+        // Long
+        const h = document.createElementNS(ns, "path");
+        h.setAttribute("d", "M11,20 Q11,5 26,5 Q41,5 41,20 L41,32 Q38,28 35,30 L35,18 Q35,10 26,10 Q17,10 17,18 L17,30 Q14,28 11,32 Z");
+        h.setAttribute("fill", hairColor);
+        hair.appendChild(h);
+      } else {
+        // Buzz cut
+        const h = document.createElementNS(ns, "ellipse");
+        h.setAttribute("cx", "26");
+        h.setAttribute("cy", "14");
+        h.setAttribute("rx", "14.5");
+        h.setAttribute("ry", "7");
+        h.setAttribute("fill", hairColor);
+        hair.appendChild(h);
+      }
+      svg.appendChild(hair);
+
+      // Hat
+      if (hasHat) {
+        const brim = document.createElementNS(ns, "ellipse");
+        brim.setAttribute("cx", "26");
+        brim.setAttribute("cy", "10");
+        brim.setAttribute("rx", "18");
+        brim.setAttribute("ry", "4");
+        brim.setAttribute("fill", hairColor);
+        brim.setAttribute("opacity", "0.8");
+        svg.appendChild(brim);
+        const top = document.createElementNS(ns, "rect");
+        top.setAttribute("x", "16");
+        top.setAttribute("y", "1");
+        top.setAttribute("width", "20");
+        top.setAttribute("height", "10");
+        top.setAttribute("rx", "4");
+        top.setAttribute("fill", hairColor);
+        top.setAttribute("opacity", "0.8");
+        svg.appendChild(top);
+      }
+
+      // Eyes
+      const eyeY = 22;
+      const leftEye = document.createElementNS(ns, "ellipse");
+      leftEye.setAttribute("cx", "20");
+      leftEye.setAttribute("cy", String(eyeY));
+      leftEye.setAttribute("rx", "2.5");
+      leftEye.setAttribute("ry", "3");
+      leftEye.setAttribute("fill", "#2c1810");
+      svg.appendChild(leftEye);
+
+      const rightEye = document.createElementNS(ns, "ellipse");
+      rightEye.setAttribute("cx", "32");
+      rightEye.setAttribute("cy", String(eyeY));
+      rightEye.setAttribute("rx", "2.5");
+      rightEye.setAttribute("ry", "3");
+      rightEye.setAttribute("fill", "#2c1810");
+      svg.appendChild(rightEye);
+
+      // Eye shine
+      [20, 32].forEach(ex => {
+        const shine = document.createElementNS(ns, "circle");
+        shine.setAttribute("cx", String(ex - 0.8));
+        shine.setAttribute("cy", String(eyeY - 1));
+        shine.setAttribute("r", "1");
+        shine.setAttribute("fill", "#fff");
+        svg.appendChild(shine);
+      });
+
+      // Glasses
+      if (hasGlasses) {
+        const glasses = document.createElementNS(ns, "g");
+        glasses.setAttribute("fill", "none");
+        glasses.setAttribute("stroke", "#333");
+        glasses.setAttribute("stroke-width", "1.2");
+        const leftLens = document.createElementNS(ns, "circle");
+        leftLens.setAttribute("cx", "20");
+        leftLens.setAttribute("cy", String(eyeY));
+        leftLens.setAttribute("r", "5");
+        glasses.appendChild(leftLens);
+        const rightLens = document.createElementNS(ns, "circle");
+        rightLens.setAttribute("cx", "32");
+        rightLens.setAttribute("cy", String(eyeY));
+        rightLens.setAttribute("r", "5");
+        glasses.appendChild(rightLens);
+        const bridge = document.createElementNS(ns, "line");
+        bridge.setAttribute("x1", "25");
+        bridge.setAttribute("y1", String(eyeY));
+        bridge.setAttribute("x2", "27");
+        bridge.setAttribute("y2", String(eyeY));
+        glasses.appendChild(bridge);
+        svg.appendChild(glasses);
+      }
+
+      // Cheek blush
+      const leftCheek = document.createElementNS(ns, "ellipse");
+      leftCheek.setAttribute("cx", "15");
+      leftCheek.setAttribute("cy", "28");
+      leftCheek.setAttribute("rx", "3.5");
+      leftCheek.setAttribute("ry", "2");
+      leftCheek.setAttribute("fill", "#ff9999");
+      leftCheek.setAttribute("opacity", "0.3");
+      svg.appendChild(leftCheek);
+
+      const rightCheek = document.createElementNS(ns, "ellipse");
+      rightCheek.setAttribute("cx", "37");
+      rightCheek.setAttribute("cy", "28");
+      rightCheek.setAttribute("rx", "3.5");
+      rightCheek.setAttribute("ry", "2");
+      rightCheek.setAttribute("fill", "#ff9999");
+      rightCheek.setAttribute("opacity", "0.3");
+      svg.appendChild(rightCheek);
+
+      // Mouth (changes with patience)
+      const mouth = document.createElementNS(ns, "path");
+      mouth.setAttribute("fill", "none");
+      mouth.setAttribute("stroke", "#2c1810");
+      mouth.setAttribute("stroke-width", "1.5");
+      mouth.setAttribute("stroke-linecap", "round");
+      if (patience === "impatient") {
+        mouth.setAttribute("d", "M20,32 Q26,28 32,32"); // frown
+      } else if (patience === "neutral") {
+        mouth.setAttribute("d", "M20,31 L32,31"); // flat
+      } else {
+        mouth.setAttribute("d", "M20,30 Q26,35 32,30"); // smile
+      }
+      svg.appendChild(mouth);
+
+      return svg;
+    }
+
+    // ====================================================================
+    //  PARTICLE SYSTEM (Phase 5b)
+    // ====================================================================
+    const particleCanvas = document.getElementById("particleCanvas");
+    const pCtx = particleCanvas.getContext("2d");
+    let particles = [];
+    let particleRAF = null;
+
+    function resizeParticleCanvas() {
+      particleCanvas.width = window.innerWidth;
+      particleCanvas.height = window.innerHeight;
+    }
+    resizeParticleCanvas();
+    window.addEventListener("resize", resizeParticleCanvas);
+
+    class Particle {
+      constructor(x, y, vx, vy, color, size, life, shape, gravity) {
+        this.x = x; this.y = y;
+        this.vx = vx; this.vy = vy;
+        this.color = color; this.size = size;
+        this.life = life; this.maxLife = life;
+        this.shape = shape || "circle";
+        this.gravity = gravity || 0;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.life--;
+        this.rotation += this.rotSpeed;
+      }
+
+      draw(ctx) {
+        const alpha = Math.max(0, this.life / this.maxLife);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = this.color;
+
+        if (this.shape === "circle") {
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (this.shape === "rect") {
+          ctx.fillRect(-this.size, -this.size / 2, this.size * 2, this.size);
+        } else if (this.shape === "star") {
+          drawStar(ctx, 0, 0, 5, this.size, this.size / 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
+      ctx.beginPath();
+      let rot = -Math.PI / 2;
+      for (let i = 0; i < spikes; i++) {
+        ctx.lineTo(cx + Math.cos(rot) * outerR, cy + Math.sin(rot) * outerR);
+        rot += Math.PI / spikes;
+        ctx.lineTo(cx + Math.cos(rot) * innerR, cy + Math.sin(rot) * innerR);
+        rot += Math.PI / spikes;
+      }
+      ctx.closePath();
+    }
+
+    function animateParticles() {
+      pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      particles = particles.filter(p => p.life > 0);
+      particles.forEach(p => {
+        p.update();
+        p.draw(pCtx);
+      });
+      if (particles.length > 0) {
+        particleRAF = requestAnimationFrame(animateParticles);
+      } else {
+        particleRAF = null;
+      }
+    }
+
+    function startParticles() {
+      if (!particleRAF) {
+        particleRAF = requestAnimationFrame(animateParticles);
+      }
+    }
+
+    function scoopPlaceEffect(x, y, color) {
+      for (let i = 0; i < 8; i++) {
+        const angle = (Math.PI * 2 * i) / 8;
+        const speed = 1.5 + Math.random() * 2;
+        particles.push(new Particle(
+          x, y,
+          Math.cos(angle) * speed, Math.sin(angle) * speed,
+          color, 3 + Math.random() * 2, 20 + Math.random() * 10, "circle", 0
+        ));
+      }
+      startParticles();
+    }
+
+    function celebratePerfect(x, y) {
+      const colors = ["#ff5f7e", "#4ea6ff", "#ffe040", "#43b581", "#ff8bb0", "#ffd966", "#7ad6ff", "#ff758c"];
+      for (let i = 0; i < 45; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 6;
+        const shape = Math.random() > 0.5 ? "rect" : "circle";
+        particles.push(new Particle(
+          x, y,
+          Math.cos(angle) * speed, Math.sin(angle) * speed - 3,
+          colors[Math.floor(Math.random() * colors.length)],
+          2 + Math.random() * 4, 40 + Math.random() * 30, shape, 0.12
+        ));
+      }
+      startParticles();
+    }
+
+    function sparkleMoney(x, y) {
+      for (let i = 0; i < 10; i++) {
+        const angle = -Math.PI/2 + (Math.random() - 0.5) * 1.2;
+        const speed = 1 + Math.random() * 2;
+        particles.push(new Particle(
+          x, y,
+          Math.cos(angle) * speed, Math.sin(angle) * speed - 1,
+          Math.random() > 0.5 ? "#ffd966" : "#f5b731",
+          2 + Math.random() * 3, 25 + Math.random() * 15, "star", -0.02
+        ));
+      }
+      startParticles();
+    }
+
+    // ====================================================================
+    //  AUDIO (Phase 5d)
+    // ====================================================================
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        audioCtx = new AC();
+      }
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      try {
+        const ctx = ensureAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
+
+        if (type === "ding") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(880, now);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.25, now + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(); osc.stop(now + 0.4);
+        } else if (type === "pickup") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.2, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(); osc.stop(now + 0.15);
+        } else if (type === "drop") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.linearRampToValueAtTime(280, now + 0.2);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.25, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(); osc.stop(now + 0.3);
+        } else if (type === "invalid") {
+          osc.type = "square";
+          osc.frequency.setValueAtTime(200, now);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.15, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.start(); osc.stop(now + 0.2);
+        }
+      } catch (e) {}
+    }
+
+    // ====================================================================
+    //  INGREDIENT SHELF & BUILDER STEPS (Phase 2)
+    // ====================================================================
+    function setBuilderEnabled(enabled) {
+      ingredientShelf.querySelectorAll(".drag-item").forEach(b => b.disabled = !enabled);
+      clearScoopsBtn.disabled = !enabled;
+      if (!enabled) submitOrderBtn.disabled = true;
+      updateBuilderSteps();
+    }
+
+    function updateBuilderSteps() {
+      const hasContainer = !!playerOrder.container;
+      const hasScoops = playerOrder.scoops.length > 0;
+      const maxScoops = playerOrder.scoops.length >= 3;
+
+      // Containers always enabled (if builder is enabled)
+      containerGrid.querySelectorAll(".drag-item").forEach(b => {
+        // containers are always usable
+      });
+
+      // Flavours: need container first
+      flavourGrid.querySelectorAll(".drag-item").forEach(b => {
+        b.disabled = !hasContainer || maxScoops;
+      });
+
+      // Toppings: need at least one scoop
+      toppingGrid.querySelectorAll(".drag-item").forEach(b => {
+        b.disabled = !hasScoops;
+      });
+
+      // Scoop count label
+      scoopCountEl.textContent = playerOrder.scoops.length + "/3";
+
+      // Drop zone state
+      if (hasContainer) {
+        builderDropZone.classList.add("has-container");
+        const hint = builderDropZone.querySelector(".drop-hint");
+        if (hint) {
+          if (!hasScoops) hint.textContent = "Add scoops!";
+          else hint.textContent = "";
+        }
+      } else {
+        builderDropZone.classList.remove("has-container");
+        const hint = builderDropZone.querySelector(".drop-hint");
+        if (hint) hint.textContent = "Drag a cone or cup here to start";
+      }
+    }
+
+    function addIngredient(type, value) {
+      if (phase !== "build" || !roundActive) return false;
+
+      if (type === "container") {
+        playerOrder.container = value;
+        playSound("drop");
+        const rect = builderDropZone.getBoundingClientRect();
+        scoopPlaceEffect(rect.left + rect.width/2, rect.top + rect.height * 0.7,
+          value === "cone" ? "#e8a84c" : "#ddd");
+      } else if (type === "flavour") {
+        if (!playerOrder.container) { playSound("invalid"); return false; }
+        if (playerOrder.scoops.length >= 3) { playSound("invalid"); return false; }
+        playerOrder.scoops.push(value);
+        playSound("drop");
+        const c = FLAVOUR_COLORS[value] || FLAVOUR_COLORS.vanilla;
+        const rect = builderDropZone.getBoundingClientRect();
+        scoopPlaceEffect(rect.left + rect.width/2, rect.top + rect.height * 0.4, c.main);
+      } else if (type === "topping") {
+        if (playerOrder.scoops.length === 0) { playSound("invalid"); return false; }
+        if (playerOrder.toppings.has(value)) {
+          playerOrder.toppings.delete(value);
+        } else {
+          playerOrder.toppings.add(value);
+          playSound("drop");
+        }
+      }
+
+      refreshSelectionStates();
+      updateBuilderSteps();
+      maybeEnableServe();
+      renderBuilderVisual();
+      renderOrderTabs();
+      return true;
+    }
+
+    // ====================================================================
+    //  SHELF RENDERING
+    // ====================================================================
+    function refreshShelfContainers() {
+      containerGrid.innerHTML = "";
+      ["cone", "cup"].forEach(val => {
+        const tile = document.createElement("div");
+        tile.className = "drag-item";
+        tile.dataset.type = "container";
+        tile.dataset.value = val;
+
+        const illust = document.createElement("div");
+        illust.className = "tile-illust";
+        illust.appendChild(createMiniContainerSVG(val));
+        tile.appendChild(illust);
+
+        const label = document.createElement("span");
+        label.className = "tile-label";
+        label.textContent = val === "cone" ? "Cone" : "Cup";
+        tile.appendChild(label);
+
+        tile.addEventListener("pointerdown", handlePointerDown);
+        containerGrid.appendChild(tile);
+      });
+    }
+
+    function refreshShelfFlavours() {
+      flavourGrid.innerHTML = "";
+      allUnlockedFlavours().forEach(f => {
+        const tile = document.createElement("div");
+        tile.className = "drag-item";
+        tile.dataset.type = "flavour";
+        tile.dataset.value = f;
+
+        const illust = document.createElement("div");
+        illust.className = "tile-illust";
+        illust.appendChild(createMiniScoopSVG(f));
+        tile.appendChild(illust);
+
+        const label = document.createElement("span");
+        label.className = "tile-label";
+        label.textContent = labelForFlavour(f);
+        tile.appendChild(label);
+
+        tile.addEventListener("pointerdown", handlePointerDown);
+        flavourGrid.appendChild(tile);
+      });
+    }
+
+    function refreshShelfToppings() {
+      toppingGrid.innerHTML = "";
+      allUnlockedToppings().forEach(t => {
+        const tile = document.createElement("div");
+        tile.className = "drag-item";
+        tile.dataset.type = "topping";
+        tile.dataset.value = t;
+
+        const illust = document.createElement("div");
+        illust.className = "tile-illust";
+        illust.appendChild(createMiniToppingSVG(t));
+        tile.appendChild(illust);
+
+        const label = document.createElement("span");
+        label.className = "tile-label";
+        label.textContent = labelForTopping(t).split(" ").pop();
+        tile.appendChild(label);
+
+        const badge = document.createElement("span");
+        badge.className = "tile-badge";
+        badge.textContent = "\u2713";
+        tile.appendChild(badge);
+
+        tile.addEventListener("pointerdown", handlePointerDown);
+        toppingGrid.appendChild(tile);
+      });
+    }
+
+    function refreshSelectionStates() {
+      // Container tiles
+      containerGrid.querySelectorAll(".drag-item").forEach(tile => {
+        tile.classList.toggle("selected", tile.dataset.value === playerOrder.container);
+      });
+
+      // Flavour tiles — no "selected" highlight since scoops stack
+      flavourGrid.querySelectorAll(".drag-item").forEach(tile => {
+        const count = playerOrder.scoops.filter(s => s === tile.dataset.value).length;
+        tile.classList.toggle("selected", count > 0);
+      });
+
+      // Topping tiles
+      toppingGrid.querySelectorAll(".drag-item").forEach(tile => {
+        tile.classList.toggle("selected", playerOrder.toppings.has(tile.dataset.value));
+      });
+    }
+
+    // ====================================================================
+    //  DRAG-AND-DROP SYSTEM (Phase 4)
+    // ====================================================================
+    const DragManager = {
+      active: false,
+      ghostEl: null,
+      sourceEl: null,
+      dragType: null,
+      dragValue: null,
+      startX: 0, startY: 0,
+      isDragging: false,
+      dragThreshold: 8,
+      pointerId: null
+    };
+
+    function handlePointerDown(e) {
+      if (e.target.closest(".drag-item")?.disabled) return;
+      const tile = e.target.closest(".drag-item");
+      if (!tile) return;
+
+      e.preventDefault();
+      tile.setPointerCapture(e.pointerId);
+
+      DragManager.active = true;
+      DragManager.isDragging = false;
+      DragManager.sourceEl = tile;
+      DragManager.dragType = tile.dataset.type;
+      DragManager.dragValue = tile.dataset.value;
+      DragManager.startX = e.clientX;
+      DragManager.startY = e.clientY;
+      DragManager.pointerId = e.pointerId;
+
+      tile.addEventListener("pointermove", handlePointerMove);
+      tile.addEventListener("pointerup", handlePointerUp);
+      tile.addEventListener("pointercancel", handlePointerUp);
+    }
+
+    function handlePointerMove(e) {
+      if (!DragManager.active) return;
+      e.preventDefault();
+
+      const dx = e.clientX - DragManager.startX;
+      const dy = e.clientY - DragManager.startY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (!DragManager.isDragging && dist > DragManager.dragThreshold) {
+        DragManager.isDragging = true;
+        document.body.style.touchAction = "none";
+        playSound("pickup");
+
+        // Create ghost
+        const ghost = document.createElement("div");
+        ghost.className = "drag-ghost";
+        const illust = DragManager.sourceEl.querySelector(".tile-illust");
+        if (illust) ghost.appendChild(illust.cloneNode(true));
+        document.body.appendChild(ghost);
+        DragManager.ghostEl = ghost;
+      }
+
+      if (DragManager.isDragging && DragManager.ghostEl) {
+        const ghost = DragManager.ghostEl;
+        ghost.style.left = (e.clientX - 36) + "px";
+        ghost.style.top = (e.clientY - 38) + "px";
+
+        // Slight tilt based on horizontal velocity
+        const tilt = Math.max(-15, Math.min(15, dx * 0.3));
+        ghost.style.transform = `rotate(${tilt}deg)`;
+
+        // Hit-test drop zone
+        ghost.style.display = "none";
+        const elBelow = document.elementFromPoint(e.clientX, e.clientY);
+        ghost.style.display = "";
+
+        const overDropZone = elBelow && (
+          elBelow.id === "builderDropZone" ||
+          elBelow.closest("#builderDropZone")
+        );
+
+        if (overDropZone) {
+          const valid = canDrop(DragManager.dragType, DragManager.dragValue);
+          builderDropZone.classList.toggle("drop-active", valid);
+          builderDropZone.classList.toggle("drop-invalid", !valid);
+          ghost.classList.toggle("over-valid", valid);
+        } else {
+          builderDropZone.classList.remove("drop-active", "drop-invalid");
+          ghost.classList.remove("over-valid");
+        }
+      }
+    }
+
+    function handlePointerUp(e) {
+      if (!DragManager.active) return;
+
+      const tile = DragManager.sourceEl;
+      tile.removeEventListener("pointermove", handlePointerMove);
+      tile.removeEventListener("pointerup", handlePointerUp);
+      tile.removeEventListener("pointercancel", handlePointerUp);
+
+      builderDropZone.classList.remove("drop-active", "drop-invalid");
+      document.body.style.touchAction = "";
+
+      if (!DragManager.isDragging) {
+        // Tap: add ingredient directly
+        addIngredient(DragManager.dragType, DragManager.dragValue);
+      } else if (DragManager.ghostEl) {
+        // Check if over drop zone
+        const ghost = DragManager.ghostEl;
+        ghost.style.display = "none";
+        const elBelow = document.elementFromPoint(e.clientX, e.clientY);
+        ghost.style.display = "";
+
+        const overDropZone = elBelow && (
+          elBelow.id === "builderDropZone" ||
+          elBelow.closest("#builderDropZone")
+        );
+
+        if (overDropZone && canDrop(DragManager.dragType, DragManager.dragValue)) {
+          // Successful drop — snap-in animation
+          ghost.style.transition = "transform 0.15s ease-out, opacity 0.15s ease-out";
+          ghost.style.transform = "scale(0.3)";
+          ghost.style.opacity = "0";
+          setTimeout(() => ghost.remove(), 160);
+          addIngredient(DragManager.dragType, DragManager.dragValue);
+        } else {
+          // Fly-back animation
+          const sourceRect = DragManager.sourceEl.getBoundingClientRect();
+          ghost.style.transition = "left 0.2s ease-out, top 0.2s ease-out, opacity 0.2s ease-out";
+          ghost.style.left = (sourceRect.left) + "px";
+          ghost.style.top = (sourceRect.top) + "px";
+          ghost.style.opacity = "0";
+          setTimeout(() => ghost.remove(), 220);
+          if (!canDrop(DragManager.dragType, DragManager.dragValue)) {
+            playSound("invalid");
+          }
+        }
+      }
+
+      DragManager.active = false;
+      DragManager.isDragging = false;
+      DragManager.ghostEl = null;
+      DragManager.sourceEl = null;
+    }
+
+    function canDrop(type, value) {
+      if (phase !== "build" || !roundActive) return false;
+      if (type === "container") return true;
+      if (type === "flavour") return !!playerOrder.container && playerOrder.scoops.length < 3;
+      if (type === "topping") return playerOrder.scoops.length > 0;
+      return false;
+    }
+
+    // ====================================================================
+    //  LABEL HELPERS
+    // ====================================================================
+    const flavourColors = {
+      vanilla: "#f0e0ac", chocolate: "#6c3c19",
+      strawberry: "#ff8bb0", mint: "#96d6b3"
+    };
+
+    function labelForFlavour(f) {
+      switch (f) {
+        case "vanilla": return "Vanilla";
+        case "chocolate": return "Chocolate";
+        case "strawberry": return "Strawberry";
+        case "mint": return "Mint Chip";
+        default: return f;
+      }
+    }
+
+    function labelForTopping(t) {
+      switch (t) {
+        case "sprinkles": return "Rainbow Sprinkles";
+        case "flake": return "Chocolate Flake";
+        case "caramel": return "Caramel Drizzle";
+        case "choc_sauce": return "Chocolate Sauce";
+        default: return t;
+      }
+    }
+
+    function primaryFlavour(order) {
+      if (!order.scoops || !order.scoops.length) return null;
+      const counts = {};
+      order.scoops.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+      return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+    }
+
+    function flavourVibe(flavour) {
+      switch (flavour) {
+        case "chocolate": return "something chocolatey";
+        case "vanilla": return "something creamy";
+        case "strawberry": return "something strawberry-ish";
+        case "mint": return "something minty";
+        default: return "something tasty";
+      }
+    }
+
+    function toppingPhrase(t) {
+      switch (t) {
+        case "sprinkles": return "some sprinkles";
+        case "flake": return "a flake";
+        case "caramel": return "caramel sauce";
+        case "choc_sauce": return "chocolate sauce";
+        default: return t;
+      }
+    }
+
+    function scoopPhrase(n) {
+      if (n === 1) return "one scoop";
+      if (n === 2) return "two scoops";
+      if (n === 3) return "three scoops";
+      return `${n} scoops`;
+    }
+
+    // ====================================================================
+    //  DIALOGUE GENERATION
+    // ====================================================================
+    function generateSingleOrderDialogue(order) {
+      const counts = {};
+      order.scoops.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+      const scoopParts = Object.entries(counts).map(([f, c]) => {
+        return `${c === 1 ? "one" : c} ${labelForFlavour(f)}`;
+      });
+
+      const toppingsText = order.toppings.length
+        ? [...order.toppings.map(toppingPhrase)]
+        : [];
+
+      let desc = `${scoopParts.join(" and ")}`;
+      desc += order.container === "cone" ? " on a cone" : " in a cup";
+
+      if (toppingsText.length) {
+        if (toppingsText.length === 1) {
+          desc += " with " + toppingsText[0];
+        } else {
+          const last = toppingsText.pop();
+          desc += " with " + toppingsText.join(", ") + " and " + last;
+        }
+      }
+      return desc;
+    }
+
+    function generateDialogue(orders, customerLabel) {
+      const lines = [];
+      const name = customerLabel || "";
+      const order = orders[0];
+      const mainFlavour = primaryFlavour(order) || "vanilla";
+      const vibe = flavourVibe(mainFlavour);
+
+      if (orders.length > 1) {
+        const countWord = orders.length === 2 ? "two" : "three";
+        if (name.includes("Sunny Tourist")) {
+          lines.push(`Hiya! I'd like ${countWord} ice creams today!`);
+        } else if (name.includes("Hurry-Up Commuter")) {
+          lines.push(`Quick, ${countWord} ice creams.`);
+        } else {
+          lines.push(`Hi! Can I get ${countWord} ice creams?`);
+        }
+
+        orders.forEach((o, i) => {
+          const ordinal = i === 0 ? "First" : i === 1 ? "Second" : "Third";
+          lines.push(`${ordinal}: ${generateSingleOrderDialogue(o)}.`);
+        });
+      } else {
+        const counts = {};
+        order.scoops.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+        const scoopParts = Object.entries(counts).map(([f, c]) => {
+          return `${c === 1 ? "one" : c} ${labelForFlavour(f)}`;
+        });
+
+        const toppingsText = order.toppings.length
+          ? [...order.toppings.map(toppingPhrase)]
+          : [];
+
+        if (name.includes("Sunny Tourist")) {
+          lines.push("Hiya! I'm in the mood for " + vibe + ".");
+          lines.push(`Maybe ${scoopPhrase(order.scoops.length)}\u2026 like ${scoopParts.join(" and ")}?`);
+        } else if (name.includes("Hurry-Up Commuter")) {
+          lines.push("Quick order please.");
+          lines.push(`${scoopPhrase(order.scoops.length)}: ${scoopParts.join(", ")}.`);
+        } else if (name.includes("Local Kid")) {
+          lines.push("Um, can I get " + scoopParts.join(" and ") + "?");
+        } else if (name.includes("Sleepy Student")) {
+          lines.push("Hey\u2026 I need " + vibe + " to wake up.");
+          lines.push(`${scoopPhrase(order.scoops.length)} of ${scoopParts.join(" and ")}.`);
+        } else {
+          lines.push("Hi! I'd like " + scoopParts.join(" and ") + ", please.");
+        }
+
+        if (order.container === "cone") {
+          lines.push("On a cone.");
+        } else {
+          lines.push("In a cup.");
+        }
+
+        if (toppingsText.length) {
+          if (toppingsText.length === 1) {
+            lines.push("Add " + toppingsText[0] + ".");
+          } else {
+            const last = toppingsText.pop();
+            lines.push("Add " + toppingsText.join(", ") + " and " + last + ".");
+          }
+        } else {
+          if (Math.random() < 0.5) {
+            lines.push("No toppings today.");
+          }
+        }
+
+        const unlocked = allUnlockedToppings();
+        const excludedOptions = unlocked.filter(t => !order.toppings.includes(t));
+        if (excludedOptions.length && Math.random() < 0.6) {
+          const noTopping = excludedOptions[Math.floor(Math.random() * excludedOptions.length)];
+          lines.push("And definitely no " + toppingPhrase(noTopping) + ".");
+        }
+      }
+
+      if (name.includes("Hurry-Up Commuter")) {
+        lines.push("Thanks, I'm in a rush.");
+      } else if (name.includes("Sunny Tourist")) {
+        lines.push("Thank you!");
+      } else if (name.includes("Local Kid")) {
+        lines.push("Thank you!");
+      } else {
+        lines.push("That's all, thanks.");
+      }
+
+      return lines.join(" ");
+    }
+
+    // ====================================================================
+    //  GAME FLOW
+    // ====================================================================
+    function resetPlayerOrder() {
+      playerOrder = { container: null, scoops: [], toppings: new Set() };
+      activeOrderIndex = 0;
+      playerOrders = [playerOrder];
+      currentOrders = [];
+      refreshSelectionStates();
+      submitOrderBtn.disabled = true;
+      renderBuilderVisual();
+      const tabsEl = document.getElementById("orderTabs");
+      if (tabsEl) { tabsEl.classList.add("hidden"); tabsEl.innerHTML = ""; }
+      updateBuilderSteps();
+    }
+
+    function allUnlockedFlavours() {
+      return Array.from(unlockedFlavours);
+    }
+    function allUnlockedToppings() {
+      return Array.from(unlockedToppings);
+    }
+
+    function randomOrder() {
+      const container = Math.random() < 0.5 ? "cone" : "cup";
+      const flavours = allUnlockedFlavours();
+      const availableToppings = allUnlockedToppings();
+
+      let minScoops, forceMixed, minToppings;
+      if (day <= 2) {
+        minScoops = 1; forceMixed = false; minToppings = 0;
+      } else if (day <= 4) {
+        minScoops = 1; forceMixed = true; minToppings = 0;
+      } else if (day <= 6) {
+        minScoops = 2; forceMixed = true; minToppings = 1;
+      } else {
+        minScoops = 2; forceMixed = true; minToppings = 1;
+      }
+
+      let totalScoops = minScoops + Math.floor(Math.random() * (4 - minScoops));
+      totalScoops = Math.min(totalScoops, 3);
+      if (day >= 7 && flavours.length >= 3) totalScoops = 3;
+
+      const scoops = [];
+      if (!forceMixed && Math.random() < 0.6) {
+        const f = flavours[Math.floor(Math.random() * flavours.length)];
+        for (let i = 0; i < totalScoops; i++) scoops.push(f);
+      } else if (forceMixed && totalScoops >= 2 && flavours.length >= 2) {
+        const shuffled = [...flavours].sort(() => Math.random() - 0.5);
+        scoops.push(shuffled[0], shuffled[1]);
+        for (let i = 2; i < totalScoops; i++) {
+          scoops.push(flavours[Math.floor(Math.random() * flavours.length)]);
+        }
+      } else {
+        for (let i = 0; i < totalScoops; i++) {
+          scoops.push(flavours[Math.floor(Math.random() * flavours.length)]);
+        }
+      }
+
+      const maxToppings = Math.min(3, availableToppings.length);
+      let count = (maxToppings === 0) ? 0 : Math.floor(Math.random() * (maxToppings + 1));
+      count = Math.max(count, Math.min(minToppings, availableToppings.length));
+      const shuffled = [...availableToppings].sort(() => Math.random() - 0.5);
+      const toppings = shuffled.slice(0, count);
+
+      return { container, scoops, toppings };
+    }
+
+    function getOrderCount() {
+      if (!hasSecondStation || day < 5) return 1;
+      const r = Math.random();
+      if (day >= 8) {
+        if (r < 0.4) return 2;
+        if (r < 0.6) return 3;
+        return 1;
+      }
+      return r < 0.4 ? 2 : 1;
+    }
+
+    function generateCustomerOrders() {
+      const count = getOrderCount();
+      const orders = [];
+      for (let i = 0; i < count; i++) {
+        orders.push(randomOrder());
+      }
+      return orders;
+    }
+
+    function describeOrder(order) {
+      const parts = [];
+      parts.push(order.container === "cone" ? "Cone" : "Cup");
+
+      const counts = {};
+      order.scoops.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+      const scoopPhrases = Object.entries(counts).map(([f, c]) => {
+        return `${c}x ${labelForFlavour(f)}`;
+      });
+
+      const scoopWord = order.scoops.length === 1 ? "1 scoop" : `${order.scoops.length} scoops`;
+      parts.push(`${scoopWord}: ${scoopPhrases.join(", ")}`);
+
+      if (order.toppings.length) {
+        parts.push("with " + order.toppings.map(labelForTopping).join(", "));
+      } else {
+        parts.push("with no toppings");
+      }
+      return parts.join(", ");
+    }
+
+    // ====================================================================
+    //  BUILDER VISUAL (SVG-based)
+    // ====================================================================
+    function renderBuilderVisual() {
+      builderVisualEl.innerHTML = "";
+
+      const container = playerOrder.container;
+      const scoops = playerOrder.scoops || [];
+      const toppingsArr = Array.from(playerOrder.toppings);
+
+      if (!container) return;
+
+      const svg = createIceCreamSVG(container, scoops, toppingsArr, 1.4);
+      svg.classList.add("scoop-drop-anim");
+      builderVisualEl.appendChild(svg);
+    }
+
+    function renderCustomerVisual() {
+      customerVisualEl.innerHTML = "";
+      if (currentOrders.length === 0) return;
+
+      currentOrders.forEach((order, i) => {
+        const scale = currentOrders.length > 1 ? 0.6 : 0.8;
+        const svg = createIceCreamSVG(order.container, order.scoops, order.toppings, scale);
+        svg.style.marginRight = "6px";
+        svg.style.display = "inline-block";
+        svg.style.verticalAlign = "bottom";
+        customerVisualEl.appendChild(svg);
+      });
+    }
+
+    function updateTopBar() {
+      dayLabel.textContent = "Day " + day;
+      moneyLabel.textContent = "$" + money;
+    }
+
+    function setTutorialMessage(msg) {
+      tutorialBanner.textContent = msg;
+    }
+
+    let currentCustomerSeed = 1;
+
+    function startDay() {
+      customersServedToday = 0;
+      endOfDayPanelEl.classList.add("hidden");
+      dayEndOverlay.classList.remove("active");
+      openShopBtn.disabled = true;
+      nextCustomerBtn.disabled = false;
+      roundActive = false;
+      phase = "idle";
+      okOrderBtn.classList.add("hidden");
+      timerBarEl.style.width = "0%";
+      timerBarEl.className = "";
+      customerOrderTextEl.classList.remove("hidden");
+      customerOrderTextEl.style.opacity = "1";
+      customerOrderTextEl.textContent = "\u201CServe first customer\u201D to start the day!";
+      customerVisualEl.innerHTML = "";
+      setBuilderEnabled(false);
+      updateTopBar();
+
+      dayTimerSeconds = Math.max(60, 100 - (day - 1) * 5);
+      dayTimeLeft = dayTimerSeconds;
+      clearInterval(dayTimerId);
+      dayTimerId = null;
+      dayEarnings = [];
+
+      showPhaseSeconds = Math.max(2, 4 - Math.floor((day - 1) / 2));
+
+      if (day === 1) {
+        inTutorial = true;
+        setTutorialMessage("Day 1: Watch the order, then click to build it.");
+      } else {
+        inTutorial = false;
+        setTutorialMessage("A new day! More customers, maybe trickier orders.");
+      }
+
+      timerEl.textContent = "Day: " + dayTimeLeft + "s";
+      timerBarEl.style.width = "100%";
+      nextCustomerBtn.textContent = "Start Day " + day;
+      updateCustomerProgress();
+
+      // Reset avatar
+      renderCharacterAvatar("happy");
+    }
+
+    function renderCharacterAvatar(patience) {
+      const avatarEl = document.getElementById("customerAvatar");
+      avatarEl.innerHTML = "";
+      avatarEl.className = "";
+      avatarEl.style.background = "none";
+      const svg = createCharacterSVG(currentCustomerSeed, patience);
+      avatarEl.appendChild(svg);
+    }
+
+    function startCustomerRound() {
+      if (phase !== "idle") return;
+
+      resetPlayerOrder();
+      resultTextEl.textContent = "Watch the order carefully\u2026";
+      roundActive = false;
+      phase = "dialogue";
+      customerOrderTextEl.classList.remove("hidden");
+      customerOrderTextEl.style.opacity = "1";
+
+      currentOrders = generateCustomerOrders();
+      currentOrder = currentOrders[0];
+      activeOrderIndex = 0;
+      playerOrders = currentOrders.map(() => ({
+        container: null, scoops: [], toppings: new Set()
+      }));
+      playerOrder = playerOrders[0];
+      currentCustomerName = randomCustomerName();
+      customerNameEl.textContent = currentCustomerName;
+
+      // New character seed for each customer
+      currentCustomerSeed = day * 100 + customersServedToday + Date.now() % 1000;
+      renderCharacterAvatar("happy");
+
+      // Typewriter effect
+      const dialogue = generateDialogue(currentOrders, currentCustomerName);
+      typewriterEffect(customerOrderTextEl, dialogue, 20, () => {
+        okOrderBtn.classList.remove("hidden");
+        okOrderBtn.disabled = false;
+      });
+
+      // Show customer visual during dialogue
+      renderCustomerVisual();
+
+      setBuilderEnabled(false);
+      playSound("ding");
+      updateCustomerProgress();
+
+      if (hasNotepad) {
+        showNotepad();
+        clearNotepad();
+      }
+
+      if (day === 1 && customersServedToday === 0) {
+        setTutorialMessage("Memorise container, flavour and toppings. They will vanish soon!");
+      }
+
+      if (customersServedToday === 0 && !dayTimerId) {
+        startDayTimer();
+      }
+
+      timerEl.textContent = "Day: " + dayTimeLeft + "s";
+      submitOrderBtn.disabled = true;
+    }
+
+    okOrderBtn.addEventListener("click", () => {
+      if (phase !== "dialogue") return;
+      okOrderBtn.disabled = true;
+      okOrderBtn.classList.add("hidden");
+
+      // Hide customer visual + dialogue
+      customerOrderTextEl.style.opacity = "0";
+      customerVisualEl.style.opacity = "0";
+      setTimeout(() => {
+        customerOrderTextEl.classList.add("hidden");
+        customerVisualEl.innerHTML = "";
+        customerVisualEl.style.opacity = "1";
+      }, 220);
+
+      if (day === 1 && customersServedToday === 0) {
+        setTutorialMessage("Now rebuild the ice cream from memory. Drag or tap ingredients!");
+      } else {
+        setTutorialMessage("Rebuild the order before the timer runs out.");
+      }
+
+      phase = "build";
+      roundActive = true;
+      setBuilderEnabled(true);
+      customerBuildStart = Date.now();
+      renderOrderTabs();
+      updateStation2Hint();
+    });
+
+    function startDayTimer() {
+      clearInterval(dayTimerId);
+      dayTimerId = setInterval(() => {
+        dayTimeLeft--;
+        timerEl.textContent = "Day: " + dayTimeLeft + "s";
+        const pct = (dayTimeLeft / dayTimerSeconds) * 100;
+        timerBarEl.style.width = pct + "%";
+        if (pct <= 15) {
+          timerBarEl.className = "danger";
+        } else if (pct <= 33) {
+          timerBarEl.className = "warning";
+        } else {
+          timerBarEl.className = "";
+        }
+
+        // Customer patience
+        if (phase === "build" && customerBuildStart) {
+          const elapsed = (Date.now() - customerBuildStart) / 1000;
+          if (elapsed > 15) {
+            renderCharacterAvatar("impatient");
+          } else if (elapsed >= 8) {
+            renderCharacterAvatar("neutral");
+          }
+        }
+
+        if (dayTimeLeft <= 0) {
+          endDayFromTimer();
+        }
+      }, 1000);
+    }
+
+    function endDayFromTimer() {
+      clearInterval(dayTimerId);
+      dayTimerId = null;
+      timerEl.textContent = "Day over!";
+      timerBarEl.style.width = "0%";
+      timerBarEl.className = "";
+
+      if (roundActive) {
+        evaluateOrder(true);
+      } else if (phase === "dialogue") {
+        phase = "idle";
+        okOrderBtn.classList.add("hidden");
+        endDaySummary();
+      } else {
+        endDaySummary();
+      }
+    }
+
+    function renderOrderTabs() {
+      const tabsEl = document.getElementById("orderTabs");
+      if (currentOrders.length <= 1) {
+        tabsEl.classList.add("hidden");
+        tabsEl.innerHTML = "";
+        return;
+      }
+      tabsEl.classList.remove("hidden");
+      tabsEl.style.display = "flex";
+      tabsEl.innerHTML = "";
+      currentOrders.forEach((_, i) => {
+        const tab = document.createElement("button");
+        tab.className = "order-tab" + (i === activeOrderIndex ? " active" : "");
+        const po = playerOrders[i];
+        let statusIcon = "\u25cb";
+        if (po.container && po.scoops.length > 0) {
+          statusIcon = "\u2713";
+        } else if (po.container || po.scoops.length > 0 || po.toppings.size > 0) {
+          statusIcon = "\u270e";
+        }
+        tab.innerHTML = `Ice Cream ${i + 1} <span class="tab-status">${statusIcon}</span>`;
+        tab.addEventListener("click", () => { switchToOrder(i); });
+        tabsEl.appendChild(tab);
+      });
+    }
+
+    function switchToOrder(index) {
+      if (index === activeOrderIndex) return;
+      playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
+      activeOrderIndex = index;
+      playerOrder = playerOrders[activeOrderIndex];
+      currentOrder = currentOrders[activeOrderIndex];
+      refreshSelectionStates();
+      updateBuilderSteps();
+      renderBuilderVisual();
+      renderOrderTabs();
+      maybeEnableServe();
+      updateStation2Preview();
+    }
+
+    function updateStation2Preview() {
+      if (!hasSecondStation || currentOrders.length <= 1) return;
+      const previewEl = document.getElementById("station2Preview");
+      if (!previewEl) return;
+      previewEl.innerHTML = "";
+      playerOrders.forEach((po, i) => {
+        if (i === activeOrderIndex) return;
+        if (!po.container && po.scoops.length === 0) return;
+        const svg = createIceCreamSVG(po.container, po.scoops, Array.from(po.toppings), 0.4);
+        svg.style.display = "inline-block";
+        previewEl.appendChild(svg);
+      });
+    }
+
+    function updateStation2Hint() {
+      if (!hasSecondStation) return;
+      const hintEl = document.getElementById("station2Hint");
+      const previewEl = document.getElementById("station2Preview");
+      if (!hintEl) return;
+
+      hintEl.innerHTML = "";
+      previewEl.innerHTML = "";
+
+      if (phase === "build" && currentOrder) {
+        const svg = createIceCreamSVG(currentOrder.container, [], [], 0.4);
+        svg.style.opacity = "0.25";
+        hintEl.appendChild(svg);
+      }
+    }
+
+    function maybeEnableServe() {
+      if (!roundActive) return;
+      playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
+      const allReady = playerOrders.every(po => po.container && po.scoops && po.scoops.length > 0);
+      submitOrderBtn.disabled = !allReady;
+    }
+
+    function randomCustomerName() {
+      const names = [
+        "Sunny Tourist", "Local Kid", "Sleepy Student", "Curious Critic",
+        "Hurry-Up Commuter", "Ice Cream Expert", "Birthday Guest"
+      ];
+      return names[Math.floor(Math.random() * names.length)];
+    }
+
+    function scoreOneOrder(trueOrder, builtOrder) {
+      let scoreParts = 0;
+      const totalParts = 3;
+      if (builtOrder.container === trueOrder.container) scoreParts++;
+      const trueScoops = trueOrder.scoops || [];
+      const playerScoops = builtOrder.scoops || [];
+      const scoopMatch =
+        trueScoops.length === playerScoops.length &&
+        [...trueScoops].sort().join("|") === [...playerScoops].sort().join("|");
+      if (scoopMatch) scoreParts++;
+      const trueToppings = new Set(trueOrder.toppings);
+      const playerToppings = builtOrder.toppings;
+      const toppingsMatch =
+        trueToppings.size === playerToppings.size &&
+        [...trueToppings].every(t => playerToppings.has(t));
+      if (toppingsMatch) scoreParts++;
+      return { scoreParts, totalParts, scoopMatch, toppingsMatch };
+    }
+
+    function evaluateOrder(timeUp = false) {
+      if (!roundActive) return;
+      roundActive = false;
+      phase = "idle";
+      submitOrderBtn.disabled = true;
+
+      // Reset avatar
+      renderCharacterAvatar("happy");
+
+      playerOrders[activeOrderIndex] = { ...playerOrder, toppings: new Set(playerOrder.toppings) };
+
+      const numOrders = currentOrders.length;
+      let totalScore = 0;
+      let totalMaxParts = 0;
+      const perOrderResults = [];
+
+      for (let i = 0; i < numOrders; i++) {
+        const result = scoreOneOrder(currentOrders[i], playerOrders[i]);
+        totalScore += result.scoreParts;
+        totalMaxParts += result.totalParts;
+        perOrderResults.push(result);
+      }
+
+      const accuracy = totalMaxParts > 0 ? totalScore / totalMaxParts : 0;
+      const baseEarnings = numOrders === 1 ? 12 : numOrders === 2 ? 20 : 28;
+      let earnings = Math.round(accuracy * baseEarnings);
+
+      let refund = 0;
+      if (totalScore === 0) {
+        refund = 8;
+        earnings -= refund;
+      }
+
+      let tip = 0;
+      if (!timeUp && totalScore === totalMaxParts && customerBuildStart) {
+        const elapsedSec = (Date.now() - customerBuildStart) / 1000;
+        const speedFactor = Math.max(0, 1 - elapsedSec / 15);
+        tip = Math.round(6 * speedFactor);
+      }
+
+      money += earnings + tip;
+      updateTopBar();
+
+      // Money animation
+      if (earnings + tip > 0) {
+        const rect = moneyLabel.getBoundingClientRect();
+        sparkleMoney(rect.left + rect.width / 2, rect.top);
+        moneyLabel.classList.add("coin-bounce");
+        setTimeout(() => moneyLabel.classList.remove("coin-bounce"), 500);
+      }
+
+      customersServedToday++;
+      updateCustomerProgress();
+
+      dayEarnings.push({
+        name: currentCustomerName,
+        earnings: earnings, tip: tip,
+        scoreParts: totalScore, totalParts: totalMaxParts
+      });
+
+      // Build short one-line result for the slim result bar
+      let text = "";
+      if (timeUp) {
+        text += "<span class='text-bad'>Time's up!</span> ";
+      }
+      if (totalScore === totalMaxParts) {
+        text += "<span class='text-good'>Perfect!</span> ";
+        const rect = builderDropZone.getBoundingClientRect();
+        celebratePerfect(rect.left + rect.width/2, rect.top + rect.height/2);
+      } else if (totalScore >= totalMaxParts * 0.66) {
+        text += "<span class='text-good'>Close!</span> ";
+      } else if (totalScore >= totalMaxParts * 0.33) {
+        text += "<span class='text-bad'>Partial.</span> ";
+      } else {
+        text += "<span class='text-bad'>Wrong.</span> ";
+        document.getElementById("gameRoot").classList.add("wrong-shake");
+        setTimeout(() => document.getElementById("gameRoot").classList.remove("wrong-shake"), 500);
+      }
+      text += `${totalScore}/${totalMaxParts}`;
+      if (refund > 0) {
+        text += ` −$${refund}`;
+      } else {
+        text += ` +$${earnings}`;
+      }
+      if (tip > 0) {
+        text += ` <span class='text-good'>+$${tip} tip</span>`;
+      }
+
+      for (let i = 0; i < numOrders; i++) {
+        const co = currentOrders[i];
+        const po = playerOrders[i];
+        const r = perOrderResults[i];
+        const label = numOrders > 1 ? `Ice Cream ${i + 1}: ` : "";
+        const correctDesc = describeOrder(co);
+        text += `<br><small style="opacity:0.8">${label}${correctDesc}</small>`;
+        const containerIcon = po.container === co.container ? "\u2713" : "\u2717";
+        const scoopsIcon = r.scoopMatch ? "\u2713" : "\u2717";
+        const toppingsIcon = r.toppingsMatch ? "\u2713" : "\u2717";
+        text += `<br><small>`;
+        text += `<span class="${po.container === co.container ? 'text-good' : 'text-bad'}">${containerIcon} Container</span> \u00b7 `;
+        text += `<span class="${r.scoopMatch ? 'text-good' : 'text-bad'}">${scoopsIcon} Scoops</span> \u00b7 `;
+        text += `<span class="${r.toppingsMatch ? 'text-good' : 'text-bad'}">${toppingsIcon} Toppings</span>`;
+        text += `</small>`;
+      }
+
+      resultTextEl.innerHTML = text;
+
+      const tabsEl = document.getElementById("orderTabs");
+      tabsEl.classList.add("hidden");
+      tabsEl.innerHTML = "";
+
+      if (dayTimeLeft <= 0) {
+        endDaySummary();
+      } else {
+        nextCustomerBtn.disabled = false;
+        nextCustomerBtn.textContent = "Next Customer";
+      }
+    }
+
+    function endDaySummary() {
+      clearInterval(dayTimerId);
+      dayTimerId = null;
+      openShopBtn.disabled = false;
+      nextCustomerBtn.disabled = true;
+      timerEl.textContent = "";
+      timerBarEl.style.width = "0%";
+      timerBarEl.className = "";
+      setTutorialMessage("Day finished!");
+
+      endOfDayPanelEl.classList.remove("hidden");
+      endOfDayPanelEl.innerHTML =
+        `<strong>Day ${day} done!</strong> ${customersServedToday} served · <strong>$${money}</strong>`;
+
+      nextCustomerBtn.textContent = "Day Over";
+
+      let breakdownHtml = "";
+      if (dayEarnings.length > 0) {
+        breakdownHtml += `<div style="text-align:left; margin-top:8px; font-size:0.85rem;">`;
+        let dayTotal = 0;
+        dayEarnings.forEach(e => {
+          const total = e.earnings + e.tip;
+          dayTotal += total;
+          const color = e.scoreParts === e.totalParts ? "var(--good)" :
+                        e.scoreParts >= 2 ? "#ff9800" : "var(--bad)";
+          const icons = [];
+          for (let i = 0; i < e.totalParts; i++) {
+            icons.push(i < e.scoreParts ? "\u2713" : "\u2717");
+          }
+          let line = `<div style="padding:3px 0; border-bottom:1px dashed rgba(0,0,0,0.08);">`;
+          line += `<span style="color:${color}; font-weight:600;">${e.name}</span>`;
+          line += ` \u2014 $${e.earnings}`;
+          if (e.tip > 0) line += ` + $${e.tip} tip`;
+          line += ` <span style="opacity:0.6">${icons.join("")}</span>`;
+          line += `</div>`;
+          breakdownHtml += line;
+        });
+        breakdownHtml += `<div style="padding:4px 0; font-weight:bold;">Total: $${dayTotal}</div>`;
+        breakdownHtml += `</div>`;
+      }
+
+      dayEndTitle.textContent = `Day ${day} Complete!`;
+      dayEndStats.innerHTML =
+        `<p>Customers served: <strong>${customersServedToday}</strong></p>` +
+        `<p>Total money: <strong>$${money}</strong></p>` +
+        breakdownHtml;
+      requestAnimationFrame(() => {
+        dayEndOverlay.classList.add("active");
+      });
+    }
+
+    // ====================================================================
+    //  SHOP / UPGRADES
+    // ====================================================================
+    function openShop() {
+      shopMoneyEl.textContent = "You have $" + money + " to spend on your shop.";
+      renderShopItems();
+      requestAnimationFrame(() => {
+        shopOverlay.classList.add("active");
+      });
+    }
+
+    function closeShopAndNextDay() {
+      shopOverlay.classList.remove("active");
+      setTimeout(() => {
+        day++;
+        startDay();
+      }, 300);
+    }
+
+    function renderShopItems() {
+      shopMoneyEl.textContent = "You have $" + money + " to spend on your shop.";
+      shopItemsEl.innerHTML = "";
+
+      const remainingFlavours = ALL_FLAVOURS.filter(f => !unlockedFlavours.has(f));
+      const remainingToppings = ALL_TOPPINGS.filter(t => !unlockedToppings.has(t));
+
+      if (!hasSecondStation) {
+        const stationRow = document.createElement("div");
+        stationRow.className = "shop-item";
+        stationRow.innerHTML = `
+          <div>
+            <strong>Extra Station</strong><br>
+            Unlocks advanced orders and provides build hints.
+          </div>
+        `;
+        const stationRight = document.createElement("div");
+        const stationCost = 60;
+        stationRight.innerHTML = `<span class="shop-cost">$${stationCost}</span>`;
+        const stationBtn = document.createElement("button");
+        stationBtn.textContent = "Buy";
+        stationBtn.disabled = money < stationCost;
+        stationBtn.addEventListener("click", () => {
+          if (money >= stationCost && !hasSecondStation) {
+            money -= stationCost;
+            hasSecondStation = true;
+            station2El.style.borderStyle = "solid";
+            document.getElementById("station2Badge").textContent = "Active";
+            station2DescEl.textContent = "Advanced orders + build hints";
+            document.getElementById("station2Content").classList.remove("hidden");
+            updateTopBar();
+            renderShopItems();
+          }
+        });
+        stationRight.appendChild(stationBtn);
+        stationRow.appendChild(stationRight);
+        shopItemsEl.appendChild(stationRow);
+      }
+
+      if (!hasNotepad) {
+        const noteRow = document.createElement("div");
+        noteRow.className = "shop-item";
+        noteRow.innerHTML = `
+          <div>
+            <strong>Notepad</strong><br>
+            Scribble notes while listening to orders.
+          </div>
+        `;
+        const noteRight = document.createElement("div");
+        const noteCost = 45;
+        noteRight.innerHTML = `<span class="shop-cost">$${noteCost}</span>`;
+        const noteBtn = document.createElement("button");
+        noteBtn.textContent = "Buy";
+        noteBtn.disabled = money < noteCost;
+        noteBtn.addEventListener("click", () => {
+          if (money >= noteCost && !hasNotepad) {
+            money -= noteCost;
+            hasNotepad = true;
+            updateTopBar();
+            renderShopItems();
+          }
+        });
+        noteRight.appendChild(noteBtn);
+        noteRow.appendChild(noteRight);
+        shopItemsEl.appendChild(noteRow);
+      }
+
+      remainingFlavours.forEach(f => {
+        const row = document.createElement("div");
+        row.className = "shop-item";
+        row.innerHTML = `
+          <div>
+            <strong>${labelForFlavour(f)}</strong><br>
+            Adds this flavour to future orders.
+          </div>
+        `;
+        const right = document.createElement("div");
+        const cost = 30;
+        right.innerHTML = `<span class="shop-cost">$${cost}</span>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Buy";
+        btn.disabled = money < cost;
+        btn.addEventListener("click", () => {
+          if (money >= cost) {
+            money -= cost;
+            unlockedFlavours.add(f);
+            updateTopBar();
+            refreshShelfFlavours();
+            renderShopItems();
+          }
+        });
+        right.appendChild(btn);
+        row.appendChild(right);
+        shopItemsEl.appendChild(row);
+      });
+
+      remainingToppings.forEach(t => {
+        const row = document.createElement("div");
+        row.className = "shop-item";
+        row.innerHTML = `
+          <div>
+            <strong>${labelForTopping(t)}</strong><br>
+            Adds this topping to future orders.
+          </div>
+        `;
+        const right = document.createElement("div");
+        const cost = 22;
+        right.innerHTML = `<span class="shop-cost">$${cost}</span>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Buy";
+        btn.disabled = money < cost;
+        btn.addEventListener("click", () => {
+          if (money >= cost) {
+            money -= cost;
+            unlockedToppings.add(t);
+            updateTopBar();
+            refreshShelfToppings();
+            renderShopItems();
+          }
+        });
+        right.appendChild(btn);
+        row.appendChild(right);
+        shopItemsEl.appendChild(row);
+      });
+
+      if (shopItemsEl.children.length === 0) {
+        shopItemsEl.innerHTML = "<em>You bought everything! Time to just enjoy the customers.</em>";
+      }
+    }
+
+    // ====================================================================
+    //  UTILITY
+    // ====================================================================
+    function typewriterEffect(element, text, speed, callback) {
+      element.textContent = "";
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else if (callback) {
+          callback();
+        }
+      }
+      type();
+    }
+
+    function updateCustomerProgress() {
+      customerProgressEl.innerHTML = "";
+      for (let i = 0; i < customersServedToday; i++) {
+        const dot = document.createElement("div");
+        dot.className = "progress-dot served";
+        customerProgressEl.appendChild(dot);
+      }
+      if (phase !== "idle" && dayTimeLeft > 0) {
+        const dot = document.createElement("div");
+        dot.className = "progress-dot current";
+        customerProgressEl.appendChild(dot);
+      }
+    }
+
+    // ====================================================================
+    //  NOTEPAD
+    // ====================================================================
+    const notepadPanel = document.getElementById("notepadPanel");
+    const notepadCanvas = document.getElementById("notepadCanvas");
+    const notepadCtx = notepadCanvas.getContext("2d");
+    let notepadColor = "#2c1810";
+    let notepadDrawing = false;
+    let notepadEraser = false;
+
+    function initNotepadCanvas() {
+      const rect = notepadCanvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      notepadCanvas.width = rect.width * dpr;
+      notepadCanvas.height = rect.height * dpr;
+      notepadCtx.scale(dpr, dpr);
+      notepadCtx.lineCap = "round";
+      notepadCtx.lineJoin = "round";
+    }
+
+    function clearNotepad() {
+      const rect = notepadCanvas.getBoundingClientRect();
+      notepadCtx.clearRect(0, 0, rect.width, rect.height);
+    }
+
+    function notepadPos(e) {
+      const rect = notepadCanvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    }
+
+    function notepadStart(e) {
+      e.preventDefault();
+      notepadDrawing = true;
+      const pos = notepadPos(e);
+      notepadCtx.beginPath();
+      notepadCtx.moveTo(pos.x, pos.y);
+    }
+    function notepadMove(e) {
+      if (!notepadDrawing) return;
+      e.preventDefault();
+      const pos = notepadPos(e);
+      notepadCtx.strokeStyle = notepadEraser ? "#fffef6" : notepadColor;
+      notepadCtx.lineWidth = notepadEraser ? 16 : 2.5;
+      notepadCtx.lineTo(pos.x, pos.y);
+      notepadCtx.stroke();
+    }
+    function notepadEnd(e) {
+      notepadDrawing = false;
+    }
+
+    notepadCanvas.addEventListener("mousedown", notepadStart);
+    notepadCanvas.addEventListener("mousemove", notepadMove);
+    notepadCanvas.addEventListener("mouseup", notepadEnd);
+    notepadCanvas.addEventListener("mouseleave", notepadEnd);
+    notepadCanvas.addEventListener("touchstart", notepadStart, { passive: false });
+    notepadCanvas.addEventListener("touchmove", notepadMove, { passive: false });
+    notepadCanvas.addEventListener("touchend", notepadEnd);
+
+    document.querySelectorAll("#notepadPanel .notepad-color-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const c = btn.dataset.color;
+        if (c === "clear") { clearNotepad(); return; }
+        document.querySelectorAll("#notepadPanel .notepad-color-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        if (c === "eraser") {
+          notepadEraser = true;
+        } else {
+          notepadEraser = false;
+          notepadColor = c;
+        }
+      });
+    });
+
+    let notepadInited = false;
+    function showNotepad() {
+      if (!hasNotepad) return;
+      notepadPanel.classList.remove("hidden");
+      if (!notepadInited) {
+        notepadInited = true;
+        requestAnimationFrame(() => initNotepadCanvas());
+      }
+    }
+
+    // ====================================================================
+    //  EVENT WIRING
+    // ====================================================================
+    submitOrderBtn.addEventListener("click", () => {
+      if (!roundActive) return;
+      evaluateOrder(false);
+    });
+
+    nextCustomerBtn.addEventListener("click", () => {
+      if (dayTimeLeft <= 0 && dayTimerId === null && customersServedToday > 0) return;
+      nextCustomerBtn.disabled = true;
+      startCustomerRound();
+    });
+
+    openShopBtn.addEventListener("click", () => { openShop(); });
+    shopCloseBtn.addEventListener("click", () => { closeShopAndNextDay(); });
+
+    dayEndContinueBtn.addEventListener("click", () => {
+      dayEndOverlay.classList.remove("active");
+      setTimeout(() => { openShop(); }, 300);
+    });
+
+    clearScoopsBtn.addEventListener("click", () => {
+      playerOrder.scoops = [];
+      refreshSelectionStates();
+      updateBuilderSteps();
+      maybeEnableServe();
+      renderBuilderVisual();
+    });
+
+    // ====================================================================
+    //  PREVENT DOUBLE-TAP ZOOM (iOS)
+    // ====================================================================
+    let lastTouchEnd = 0;
+    document.addEventListener("touchend", (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+
+    // ====================================================================
+    //  INIT
+    // ====================================================================
+    refreshShelfContainers();
+    refreshShelfFlavours();
+    refreshShelfToppings();
+    setBuilderEnabled(false);
+    startDay();
+  </script>
+</body>
+</html>
