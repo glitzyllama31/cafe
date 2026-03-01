@@ -49,21 +49,23 @@ Between days you can spend earnings on upgrades:
 
 ## Tech Stack
 
-- **HTML + JS** in `index.html` (~2570 lines) — all game logic inline
-- **CSS** in `style.css` (~1020 lines) — extracted for maintainability
+- **HTML + JS** in `index.html` (~2560 lines) — all game logic inline
+- **CSS** in `style.css` (~990 lines) — extracted for maintainability
 - **Google Fonts**: Fredoka (display) + Nunito (body)
 - **SVG** ice cream illustrations with radial gradients, filters, and waffle patterns
 - **Pointer Events** drag-and-drop system (mouse + touch, tap fallback)
 - **Canvas** particle system (confetti, scoop bursts, money sparkles) + notepad drawing
 - **Web Audio API** for sound effects (pickup, drop, invalid, ding)
+- **GitHub Actions** PR preview deployments via GitHub Pages
 - No frameworks or build tools — open `index.html` directly
 
 ## Project Structure
 
 ```
 cafe/
-  index.html    # HTML structure + all JS (~2570 lines)
-  style.css     # All CSS (~1020 lines)
-  README.md     # This file
-  CLAUDE.md     # Development guide for AI assistants
+  index.html                        # HTML structure + all JS (~2560 lines)
+  style.css                         # All CSS (~990 lines)
+  .github/workflows/pr-preview.yml  # PR preview deployment to GitHub Pages
+  README.md                         # This file
+  CLAUDE.md                         # Development guide for AI assistants
 ```
