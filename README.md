@@ -1,13 +1,13 @@
 # Cafe Creamery
 
-A browser-based memory game where customers order ice cream and you rebuild their orders from memory.
+A browser-based memory game where customers order ice cream and you rebuild their orders from memory. Features drag-and-drop building, SVG illustrations, particle effects, and randomized character avatars.
 
 ## How to Play
 
-1. **Open `index.html`** in any modern browser — no build step or server needed
+1. **Open `index.html`** in any modern browser — no build step or server needed (optimized for iPad landscape)
 2. A customer arrives and describes their ice cream order via dialogue
 3. Click **Okay** to dismiss the order — it disappears from view
-4. Rebuild the order from memory: pick the container, scoop flavors, and toppings
+4. Rebuild the order from memory: **drag** (or tap) ingredients from the right shelf onto the builder zone — container first, then scoops, then toppings
 5. Click **Serve Ice Cream** to submit. You earn money based on accuracy and speed
 
 ## Game Mechanics
@@ -20,6 +20,7 @@ Each day has a countdown timer (100 seconds on Day 1, scaling down to a minimum 
 - Base earnings scale with accuracy (up to $12 per single order)
 - Tips (up to $6) are awarded for perfect orders served quickly (within a 15-second window)
 - Completely wrong orders result in an $8 refund penalty
+- Perfect orders trigger confetti particles; bad orders shake the screen
 
 ### Difficulty Scaling
 | Day | Min Scoops | Flavors | Min Toppings |
@@ -30,7 +31,7 @@ Each day has a countdown timer (100 seconds on Day 1, scaling down to a minimum 
 | 7+  | 3 (if 3+ flavors) | Always mixed | 1 |
 
 ### Customer Patience
-During the build phase, the customer avatar visually reacts to how long you take — happy under 8 seconds, neutral at 8-15 seconds, and visibly impatient (with a shake animation) beyond 15 seconds.
+During the build phase, the SVG customer avatar changes expression — smiling under 8 seconds, neutral at 8-15 seconds, and frowning beyond 15 seconds.
 
 ### Multi-Ice-Cream Orders
 Starting at Day 5 (requires Station B upgrade), customers may order 2 or 3 ice creams. A tab system lets you switch between orders during the build phase.
@@ -48,17 +49,21 @@ Between days you can spend earnings on upgrades:
 
 ## Tech Stack
 
-- Single HTML file (`index.html`) — all CSS, HTML, and JS inline
-- No dependencies, frameworks, or build tools
-- Pure CSS ice cream illustrations and topping art
-- HTML5 Canvas for the notepad feature
-- Web Audio API for the order-arrival ding sound
+- **HTML + JS** in `index.html` (~2570 lines) — all game logic inline
+- **CSS** in `style.css` (~1020 lines) — extracted for maintainability
+- **Google Fonts**: Fredoka (display) + Nunito (body)
+- **SVG** ice cream illustrations with radial gradients, filters, and waffle patterns
+- **Pointer Events** drag-and-drop system (mouse + touch, tap fallback)
+- **Canvas** particle system (confetti, scoop bursts, money sparkles) + notepad drawing
+- **Web Audio API** for sound effects (pickup, drop, invalid, ding)
+- No frameworks or build tools — open `index.html` directly
 
 ## Project Structure
 
 ```
 cafe/
-  index.html    # The entire game (~2300 lines)
+  index.html    # HTML structure + all JS (~2570 lines)
+  style.css     # All CSS (~1020 lines)
   README.md     # This file
   CLAUDE.md     # Development guide for AI assistants
 ```
